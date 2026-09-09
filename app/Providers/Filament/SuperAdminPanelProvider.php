@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use Filament\Actions\Action;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -18,14 +19,19 @@ use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Jeffgreco13\FilamentBreezy\BreezyCore;
+use Jeffgreco13\FilamentBreezy\Pages\MyProfilePage;
 
 class SuperAdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->id('super Admin')
-            ->path('super Admin')
+            ->default()
+            ->id('super-admin')
+            ->path('super-admin')
+            ->authGuard('filament')
+            ->login()
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -52,6 +58,22 @@ class SuperAdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+            ])
+            ->userMenuItems([
+                'profile' => fn (Action $action) => $action
+                    ->label('My Profile')
+                    ->url(fn (): string => MyProfilePage::getUrl())
+                    ->icon('heroicon-o-user'),
+            ])
+            ->plugins([
+                BreezyCore::make()
+                    ->myProfile(
+                        shouldRegisterUserMenu: true,
+                        shouldRegisterNavigation: true,
+                        hasAvatars: true,
+                        slug: 'my-profile'
+                    )
+                    ->enableTwoFactorAuthentication(),
             ]);
     }
 }
