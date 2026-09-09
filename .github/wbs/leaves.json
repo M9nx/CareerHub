@@ -1,0 +1,1832 @@
+[
+  {
+    "phase": "P0",
+    "role": "M9nx",
+    "title": "Architecture, governance and SuperAdmin panel isolation",
+    "task": "Publish master/phase hierarchy, fix SuperAdmin panel, deprecate /admin, document ADRs and CONTRIBUTING.",
+    "learn": "Filament panel isolation; Laravel guards; GitHub issue hierarchy; protected main workflow",
+    "deps": "-",
+    "branch_slug": "foundation-governance",
+    "files": [
+      {
+        "file": "app/Providers/Filament/SuperAdminPanelProvider.php",
+        "action": "Modify",
+        "what": "Panel id `super-admin`, path `/super-admin`, login, guard `filament`, Breezy profile.",
+        "example": "`->id('super-admin')->path('super-admin')->login()->authGuard('filament')`"
+      },
+      {
+        "file": "bootstrap/providers.php",
+        "action": "Modify",
+        "what": "Register SuperAdmin only; remove or comment AdminPanelProvider.",
+        "example": "Only SuperAdmin + AppServiceProvider for Filament admin surface."
+      },
+      {
+        "file": "docs/adr/0001-panel-isolation.md",
+        "action": "Create",
+        "what": "ADR: SuperAdmin uses Filament; Employer/Employee use Breeze only.",
+        "example": "Document guard and path separation."
+      },
+      {
+        "file": "CONTRIBUTING.md",
+        "action": "Create",
+        "what": "Branch naming `feat/#ISSUE-slug`, Conventional Commits, PR must `Closes #issue`.",
+        "example": "Match Cafeteria workflow adapted for Laravel."
+      },
+      {
+        "file": ".github/pull_request_template.md",
+        "action": "Create",
+        "what": "PR template with WBS ID, hours, tests, reviewers checklist.",
+        "example": "Contains `Closes #ISSUE` and WBS ID field."
+      },
+      {
+        "file": "tests/Feature/Panel/SuperAdminPanelAccessTest.php",
+        "action": "Create",
+        "what": "Only SuperAdmin can access /super-admin login page.",
+        "example": "Employer/Employee receive 403 on Filament panel."
+      }
+    ]
+  },
+  {
+    "phase": "P0",
+    "role": "Mariam",
+    "title": "User role schema and panel access contract",
+    "task": "Add UserRole enum, users.role/is_active/is_blocked_from_posts migration, update User model casts and canAccessPanel().",
+    "learn": "PHP 8.5 enums; Eloquent casts; FilamentUser contract",
+    "deps": "P0-M9nx",
+    "branch_slug": "user-role-schema",
+    "files": [
+      {
+        "file": "app/Enums/UserRole.php",
+        "action": "Create",
+        "what": "Cases: SuperAdmin, Employer, Employee.",
+        "example": "Backed string enum."
+      },
+      {
+        "file": "database/migrations/2026_09_10_000001_add_role_and_status_to_users_table.php",
+        "action": "Create",
+        "what": "Add role, is_active, is_blocked_from_posts to users.",
+        "example": "role string indexed; is_active default true."
+      },
+      {
+        "file": "app/Models/User.php",
+        "action": "Modify",
+        "what": "Cast role enum; implement canAccessPanel() for super-admin panel only.",
+        "example": "SuperAdmin -> super-admin panel; others false for Filament."
+      },
+      {
+        "file": "database/factories/UserFactory.php",
+        "action": "Modify",
+        "what": "States: superAdmin(), employer(), employee().",
+        "example": "Factory states for each role."
+      },
+      {
+        "file": "tests/Feature/Models/UserRoleCastTest.php",
+        "action": "Create",
+        "what": "Assert role enum cast and is_active defaults.",
+        "example": "Factory employer() persists Employer role."
+      }
+    ]
+  },
+  {
+    "phase": "P0",
+    "role": "Omar",
+    "title": "Employer Breeze route shell",
+    "task": "Create routes/employer.php, EnsureEmployer middleware, placeholder dashboard controller and view.",
+    "learn": "Route groups; middleware aliases; Breeze layouts",
+    "deps": "P0-Mariam",
+    "branch_slug": "employer-route-shell",
+    "files": [
+      {
+        "file": "app/Http/Middleware/EnsureEmployer.php",
+        "action": "Create",
+        "what": "Abort 403 unless authenticated user role is Employer.",
+        "example": "Redirect guests to login."
+      },
+      {
+        "file": "routes/employer.php",
+        "action": "Create",
+        "what": "Prefix employer routes with auth + employer middleware.",
+        "example": "GET /employer/dashboard -> Employer\\DashboardController"
+      },
+      {
+        "file": "app/Http/Controllers/Employer/DashboardController.php",
+        "action": "Create",
+        "what": "Return employer dashboard blade.",
+        "example": "Returns view('employer.dashboard')."
+      },
+      {
+        "file": "resources/views/employer/dashboard.blade.php",
+        "action": "Create",
+        "what": "Placeholder dashboard using app layout.",
+        "example": "Shows welcome message for employer."
+      },
+      {
+        "file": "bootstrap/app.php",
+        "action": "Modify",
+        "what": "Register employer route file and middleware alias `employer`.",
+        "example": "Middleware alias in withMiddleware callback."
+      },
+      {
+        "file": "tests/Feature/Employer/EmployerDashboardTest.php",
+        "action": "Create",
+        "what": "Employer can access dashboard; guest redirected.",
+        "example": "actingAs employer -> 200."
+      }
+    ]
+  },
+  {
+    "phase": "P0",
+    "role": "Eldeep",
+    "title": "Employee Breeze route shell",
+    "task": "Create routes/employee.php, EnsureEmployee middleware, placeholder dashboard.",
+    "learn": "Same as employer shell but Employee role.",
+    "deps": "P0-Mariam",
+    "branch_slug": "employee-route-shell",
+    "files": [
+      {
+        "file": "app/Http/Middleware/EnsureEmployee.php",
+        "action": "Create",
+        "what": "Abort 403 unless role is Employee.",
+        "example": "Redirect guests to login."
+      },
+      {
+        "file": "routes/employee.php",
+        "action": "Create",
+        "what": "Employee dashboard route group.",
+        "example": "GET /employee/dashboard"
+      },
+      {
+        "file": "app/Http/Controllers/Employee/DashboardController.php",
+        "action": "Create",
+        "what": "Employee dashboard controller.",
+        "example": "Returns view('employee.dashboard')."
+      },
+      {
+        "file": "resources/views/employee/dashboard.blade.php",
+        "action": "Create",
+        "what": "Placeholder employee dashboard.",
+        "example": "Uses layouts.app."
+      },
+      {
+        "file": "bootstrap/app.php",
+        "action": "Modify",
+        "what": "Register employee routes and middleware alias `employee`.",
+        "example": "Alias registered alongside employer."
+      },
+      {
+        "file": "tests/Feature/Employee/EmployeeDashboardTest.php",
+        "action": "Create",
+        "what": "Employee can access dashboard; guest redirected.",
+        "example": "actingAs employee -> 200."
+      }
+    ]
+  },
+  {
+    "phase": "P0",
+    "role": "Basha",
+    "title": "Shared persona navigation components",
+    "task": "Create Blade components for employer/employee nav links and role-aware dashboard redirect after login.",
+    "learn": "Blade components; route() helper; auth redirects",
+    "deps": "P0-Omar, P0-Eldeep",
+    "branch_slug": "persona-navigation",
+    "files": [
+      {
+        "file": "resources/views/components/employer-nav.blade.php",
+        "action": "Create",
+        "what": "Nav partial for employer area.",
+        "example": "Links: dashboard, jobs, applications, posts, profile."
+      },
+      {
+        "file": "resources/views/components/employee-nav.blade.php",
+        "action": "Create",
+        "what": "Nav partial for employee area.",
+        "example": "Links: dashboard, jobs, applications, posts, profile."
+      },
+      {
+        "file": "app/Http/Controllers/Auth/AuthenticatedSessionController.php",
+        "action": "Modify",
+        "what": "Redirect by role after login.",
+        "example": "Employer -> employer.dashboard; Employee -> employee.dashboard."
+      },
+      {
+        "file": "resources/views/layouts/navigation.blade.php",
+        "action": "Modify",
+        "what": "Include persona nav when authenticated.",
+        "example": "x-employer-nav or x-employee-nav by role."
+      },
+      {
+        "file": "tests/Feature/Auth/LoginRedirectTest.php",
+        "action": "Create",
+        "what": "Login redirects to correct persona dashboard.",
+        "example": "Role-based redirect assertions."
+      }
+    ]
+  },
+  {
+    "phase": "P0",
+    "role": "Youmna",
+    "title": "Foundation feature tests",
+    "task": "Pest tests for middleware, panel access, and cross-persona isolation.",
+    "learn": "Pest HTTP tests; actingAs; role factories",
+    "deps": "P0-M9nx, P0-Mariam, P0-Omar, P0-Eldeep",
+    "branch_slug": "foundation-tests",
+    "files": [
+      {
+        "file": "tests/Feature/Middleware/RoleMiddlewareTest.php",
+        "action": "Create",
+        "what": "Employer cannot access /employee/* and vice versa.",
+        "example": "403 cross-role access."
+      },
+      {
+        "file": "tests/Feature/Panel/SuperAdminPanelAccessTest.php",
+        "action": "Create",
+        "what": "Only SuperAdmin can access /super-admin.",
+        "example": "Employer/Employee receive 403 on Filament login."
+      },
+      {
+        "file": "tests/Feature/Auth/LoginRedirectTest.php",
+        "action": "Create",
+        "what": "Login redirects to correct persona dashboard.",
+        "example": "Role-based redirect assertions."
+      },
+      {
+        "file": "tests/Pest.php",
+        "action": "Modify",
+        "what": "Add helper actingAsEmployer()/actingAsEmployee() if missing.",
+        "example": "Shared test helpers for persona auth."
+      }
+    ]
+  },
+  {
+    "phase": "P1",
+    "role": "M9nx",
+    "title": "Open registration with role picker",
+    "task": "Extend Breeze registration to accept Employer|Employee role; validate and persist role on User.",
+    "learn": "Breeze auth scaffolding; FormRequest validation; mass assignment",
+    "deps": "P0-Mariam",
+    "branch_slug": "auth-registration-role",
+    "files": [
+      {
+        "file": "app/Http/Controllers/Auth/RegisteredUserController.php",
+        "action": "Modify",
+        "what": "Accept role field; create user with Employer or Employee role.",
+        "example": "Reject SuperAdmin via registration."
+      },
+      {
+        "file": "app/Http/Requests/Auth/RegisterRequest.php",
+        "action": "Create",
+        "what": "Validate name, email, password, role in [Employer, Employee].",
+        "example": "role required|string|in:Employer,Employee"
+      },
+      {
+        "file": "resources/views/auth/register.blade.php",
+        "action": "Modify",
+        "what": "Add role radio/select for Employer and Employee.",
+        "example": "Two visible role options."
+      },
+      {
+        "file": "routes/auth.php",
+        "action": "Modify",
+        "what": "Wire RegisterRequest if using dedicated form request.",
+        "example": "POST /register uses validation."
+      },
+      {
+        "file": "tests/Feature/Auth/RegistrationRoleTest.php",
+        "action": "Create",
+        "what": "Employer and Employee registration sets correct role.",
+        "example": "Database has role enum value."
+      }
+    ]
+  },
+  {
+    "phase": "P1",
+    "role": "Mariam",
+    "title": "SuperAdmin auth gate and UserPolicy bootstrap",
+    "task": "Create UserPolicy skeleton; register SuperAdmin gate bypass in AppServiceProvider.",
+    "learn": "Laravel policies; Gate::before; Filament authorization",
+    "deps": "P0-Mariam",
+    "branch_slug": "user-policy-bootstrap",
+    "files": [
+      {
+        "file": "app/Policies/UserPolicy.php",
+        "action": "Create",
+        "what": "SuperAdmin may manage users; others denied.",
+        "example": "viewAny/update only SuperAdmin."
+      },
+      {
+        "file": "app/Providers/AppServiceProvider.php",
+        "action": "Modify",
+        "what": "Gate::before SuperAdmin bypass; register UserPolicy.",
+        "example": "return true for SuperAdmin."
+      },
+      {
+        "file": "app/Models/User.php",
+        "action": "Modify",
+        "what": "Add isActive()/isBlockedFromPosts() helpers.",
+        "example": "Boolean accessors for flags."
+      },
+      {
+        "file": "tests/Feature/Policies/UserPolicyTest.php",
+        "action": "Create",
+        "what": "Employer cannot update another user.",
+        "example": "403 or false from policy."
+      }
+    ]
+  },
+  {
+    "phase": "P1",
+    "role": "Omar",
+    "title": "Job postings schema slice",
+    "task": "Create job_postings migration, JobPostingStatus enum, JobPosting model and factory.",
+    "learn": "Migrations; enums; Eloquent relationships",
+    "deps": "P0-Mariam",
+    "branch_slug": "job-postings-schema",
+    "files": [
+      {
+        "file": "database/migrations/2026_09_10_000004_create_job_postings_table.php",
+        "action": "Create",
+        "what": "Columns: employer_id FK, title, description, status, is_active, published_at.",
+        "example": "Table name job_postings not jobs."
+      },
+      {
+        "file": "app/Enums/JobPostingStatus.php",
+        "action": "Create",
+        "what": "Cases: Draft, Published, Closed, Archived.",
+        "example": "Backed string enum."
+      },
+      {
+        "file": "app/Models/JobPosting.php",
+        "action": "Create",
+        "what": "belongsTo User as employer; casts status enum.",
+        "example": "fillable + casts defined."
+      },
+      {
+        "file": "database/factories/JobPostingFactory.php",
+        "action": "Create",
+        "what": "published() and draft() states.",
+        "example": "Factory creates valid employer_id."
+      },
+      {
+        "file": "tests/Feature/JobPosting/JobPostingModelTest.php",
+        "action": "Create",
+        "what": "Factory persists job posting with status cast.",
+        "example": "assertDatabaseHas job_postings."
+      }
+    ]
+  },
+  {
+    "phase": "P1",
+    "role": "Eldeep",
+    "title": "Applications schema slice",
+    "task": "Create applications migration, ApplicationStatus enum, Application model and factory.",
+    "learn": "State machines; foreign keys; soft status columns",
+    "deps": "P1-Omar",
+    "branch_slug": "applications-schema",
+    "files": [
+      {
+        "file": "database/migrations/2026_09_10_000005_create_applications_table.php",
+        "action": "Create",
+        "what": "Columns: job_posting_id, employee_id, status, is_active, cover_letter, cancelled_at.",
+        "example": "Unique employee+job_posting."
+      },
+      {
+        "file": "app/Enums/ApplicationStatus.php",
+        "action": "Create",
+        "what": "Cases: Submitted, UnderReview, Accepted, Rejected, Cancelled.",
+        "example": "Cancelled is terminal cancel status."
+      },
+      {
+        "file": "app/Models/Application.php",
+        "action": "Create",
+        "what": "belongsTo JobPosting and User (employee).",
+        "example": "casts status enum; cancelled_at datetime."
+      },
+      {
+        "file": "database/factories/ApplicationFactory.php",
+        "action": "Create",
+        "what": "submitted() state default.",
+        "example": "Links existing job_posting and employee."
+      },
+      {
+        "file": "tests/Feature/Application/ApplicationModelTest.php",
+        "action": "Create",
+        "what": "Application factory persists with Submitted status.",
+        "example": "assertDatabaseHas applications."
+      }
+    ]
+  },
+  {
+    "phase": "P1",
+    "role": "Basha",
+    "title": "Posts schema slice",
+    "task": "Create posts migration, PostStatus enum, Post model and factory.",
+    "learn": "Author polymorphism via author_id; shared feed prep",
+    "deps": "P0-Mariam",
+    "branch_slug": "posts-schema",
+    "files": [
+      {
+        "file": "database/migrations/2026_09_10_000006_create_posts_table.php",
+        "action": "Create",
+        "what": "Columns: author_id, author_role, title, body, status, is_active.",
+        "example": "author_role mirrors UserRole."
+      },
+      {
+        "file": "app/Enums/PostStatus.php",
+        "action": "Create",
+        "what": "Cases: Draft, Published, Hidden, Archived.",
+        "example": "Backed string enum."
+      },
+      {
+        "file": "app/Models/Post.php",
+        "action": "Create",
+        "what": "belongsTo User as author.",
+        "example": "casts status and author_role."
+      },
+      {
+        "file": "database/factories/PostFactory.php",
+        "action": "Create",
+        "what": "published() state.",
+        "example": "Creates author employer or employee."
+      },
+      {
+        "file": "tests/Feature/Post/PostModelTest.php",
+        "action": "Create",
+        "what": "Post factory persists published post.",
+        "example": "assertDatabaseHas posts."
+      }
+    ]
+  },
+  {
+    "phase": "P1",
+    "role": "Youmna",
+    "title": "Profiles schema slice",
+    "task": "Create employer_profiles and employee_profiles migrations, models, factories.",
+    "learn": "One-to-one user relations; local path columns",
+    "deps": "P0-Mariam",
+    "branch_slug": "profiles-schema",
+    "files": [
+      {
+        "file": "database/migrations/2026_09_10_000002_create_employer_profiles_table.php",
+        "action": "Create",
+        "what": "user_id unique FK, company_name.",
+        "example": "Cascade on user delete."
+      },
+      {
+        "file": "database/migrations/2026_09_10_000003_create_employee_profiles_table.php",
+        "action": "Create",
+        "what": "user_id unique FK, cv_path, application_image_path nullable.",
+        "example": "Paths stored as strings."
+      },
+      {
+        "file": "app/Models/EmployerProfile.php",
+        "action": "Create",
+        "what": "belongsTo User.",
+        "example": "fillable company_name."
+      },
+      {
+        "file": "app/Models/EmployeeProfile.php",
+        "action": "Create",
+        "what": "belongsTo User.",
+        "example": "fillable cv_path, application_image_path."
+      },
+      {
+        "file": "database/factories/EmployerProfileFactory.php",
+        "action": "Create",
+        "what": "Creates profile for employer user.",
+        "example": "company_name faker."
+      },
+      {
+        "file": "database/factories/EmployeeProfileFactory.php",
+        "action": "Create",
+        "what": "Creates profile for employee user.",
+        "example": "nullable paths."
+      },
+      {
+        "file": "tests/Feature/Profile/ProfileModelTest.php",
+        "action": "Create",
+        "what": "User hasOne profile by role.",
+        "example": "Employer has employerProfile relation."
+      }
+    ]
+  },
+  {
+    "phase": "P2",
+    "role": "M9nx",
+    "title": "CRM activity log and ApplicationNote schema",
+    "task": "Create activity_logs and application_notes tables, models, ActivityLogger service, Filament ActivityLogResource.",
+    "learn": "Audit trails; service classes; Filament resources",
+    "deps": "P1-M9nx",
+    "branch_slug": "crm-activity-log",
+    "files": [
+      {
+        "file": "database/migrations/2026_09_10_000007_create_activity_logs_table.php",
+        "action": "Create",
+        "what": "Columns: log_name, description, subject_id, causer_id, properties json.",
+        "example": "Indexed causer_id."
+      },
+      {
+        "file": "database/migrations/2026_09_10_000008_create_application_notes_table.php",
+        "action": "Create",
+        "what": "application_id, author_id, body.",
+        "example": "FK to applications and users."
+      },
+      {
+        "file": "app/Models/ActivityLog.php",
+        "action": "Create",
+        "what": "Morph or belongsTo subject/causer.",
+        "example": "Read-only model for CRM."
+      },
+      {
+        "file": "app/Models/ApplicationNote.php",
+        "action": "Create",
+        "what": "belongsTo Application and User author.",
+        "example": "fillable body."
+      },
+      {
+        "file": "app/Services/ActivityLogger.php",
+        "action": "Create",
+        "what": "log(string $name, Model $subject, ?User $causer, array $props).",
+        "example": "Persists ActivityLog row."
+      },
+      {
+        "file": "app/Filament/SuperAdmin/Resources/ActivityLogResource.php",
+        "action": "Create",
+        "what": "Read-only list/view for SuperAdmin.",
+        "example": "No create; view description + causer."
+      },
+      {
+        "file": "tests/Feature/Crm/ActivityLogTest.php",
+        "action": "Create",
+        "what": "ActivityLogger writes log entry.",
+        "example": "SuperAdmin can view in Filament."
+      }
+    ]
+  },
+  {
+    "phase": "P2",
+    "role": "Mariam",
+    "title": "SuperAdmin UserResource full CRUD",
+    "task": "Filament UserResource with activate, deactivate, change role actions.",
+    "learn": "Filament v5 resources; table actions; form components",
+    "deps": "P1-Mariam",
+    "branch_slug": "superadmin-user-resource",
+    "files": [
+      {
+        "file": "app/Filament/SuperAdmin/Resources/UserResource.php",
+        "action": "Create",
+        "what": "List, create, edit users; role select; is_active toggle.",
+        "example": "SuperAdmin only via panel."
+      },
+      {
+        "file": "app/Filament/SuperAdmin/Resources/UserResource/Pages/ListUsers.php",
+        "action": "Create",
+        "what": "List page.",
+        "example": "Standard Filament list."
+      },
+      {
+        "file": "app/Filament/SuperAdmin/Resources/UserResource/Pages/CreateUser.php",
+        "action": "Create",
+        "what": "Create page.",
+        "example": "Role SuperAdmin|Employer|Employee."
+      },
+      {
+        "file": "app/Filament/SuperAdmin/Resources/UserResource/Pages/EditUser.php",
+        "action": "Create",
+        "what": "Edit page with deactivate action.",
+        "example": "Table action toggles is_active."
+      },
+      {
+        "file": "app/Policies/UserPolicy.php",
+        "action": "Modify",
+        "what": "Align with Filament authorization.",
+        "example": "SuperAdmin full access."
+      },
+      {
+        "file": "tests/Feature/SuperAdmin/UserManagementTest.php",
+        "action": "Create",
+        "what": "SuperAdmin lists and updates user role.",
+        "example": "Livewire/Filament panel test."
+      }
+    ]
+  },
+  {
+    "phase": "P2",
+    "role": "Omar",
+    "title": "JobPostingPolicy and SuperAdmin JobPostingResource read",
+    "task": "Authorize job postings; SuperAdmin can view all job_postings in Filament.",
+    "learn": "Policy methods; Filament resource authorization",
+    "deps": "P1-Omar",
+    "branch_slug": "job-posting-policy-sa",
+    "files": [
+      {
+        "file": "app/Policies/JobPostingPolicy.php",
+        "action": "Create",
+        "what": "Employer owns CRUD on own postings; employee view published; SuperAdmin viewAny.",
+        "example": "view/update/delete checks employer_id."
+      },
+      {
+        "file": "app/Filament/SuperAdmin/Resources/JobPostingResource.php",
+        "action": "Create",
+        "what": "Read-only list/view for SuperAdmin.",
+        "example": "Shows title, employer, status."
+      },
+      {
+        "file": "app/Models/JobPosting.php",
+        "action": "Modify",
+        "what": "Add scope published().",
+        "example": "where status Published and is_active."
+      },
+      {
+        "file": "tests/Feature/JobPosting/JobPostingPolicyTest.php",
+        "action": "Create",
+        "what": "Employer cannot update another employer's posting.",
+        "example": "Policy returns false."
+      }
+    ]
+  },
+  {
+    "phase": "P2",
+    "role": "Eldeep",
+    "title": "ApplicationPolicy bootstrap",
+    "task": "ApplicationPolicy with employee submit/cancel and employer review rules.",
+    "learn": "Authorization matrix; Cancelled terminal status",
+    "deps": "P1-Eldeep",
+    "branch_slug": "application-policy-bootstrap",
+    "files": [
+      {
+        "file": "app/Policies/ApplicationPolicy.php",
+        "action": "Create",
+        "what": "Employee create/cancel own; employer update status on own jobs.",
+        "example": "cancel only if not Accepted/Rejected."
+      },
+      {
+        "file": "app/Models/Application.php",
+        "action": "Modify",
+        "what": "Add isCancelled() helper.",
+        "example": "status === Cancelled."
+      },
+      {
+        "file": "app/Providers/AppServiceProvider.php",
+        "action": "Modify",
+        "what": "Register ApplicationPolicy.",
+        "example": "Gate policy mapping."
+      },
+      {
+        "file": "tests/Feature/Application/ApplicationPolicyTest.php",
+        "action": "Create",
+        "what": "Employee cannot review applications.",
+        "example": "Employer can view applications for own job."
+      }
+    ]
+  },
+  {
+    "phase": "P2",
+    "role": "Basha",
+    "title": "PostPolicy and block-from-posts flag",
+    "task": "PostPolicy; enforce users.is_blocked_from_posts on create.",
+    "learn": "Policy checks; user flag integration",
+    "deps": "P1-Basha",
+    "branch_slug": "post-policy-block-flag",
+    "files": [
+      {
+        "file": "app/Policies/PostPolicy.php",
+        "action": "Create",
+        "what": "Author CRUD own posts; blocked users cannot create.",
+        "example": "Check is_blocked_from_posts."
+      },
+      {
+        "file": "app/Models/Post.php",
+        "action": "Modify",
+        "what": "scope published() for feed.",
+        "example": "status Published, is_active true."
+      },
+      {
+        "file": "app/Models/User.php",
+        "action": "Modify",
+        "what": "hasMany posts relation.",
+        "example": "posts() hasMany Post::class, author_id"
+      },
+      {
+        "file": "tests/Feature/Post/PostPolicyTest.php",
+        "action": "Create",
+        "what": "Blocked user cannot create post.",
+        "example": "Policy create returns false."
+      }
+    ]
+  },
+  {
+    "phase": "P2",
+    "role": "Youmna",
+    "title": "Local storage service and filesystem config",
+    "task": "Configure public disk; LocalDocumentStorage service for CV and images.",
+    "learn": "Storage facade; local disk; symlink public/storage",
+    "deps": "P1-Youmna",
+    "branch_slug": "local-storage-service",
+    "files": [
+      {
+        "file": "config/filesystems.php",
+        "action": "Modify",
+        "what": "Ensure public disk root storage/app/public.",
+        "example": "URL via APP_URL/storage."
+      },
+      {
+        "file": "app/Services/LocalDocumentStorage.php",
+        "action": "Create",
+        "what": "store(UploadedFile $file, string $directory): string returns path.",
+        "example": "Uses Storage::disk('public')."
+      },
+      {
+        "file": "app/Providers/AppServiceProvider.php",
+        "action": "Modify",
+        "what": "Bind LocalDocumentStorage singleton.",
+        "example": "app()->singleton(...)."
+      },
+      {
+        "file": "tests/Feature/Profile/LocalDocumentStorageTest.php",
+        "action": "Create",
+        "what": "Service stores file on public disk.",
+        "example": "Storage::fake('public') assertion."
+      }
+    ]
+  },
+  {
+    "phase": "P3",
+    "role": "M9nx",
+    "title": "Activity logging for job posting lifecycle",
+    "task": "Log create/publish/close events via ActivityLogger on employer job actions.",
+    "learn": "Model events or controller hooks; CRM integration",
+    "deps": "P2-M9nx, P3-Omar",
+    "branch_slug": "crm-job-posting-events",
+    "files": [
+      {
+        "file": "app/Observers/JobPostingObserver.php",
+        "action": "Create",
+        "what": "Log created/updated status changes.",
+        "example": "ActivityLogger::log('job_posting', ...)."
+      },
+      {
+        "file": "app/Providers/AppServiceProvider.php",
+        "action": "Modify",
+        "what": "Register JobPostingObserver.",
+        "example": "JobPosting::observe(...)."
+      },
+      {
+        "file": "app/Services/ActivityLogger.php",
+        "action": "Modify",
+        "what": "Add helper for job posting events.",
+        "example": "Structured properties JSON."
+      },
+      {
+        "file": "tests/Feature/Crm/JobPostingActivityLogTest.php",
+        "action": "Create",
+        "what": "Publishing job creates activity log.",
+        "example": "assertDatabaseHas activity_logs."
+      }
+    ]
+  },
+  {
+    "phase": "P3",
+    "role": "Mariam",
+    "title": "SuperAdmin JobPostingResource actions",
+    "task": "Extend JobPostingResource with archive/close admin actions.",
+    "learn": "Filament table actions; bulk actions",
+    "deps": "P2-Omar",
+    "branch_slug": "sa-job-posting-actions",
+    "files": [
+      {
+        "file": "app/Filament/SuperAdmin/Resources/JobPostingResource.php",
+        "action": "Modify",
+        "what": "Add view page and force-close action.",
+        "example": "SuperAdmin can set Closed."
+      },
+      {
+        "file": "app/Filament/SuperAdmin/Resources/JobPostingResource/Pages/ViewJobPosting.php",
+        "action": "Create",
+        "what": "View job posting details.",
+        "example": "Shows description and employer."
+      },
+      {
+        "file": "tests/Feature/SuperAdmin/JobPostingResourceTest.php",
+        "action": "Create",
+        "what": "SuperAdmin closes job posting.",
+        "example": "Status becomes Closed."
+      }
+    ]
+  },
+  {
+    "phase": "P3",
+    "role": "Omar",
+    "title": "Employer job postings CRUD",
+    "task": "Full employer JobPostingController CRUD with form requests, blades, routes, tests.",
+    "learn": "Resource controllers; FormRequest; Blade forms",
+    "deps": "P2-Omar",
+    "branch_slug": "employer-job-posting-crud",
+    "files": [
+      {
+        "file": "app/Http/Controllers/Employer/JobPostingController.php",
+        "action": "Create",
+        "what": "index, create, store, edit, update, destroy for own jobs.",
+        "example": "Authorize via JobPostingPolicy."
+      },
+      {
+        "file": "app/Http/Requests/Employer/StoreJobPostingRequest.php",
+        "action": "Create",
+        "what": "Validate title, description, status.",
+        "example": "Employer-only authorization."
+      },
+      {
+        "file": "app/Http/Requests/Employer/UpdateJobPostingRequest.php",
+        "action": "Create",
+        "what": "Same rules; prevent employer_id change.",
+        "example": "Unique title optional."
+      },
+      {
+        "file": "routes/employer.php",
+        "action": "Modify",
+        "what": "Resource routes employer/jobs.",
+        "example": "Route names employer.jobs.*"
+      },
+      {
+        "file": "resources/views/employer/jobs/index.blade.php",
+        "action": "Create",
+        "what": "List employer jobs with status badges.",
+        "example": "Link to create/edit."
+      },
+      {
+        "file": "resources/views/employer/jobs/create.blade.php",
+        "action": "Create",
+        "what": "Create form.",
+        "example": "CSRF + method POST."
+      },
+      {
+        "file": "resources/views/employer/jobs/edit.blade.php",
+        "action": "Create",
+        "what": "Edit form with publish action.",
+        "example": "PATCH update."
+      },
+      {
+        "file": "tests/Feature/JobPosting/EmployerJobPostingTest.php",
+        "action": "Create",
+        "what": "Employer CRUD own jobs; cannot edit others.",
+        "example": "Full HTTP feature test."
+      }
+    ]
+  },
+  {
+    "phase": "P3",
+    "role": "Eldeep",
+    "title": "Employee job browse (read-only)",
+    "task": "Employee JobBrowseController lists published active job_postings.",
+    "learn": "Query scopes; pagination; Breeze views",
+    "deps": "P3-Omar",
+    "branch_slug": "employee-job-browse",
+    "files": [
+      {
+        "file": "app/Http/Controllers/Employee/JobBrowseController.php",
+        "action": "Create",
+        "what": "index show published jobs; show single posting.",
+        "example": "Uses JobPosting::published()."
+      },
+      {
+        "file": "routes/employee.php",
+        "action": "Modify",
+        "what": "GET employee/jobs and employee/jobs/{job_posting}.",
+        "example": "Named employee.jobs.*"
+      },
+      {
+        "file": "resources/views/employee/jobs/index.blade.php",
+        "action": "Create",
+        "what": "Paginated job cards.",
+        "example": "Title, employer company if available."
+      },
+      {
+        "file": "resources/views/employee/jobs/show.blade.php",
+        "action": "Create",
+        "what": "Job detail with apply CTA placeholder.",
+        "example": "Shows description."
+      },
+      {
+        "file": "tests/Feature/JobPosting/EmployeeJobBrowseTest.php",
+        "action": "Create",
+        "what": "Employee sees published jobs only.",
+        "example": "Draft jobs not visible."
+      }
+    ]
+  },
+  {
+    "phase": "P3",
+    "role": "Basha",
+    "title": "Feed route shell for shared posts",
+    "task": "Create FeedController index stub and /feed route accessible to both personas.",
+    "learn": "Shared routes in web.php; dual middleware groups",
+    "deps": "P2-Basha",
+    "branch_slug": "feed-route-shell",
+    "files": [
+      {
+        "file": "app/Http/Controllers/FeedController.php",
+        "action": "Create",
+        "what": "index returns feed view with published posts.",
+        "example": "Shared by employer and employee."
+      },
+      {
+        "file": "routes/web.php",
+        "action": "Modify",
+        "what": "GET /feed auth middleware.",
+        "example": "Route name feed.index"
+      },
+      {
+        "file": "resources/views/feed/index.blade.php",
+        "action": "Create",
+        "what": "Shared feed layout placeholder.",
+        "example": "Lists posts or empty state."
+      },
+      {
+        "file": "resources/views/components/employer-nav.blade.php",
+        "action": "Modify",
+        "what": "Link to feed.index.",
+        "example": "Posts/Feed nav item."
+      },
+      {
+        "file": "resources/views/components/employee-nav.blade.php",
+        "action": "Modify",
+        "what": "Link to feed.index.",
+        "example": "Same feed link."
+      },
+      {
+        "file": "tests/Feature/Post/SharedFeedAccessTest.php",
+        "action": "Create",
+        "what": "Employer and employee can access /feed.",
+        "example": "Both roles 200."
+      }
+    ]
+  },
+  {
+    "phase": "P3",
+    "role": "Youmna",
+    "title": "Employer profile edit (company name)",
+    "task": "Employer ProfileController edit/update company name without file upload yet.",
+    "learn": "One-to-one profile; FormRequest",
+    "deps": "P2-Youmna, P1-Youmna",
+    "branch_slug": "employer-profile-edit",
+    "files": [
+      {
+        "file": "app/Http/Controllers/Employer/ProfileController.php",
+        "action": "Create",
+        "what": "edit/update employer profile company_name.",
+        "example": "Creates profile if missing."
+      },
+      {
+        "file": "app/Http/Requests/Employer/UpdateEmployerProfileRequest.php",
+        "action": "Create",
+        "what": "Validate company_name required string max 255.",
+        "example": "authorize employer."
+      },
+      {
+        "file": "routes/employer.php",
+        "action": "Modify",
+        "what": "GET/PATCH employer/profile.",
+        "example": "employer.profile.edit/update"
+      },
+      {
+        "file": "resources/views/employer/profile/edit.blade.php",
+        "action": "Create",
+        "what": "Company name form.",
+        "example": "No file inputs yet."
+      },
+      {
+        "file": "tests/Feature/Profile/EmployerProfileTest.php",
+        "action": "Create",
+        "what": "Employer updates company name.",
+        "example": "assertDatabaseHas employer_profiles."
+      }
+    ]
+  },
+  {
+    "phase": "P4",
+    "role": "M9nx",
+    "title": "Application notes relation manager prep",
+    "task": "Filament notes relation on ApplicationResource; wire ApplicationNote creation.",
+    "learn": "Filament relation managers; CRM notes",
+    "deps": "P2-M9nx, P4-Eldeep",
+    "branch_slug": "crm-application-notes",
+    "files": [
+      {
+        "file": "app/Filament/SuperAdmin/Resources/ApplicationResource/RelationManagers/NotesRelationManager.php",
+        "action": "Create",
+        "what": "SuperAdmin can add/view notes on application.",
+        "example": "Create form body textarea."
+      },
+      {
+        "file": "app/Filament/SuperAdmin/Resources/ApplicationResource.php",
+        "action": "Create",
+        "what": "List/view applications with notes relation.",
+        "example": "Read-only status display."
+      },
+      {
+        "file": "app/Models/Application.php",
+        "action": "Modify",
+        "what": "hasMany applicationNotes.",
+        "example": "notes() relation."
+      },
+      {
+        "file": "tests/Feature/Crm/ApplicationNoteTest.php",
+        "action": "Create",
+        "what": "SuperAdmin adds note to application.",
+        "example": "Note persisted with author_id."
+      }
+    ]
+  },
+  {
+    "phase": "P4",
+    "role": "Mariam",
+    "title": "SuperAdmin user block-from-posts action",
+    "task": "UserResource action sets is_blocked_from_posts.",
+    "learn": "Filament actions; user flags",
+    "deps": "P2-Mariam",
+    "branch_slug": "sa-block-from-posts",
+    "files": [
+      {
+        "file": "app/Filament/SuperAdmin/Resources/UserResource.php",
+        "action": "Modify",
+        "what": "Add block/unblock from posts table action.",
+        "example": "Toggles is_blocked_from_posts."
+      },
+      {
+        "file": "app/Actions/BlockUserFromPosts.php",
+        "action": "Create",
+        "what": "Execute block/unblock on User.",
+        "example": "Updates is_blocked_from_posts boolean."
+      },
+      {
+        "file": "tests/Feature/SuperAdmin/BlockUserFromPostsTest.php",
+        "action": "Create",
+        "what": "SuperAdmin blocks user from posts.",
+        "example": "User flag true after action."
+      }
+    ]
+  },
+  {
+    "phase": "P4",
+    "role": "Omar",
+    "title": "Employer job publish/close UI polish",
+    "task": "Add publish and close transitions on employer job edit.",
+    "learn": "Status transitions; validation",
+    "deps": "P3-Omar",
+    "branch_slug": "employer-job-transitions",
+    "files": [
+      {
+        "file": "app/Http/Controllers/Employer/JobPostingController.php",
+        "action": "Modify",
+        "what": "Add publish() and close() actions.",
+        "example": "Sets status Published/Closed + published_at."
+      },
+      {
+        "file": "resources/views/employer/jobs/edit.blade.php",
+        "action": "Modify",
+        "what": "Publish and close buttons.",
+        "example": "Separate POST routes."
+      },
+      {
+        "file": "routes/employer.php",
+        "action": "Modify",
+        "what": "POST employer/jobs/{job_posting}/publish|close.",
+        "example": "Named routes."
+      },
+      {
+        "file": "tests/Feature/JobPosting/EmployerJobTransitionTest.php",
+        "action": "Create",
+        "what": "Publish sets published_at.",
+        "example": "Close sets Closed status."
+      }
+    ]
+  },
+  {
+    "phase": "P4",
+    "role": "Eldeep",
+    "title": "Applications workflow full slice",
+    "task": "Apply, employer review, status transitions, employee cancel -> Cancelled.",
+    "learn": "Actions pattern; notifications prep; state machine",
+    "deps": "P2-Eldeep, P3-Eldeep",
+    "branch_slug": "applications-workflow",
+    "files": [
+      {
+        "file": "app/Actions/CancelApplication.php",
+        "action": "Create",
+        "what": "Employee cancels -> status Cancelled, cancelled_at now.",
+        "example": "Reject if Accepted/Rejected."
+      },
+      {
+        "file": "app/Actions/TransitionApplicationStatus.php",
+        "action": "Create",
+        "what": "Employer moves Submitted->UnderReview->Accepted/Rejected.",
+        "example": "Validates allowed transitions."
+      },
+      {
+        "file": "app/Http/Controllers/Employee/ApplicationController.php",
+        "action": "Create",
+        "what": "index, store (apply), cancel.",
+        "example": "Authorize ApplicationPolicy."
+      },
+      {
+        "file": "app/Http/Controllers/Employer/ApplicationController.php",
+        "action": "Create",
+        "what": "index per job, show, update status.",
+        "example": "Employer sees own job applications."
+      },
+      {
+        "file": "app/Http/Requests/Employee/StoreApplicationRequest.php",
+        "action": "Create",
+        "what": "Validate job_posting_id, cover_letter.",
+        "example": "Unique apply per job."
+      },
+      {
+        "file": "routes/employee.php",
+        "action": "Modify",
+        "what": "Application routes for employee.",
+        "example": "employee.applications.*"
+      },
+      {
+        "file": "routes/employer.php",
+        "action": "Modify",
+        "what": "Application routes for employer.",
+        "example": "employer.applications.*"
+      },
+      {
+        "file": "resources/views/employee/applications/index.blade.php",
+        "action": "Create",
+        "what": "My applications list.",
+        "example": "Show status + cancel button."
+      },
+      {
+        "file": "resources/views/employer/applications/index.blade.php",
+        "action": "Create",
+        "what": "Applications for employer jobs.",
+        "example": "Status update form."
+      },
+      {
+        "file": "tests/Feature/Application/ApplicationWorkflowTest.php",
+        "action": "Create",
+        "what": "Full apply -> review -> accept flow.",
+        "example": "Policy enforced."
+      },
+      {
+        "file": "tests/Feature/Application/EmployeeCancelTest.php",
+        "action": "Create",
+        "what": "Cancel sets Cancelled status.",
+        "example": "cancelled_at not null."
+      }
+    ]
+  },
+  {
+    "phase": "P4",
+    "role": "Basha",
+    "title": "Employer and employee post CRUD",
+    "task": "Own-post CRUD for both personas; published posts appear on feed.",
+    "learn": "Resource controllers; shared feed integration",
+    "deps": "P3-Basha",
+    "branch_slug": "persona-post-crud",
+    "files": [
+      {
+        "file": "app/Http/Controllers/Employer/PostController.php",
+        "action": "Create",
+        "what": "CRUD own posts unless blocked.",
+        "example": "PostPolicy authorize."
+      },
+      {
+        "file": "app/Http/Controllers/Employee/PostController.php",
+        "action": "Create",
+        "what": "CRUD own posts unless blocked.",
+        "example": "Same policy rules."
+      },
+      {
+        "file": "routes/employer.php",
+        "action": "Modify",
+        "what": "employer/posts resource routes.",
+        "example": "employer.posts.*"
+      },
+      {
+        "file": "routes/employee.php",
+        "action": "Modify",
+        "what": "employee/posts resource routes.",
+        "example": "employee.posts.*"
+      },
+      {
+        "file": "resources/views/employer/posts/create.blade.php",
+        "action": "Create",
+        "what": "Post create form.",
+        "example": "title, body, publish."
+      },
+      {
+        "file": "resources/views/employee/posts/create.blade.php",
+        "action": "Create",
+        "what": "Post create form.",
+        "example": "Same fields."
+      },
+      {
+        "file": "tests/Feature/Post/EmployerPostCrudTest.php",
+        "action": "Create",
+        "what": "Employer creates published post.",
+        "example": "Visible on feed."
+      },
+      {
+        "file": "tests/Feature/Post/EmployeePostCrudTest.php",
+        "action": "Create",
+        "what": "Employee creates published post.",
+        "example": "Visible on feed."
+      }
+    ]
+  },
+  {
+    "phase": "P4",
+    "role": "Youmna",
+    "title": "Employee profile edit (no uploads)",
+    "task": "Employee profile form for display fields; prepare upload fields disabled.",
+    "learn": "Profile controller; validation without files",
+    "deps": "P3-Youmna",
+    "branch_slug": "employee-profile-edit-base",
+    "files": [
+      {
+        "file": "app/Http/Controllers/Employee/ProfileController.php",
+        "action": "Create",
+        "what": "edit/update employee profile metadata.",
+        "example": "Creates profile if missing."
+      },
+      {
+        "file": "app/Http/Requests/Employee/UpdateEmployeeProfileRequest.php",
+        "action": "Create",
+        "what": "Validate optional display fields.",
+        "example": "File rules added in P6."
+      },
+      {
+        "file": "routes/employee.php",
+        "action": "Modify",
+        "what": "employee/profile edit/update.",
+        "example": "employee.profile.*"
+      },
+      {
+        "file": "resources/views/employee/profile/edit.blade.php",
+        "action": "Create",
+        "what": "Profile form without file inputs.",
+        "example": "Placeholder for CV."
+      },
+      {
+        "file": "tests/Feature/Profile/EmployeeProfileEditTest.php",
+        "action": "Create",
+        "what": "Employee updates profile record.",
+        "example": "Profile exists after update."
+      }
+    ]
+  },
+  {
+    "phase": "P5",
+    "role": "M9nx",
+    "title": "Activity logging for posts and moderation",
+    "task": "Log post publish/hide and user block events.",
+    "learn": "CRM hooks; moderation audit",
+    "deps": "P4-M9nx, P5-Basha",
+    "branch_slug": "crm-post-moderation-log",
+    "files": [
+      {
+        "file": "app/Observers/PostObserver.php",
+        "action": "Create",
+        "what": "Log status changes on Post.",
+        "example": "ActivityLogger on Hidden/Published."
+      },
+      {
+        "file": "app/Providers/AppServiceProvider.php",
+        "action": "Modify",
+        "what": "Register PostObserver.",
+        "example": "Post::observe(...)."
+      },
+      {
+        "file": "app/Actions/BlockUserFromPosts.php",
+        "action": "Modify",
+        "what": "Log block/unblock via ActivityLogger.",
+        "example": "CRM entry on block."
+      },
+      {
+        "file": "tests/Feature/Crm/PostModerationActivityLogTest.php",
+        "action": "Create",
+        "what": "Hiding post creates activity log.",
+        "example": "assertDatabaseHas activity_logs."
+      }
+    ]
+  },
+  {
+    "phase": "P5",
+    "role": "Mariam",
+    "title": "SuperAdmin PostModerationResource",
+    "task": "Filament resource to list all posts, hide, archive, link to block user.",
+    "learn": "Filament tables; moderation actions",
+    "deps": "P4-Mariam, P2-Basha",
+    "branch_slug": "sa-post-moderation",
+    "files": [
+      {
+        "file": "app/Filament/SuperAdmin/Resources/PostModerationResource.php",
+        "action": "Create",
+        "what": "List all posts; hide action sets Hidden.",
+        "example": "View author and role."
+      },
+      {
+        "file": "app/Filament/SuperAdmin/Resources/PostModerationResource/Pages/ListPosts.php",
+        "action": "Create",
+        "what": "Moderation list page.",
+        "example": "Filters by status."
+      },
+      {
+        "file": "app/Filament/SuperAdmin/Resources/PostModerationResource/Pages/EditPost.php",
+        "action": "Create",
+        "what": "Edit/hide post.",
+        "example": "SuperAdmin only."
+      },
+      {
+        "file": "tests/Feature/Post/AdminModerationTest.php",
+        "action": "Create",
+        "what": "SuperAdmin hides post.",
+        "example": "Status Hidden on post."
+      }
+    ]
+  },
+  {
+    "phase": "P5",
+    "role": "Omar",
+    "title": "Employee apply UI on job show",
+    "task": "Wire apply form on job show page linking to ApplicationController store.",
+    "learn": "Forms; CSRF; authorization",
+    "deps": "P4-Eldeep, P3-Eldeep",
+    "branch_slug": "employee-apply-ui",
+    "files": [
+      {
+        "file": "resources/views/employee/jobs/show.blade.php",
+        "action": "Modify",
+        "what": "Apply form with cover_letter.",
+        "example": "POST employee.applications.store"
+      },
+      {
+        "file": "app/Http/Controllers/Employee/ApplicationController.php",
+        "action": "Modify",
+        "what": "store redirects with success flash.",
+        "example": "Prevents duplicate apply."
+      },
+      {
+        "file": "resources/views/employee/applications/partials/status-badge.blade.php",
+        "action": "Create",
+        "what": "Status badge partial including Cancelled.",
+        "example": "Color per ApplicationStatus."
+      },
+      {
+        "file": "tests/Feature/Application/EmployeeApplyUiTest.php",
+        "action": "Create",
+        "what": "Apply from job show creates application.",
+        "example": "Redirect to applications index."
+      }
+    ]
+  },
+  {
+    "phase": "P5",
+    "role": "Eldeep",
+    "title": "Application status notifications",
+    "task": "Notify employee when employer changes application status.",
+    "learn": "Notifications; mail/database channels",
+    "deps": "P4-Eldeep",
+    "branch_slug": "application-notifications",
+    "files": [
+      {
+        "file": "app/Notifications/ApplicationStatusChangedNotification.php",
+        "action": "Create",
+        "what": "Notify employee of status change.",
+        "example": "Includes job title + new status."
+      },
+      {
+        "file": "app/Actions/TransitionApplicationStatus.php",
+        "action": "Modify",
+        "what": "Dispatch notification after transition.",
+        "example": "$employee->notify(...)."
+      },
+      {
+        "file": "app/Actions/CancelApplication.php",
+        "action": "Modify",
+        "what": "Optional notify employer on cancel.",
+        "example": "Log-only or notification."
+      },
+      {
+        "file": "tests/Feature/Application/ApplicationNotificationTest.php",
+        "action": "Create",
+        "what": "Status change sends notification.",
+        "example": "Notification::fake assertion."
+      }
+    ]
+  },
+  {
+    "phase": "P5",
+    "role": "Basha",
+    "title": "Shared feed complete UI",
+    "task": "FeedController shows published posts from both roles; pagination.",
+    "learn": "Shared view; eager loading",
+    "deps": "P4-Basha",
+    "branch_slug": "shared-feed-complete",
+    "files": [
+      {
+        "file": "app/Http/Controllers/FeedController.php",
+        "action": "Modify",
+        "what": "Load published posts with author eager load.",
+        "example": "Order by created_at desc."
+      },
+      {
+        "file": "resources/views/feed/index.blade.php",
+        "action": "Modify",
+        "what": "Render post cards with author role badge.",
+        "example": "Same view both personas."
+      },
+      {
+        "file": "resources/views/feed/partials/post-card.blade.php",
+        "action": "Create",
+        "what": "Single post card partial.",
+        "example": "Title, excerpt, author."
+      },
+      {
+        "file": "tests/Feature/Post/SharedFeedTest.php",
+        "action": "Create",
+        "what": "Feed shows employer and employee posts.",
+        "example": "Single feed endpoint."
+      }
+    ]
+  },
+  {
+    "phase": "P5",
+    "role": "Youmna",
+    "title": "Employee CV and application image upload",
+    "task": "File upload on employee profile using LocalDocumentStorage.",
+    "learn": "File uploads; storage symlink; validation",
+    "deps": "P2-Youmna, P4-Youmna",
+    "branch_slug": "employee-cv-upload",
+    "files": [
+      {
+        "file": "app/Http/Controllers/Employee/ProfileController.php",
+        "action": "Modify",
+        "what": "Handle cv and application_image uploads.",
+        "example": "Store paths on employee_profiles."
+      },
+      {
+        "file": "app/Http/Requests/Employee/UpdateEmployeeProfileRequest.php",
+        "action": "Modify",
+        "what": "Add file rules: pdf/images max size.",
+        "example": "mimes:pdf,jpg,png"
+      },
+      {
+        "file": "resources/views/employee/profile/edit.blade.php",
+        "action": "Modify",
+        "what": "File inputs for CV and application image.",
+        "example": "Show current file if set."
+      },
+      {
+        "file": "tests/Feature/Profile/EmployeeCvUploadTest.php",
+        "action": "Create",
+        "what": "Upload stores on public disk.",
+        "example": "Storage::disk('public')->exists."
+      }
+    ]
+  },
+  {
+    "phase": "P6",
+    "role": "M9nx",
+    "title": "CareerHub demo seeder",
+    "task": "Seeder with 6 demo users, sample jobs, applications, posts, profiles.",
+    "learn": "Database seeders; factory states",
+    "deps": "P5-*",
+    "branch_slug": "demo-seeder",
+    "files": [
+      {
+        "file": "database/seeders/CareerHubDemoSeeder.php",
+        "action": "Create",
+        "what": "6 users (1 SA, 2 employers, 3 employees), sample data.",
+        "example": "Calls factories for all domains."
+      },
+      {
+        "file": "database/seeders/DatabaseSeeder.php",
+        "action": "Modify",
+        "what": "Call CareerHubDemoSeeder in local.",
+        "example": "Env-guarded or always for demo."
+      },
+      {
+        "file": "tests/Feature/Seeders/CareerHubDemoSeederTest.php",
+        "action": "Create",
+        "what": "Seeder runs without error.",
+        "example": "assert User::count() >= 6."
+      }
+    ]
+  },
+  {
+    "phase": "P6",
+    "role": "Mariam",
+    "title": "SuperAdmin dashboard widgets",
+    "task": "Filament stats widgets: user count, open jobs, pending applications.",
+    "learn": "Filament widgets; aggregate queries",
+    "deps": "P5-Mariam",
+    "branch_slug": "sa-dashboard-widgets",
+    "files": [
+      {
+        "file": "app/Filament/SuperAdmin/Widgets/StatsOverviewWidget.php",
+        "action": "Create",
+        "what": "Show users, job_postings, applications counts.",
+        "example": "Filament StatsOverviewWidget."
+      },
+      {
+        "file": "app/Providers/Filament/SuperAdminPanelProvider.php",
+        "action": "Modify",
+        "what": "Register widgets.",
+        "example": "->widgets([...])"
+      },
+      {
+        "file": "tests/Feature/SuperAdmin/StatsWidgetTest.php",
+        "action": "Create",
+        "what": "Widget renders for SuperAdmin.",
+        "example": "Livewire widget test."
+      }
+    ]
+  },
+  {
+    "phase": "P6",
+    "role": "Omar",
+    "title": "Job posting filters on employee browse",
+    "task": "Search/filter published jobs by title on employee index.",
+    "learn": "Query filters; request input",
+    "deps": "P5-Omar",
+    "branch_slug": "employee-job-filters",
+    "files": [
+      {
+        "file": "app/Http/Controllers/Employee/JobBrowseController.php",
+        "action": "Modify",
+        "what": "Accept search query filter on title.",
+        "example": "when($request->search, fn...)."
+      },
+      {
+        "file": "resources/views/employee/jobs/index.blade.php",
+        "action": "Modify",
+        "what": "Search form.",
+        "example": "GET filter preserved."
+      },
+      {
+        "file": "tests/Feature/JobPosting/EmployeeJobFilterTest.php",
+        "action": "Create",
+        "what": "Search returns matching jobs only.",
+        "example": "Filter by title keyword."
+      }
+    ]
+  },
+  {
+    "phase": "P6",
+    "role": "Eldeep",
+    "title": "Application status timeline partial",
+    "task": "Timeline partial showing status history for employee trace view.",
+    "learn": "Blade partials; status enum display",
+    "deps": "P5-Eldeep",
+    "branch_slug": "application-timeline",
+    "files": [
+      {
+        "file": "resources/views/employee/applications/show.blade.php",
+        "action": "Create",
+        "what": "Application detail with timeline.",
+        "example": "Shows Cancelled_at if cancelled."
+      },
+      {
+        "file": "resources/views/employee/applications/partials/timeline.blade.php",
+        "action": "Create",
+        "what": "Visual timeline Submitted -> ... -> terminal.",
+        "example": "Cancelled terminal state labeled."
+      },
+      {
+        "file": "app/Http/Controllers/Employee/ApplicationController.php",
+        "action": "Modify",
+        "what": "Add show route.",
+        "example": "employee.applications.show"
+      },
+      {
+        "file": "routes/employee.php",
+        "action": "Modify",
+        "what": "GET employee/applications/{application}.",
+        "example": "Named show route."
+      },
+      {
+        "file": "tests/Feature/Application/ApplicationTimelineTest.php",
+        "action": "Create",
+        "what": "Timeline renders for application.",
+        "example": "See Cancelled label."
+      }
+    ]
+  },
+  {
+    "phase": "P6",
+    "role": "Basha",
+    "title": "Feed blocked-user empty state",
+    "task": "Feed and post create respect block flag with user-friendly message.",
+    "learn": "UX for moderation; policy errors",
+    "deps": "P5-Basha",
+    "branch_slug": "feed-blocked-user-ux",
+    "files": [
+      {
+        "file": "app/Http/Controllers/Employer/PostController.php",
+        "action": "Modify",
+        "what": "Redirect blocked users with error.",
+        "example": "403 or flash message."
+      },
+      {
+        "file": "app/Http/Controllers/Employee/PostController.php",
+        "action": "Modify",
+        "what": "Same block handling.",
+        "example": "Consistent message."
+      },
+      {
+        "file": "resources/views/feed/index.blade.php",
+        "action": "Modify",
+        "what": "Hide create link if blocked.",
+        "example": "@can create Post."
+      },
+      {
+        "file": "tests/Feature/Post/BlockedUserFeedTest.php",
+        "action": "Create",
+        "what": "Blocked user cannot create post.",
+        "example": "Feed still accessible read-only."
+      }
+    ]
+  },
+  {
+    "phase": "P6",
+    "role": "Youmna",
+    "title": "Profile file download and storage docs",
+    "task": "Download route for CV; README storage symlink instructions.",
+    "learn": "Storage responses; documentation",
+    "deps": "P5-Youmna",
+    "branch_slug": "profile-download-docs",
+    "files": [
+      {
+        "file": "app/Http/Controllers/Employee/ProfileController.php",
+        "action": "Modify",
+        "what": "downloadCv returns Storage download response.",
+        "example": "Authorize own profile only."
+      },
+      {
+        "file": "routes/employee.php",
+        "action": "Modify",
+        "what": "GET employee/profile/cv/download.",
+        "example": "employee.profile.cv.download"
+      },
+      {
+        "file": "docs/storage-local-setup.md",
+        "action": "Create",
+        "what": "Document php artisan storage:link and public disk.",
+        "example": "Local storage only, no S3."
+      },
+      {
+        "file": "tests/Feature/Profile/EmployeeCvDownloadTest.php",
+        "action": "Create",
+        "what": "Employee downloads own CV.",
+        "example": "200 response headers."
+      }
+    ]
+  },
+  {
+    "phase": "P7",
+    "role": "M9nx",
+    "title": "Integration test suite and release checklist",
+    "task": "Cross-feature integration tests; RELEASE.md checklist; update master statuses.",
+    "learn": "E2E testing; release governance",
+    "deps": "P6-*",
+    "branch_slug": "integration-release",
+    "files": [
+      {
+        "file": "tests/Feature/Integration/CrossPersonaFlowTest.php",
+        "action": "Create",
+        "what": "Register employer -> post job -> employee apply -> accept.",
+        "example": "Full happy path."
+      },
+      {
+        "file": "docs/RELEASE.md",
+        "action": "Create",
+        "what": "Release checklist: migrate, seed, test, storage:link.",
+        "example": "Demo script steps."
+      },
+      {
+        "file": "tests/Feature/Integration/SuperAdminCrmFlowTest.php",
+        "action": "Create",
+        "what": "SuperAdmin views activity log after workflows.",
+        "example": "CRM entries exist."
+      }
+    ]
+  },
+  {
+    "phase": "P7",
+    "role": "Mariam",
+    "title": "SuperAdmin regression and access audit",
+    "task": "Audit all Filament resources accessible only to SuperAdmin.",
+    "learn": "Security regression; Filament testing",
+    "deps": "P6-Mariam",
+    "branch_slug": "sa-regression-audit",
+    "files": [
+      {
+        "file": "tests/Feature/SuperAdmin/SuperAdminRegressionTest.php",
+        "action": "Create",
+        "what": "All SA resources 403 for employer/employee.",
+        "example": "User, Job, Application, Post, ActivityLog."
+      },
+      {
+        "file": "tests/Feature/SuperAdmin/UserManagementTest.php",
+        "action": "Modify",
+        "what": "Extend coverage for deactivate.",
+        "example": "Regression additions."
+      }
+    ]
+  },
+  {
+    "phase": "P7",
+    "role": "Omar",
+    "title": "Job postings E2E regression",
+    "task": "Consolidated job posting tests across employer/employee/super-admin.",
+    "learn": "Test consolidation; regression",
+    "deps": "P6-Omar",
+    "branch_slug": "jobs-e2e-regression",
+    "files": [
+      {
+        "file": "tests/Feature/JobPosting/JobPostingE2ETest.php",
+        "action": "Create",
+        "what": "Draft->publish->browse->close lifecycle.",
+        "example": "Single file E2E."
+      },
+      {
+        "file": "tests/Feature/JobPosting/EmployerJobPostingTest.php",
+        "action": "Modify",
+        "what": "Fix any integration failures.",
+        "example": "Suite green."
+      }
+    ]
+  },
+  {
+    "phase": "P7",
+    "role": "Eldeep",
+    "title": "Applications E2E regression",
+    "task": "Full state machine regression including Cancelled terminal state.",
+    "learn": "State machine tests; cancel edge cases",
+    "deps": "P6-Eldeep",
+    "branch_slug": "applications-e2e-regression",
+    "files": [
+      {
+        "file": "tests/Feature/Application/ApplicationE2ETest.php",
+        "action": "Create",
+        "what": "Apply, review, cancel, accept paths.",
+        "example": "Cancelled is terminal."
+      },
+      {
+        "file": "tests/Feature/Application/EmployeeCancelTest.php",
+        "action": "Modify",
+        "what": "Edge: cannot cancel Accepted.",
+        "example": "Assert 422 or exception."
+      }
+    ]
+  },
+  {
+    "phase": "P7",
+    "role": "Basha",
+    "title": "Posts and feed E2E regression",
+    "task": "Shared feed + moderation + block user integrated test.",
+    "learn": "Feed integration; moderation",
+    "deps": "P6-Basha",
+    "branch_slug": "posts-e2e-regression",
+    "files": [
+      {
+        "file": "tests/Feature/Post/PostFeedE2ETest.php",
+        "action": "Create",
+        "what": "Both personas post -> feed -> SA hides -> block.",
+        "example": "Full moderation path."
+      },
+      {
+        "file": "tests/Feature/Post/SharedFeedTest.php",
+        "action": "Modify",
+        "what": "Integration fixes.",
+        "example": "Suite green."
+      }
+    ]
+  },
+  {
+    "phase": "P7",
+    "role": "Youmna",
+    "title": "Profiles and storage E2E regression",
+    "task": "Profile upload/download integration; storage link verification test.",
+    "learn": "File storage integration",
+    "deps": "P6-Youmna",
+    "branch_slug": "profiles-e2e-regression",
+    "files": [
+      {
+        "file": "tests/Feature/Profile/ProfileStorageE2ETest.php",
+        "action": "Create",
+        "what": "Upload CV -> download -> employer sees company.",
+        "example": "Storage integration."
+      },
+      {
+        "file": "tests/Feature/Profile/EmployeeCvUploadTest.php",
+        "action": "Modify",
+        "what": "Regression fixes.",
+        "example": "Suite green."
+      }
+    ]
+  }
+]
