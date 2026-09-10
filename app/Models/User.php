@@ -3,18 +3,18 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Filament\Models\Contracts\FilamentUser; 
-use Filament\Panel;
 use App\Enums\UserRole;
+use Database\Factories\UserFactory;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Jeffgreco13\FilamentBreezy\Traits\TwoFactorAuthenticatable; // <-- 1. Added import for 2FA
+
 #[Fillable(['name', 'email', 'password', 'role', 'is_active', 'is_blocked_from_posts'])]
-#[Fillable(['name', 'email', 'password'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements FilamentUser // <-- 2. Added 'implements FilamentUser'
 {
@@ -26,22 +26,21 @@ class User extends Authenticatable implements FilamentUser // <-- 2. Added 'impl
      *
      * @return array<string, string>
      */
-     
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'role' => UserRole::class, 
+            'role' => UserRole::class,
             'is_active' => 'boolean',
-        'is_blocked_from_posts' => 'boolean',
-    
+            'is_blocked_from_posts' => 'boolean',
+
         ];
     }
 
-        public function canAccessPanel(Panel $panel): bool
-{
-    return $this->role === UserRole::SuperAdmin
-        && $panel->getId() === 'super-admin';
-}
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->role === UserRole::SuperAdmin
+            && $panel->getId() === 'super-admin';
     }
+}

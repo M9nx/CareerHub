@@ -35,7 +35,8 @@ class UserFactory extends Factory
             'is_blocked_from_posts' => false,
         ];
     }
-public function superAdmin(): static
+
+    public function superAdmin(): static
     {
         return $this->state(fn (array $attributes) => [
             'role' => UserRole::SuperAdmin,
@@ -55,8 +56,7 @@ public function superAdmin(): static
             'role' => UserRole::Employee,
         ]);
     }
-}
-    
+
     public function unverified(): static
     {
         return $this->state(fn (array $attributes) => [
