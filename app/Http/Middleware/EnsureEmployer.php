@@ -14,11 +14,7 @@ class EnsureEmployer
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (! $request->user()) {
-            return redirect()->route('login');
-        }
-
-        if ($request->user()->role !== UserRole::Employer) {
+        if ($request->user()?->role !== UserRole::Employer) {
             abort(403);
         }
 

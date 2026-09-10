@@ -27,4 +27,14 @@ class EmployerDashboardTest extends TestCase
 
         $response->assertRedirect('/login');
     }
+
+    public function test_employee_cannot_access_employer_dashboard(): void
+    {
+        $employee = User::factory()->employee()->create();
+
+        $response = $this->actingAs($employee)
+            ->get('/employer/dashboard');
+
+        $response->assertStatus(403);
+    }
 }
