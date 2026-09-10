@@ -13,7 +13,7 @@ test('legacy admin panel route is not registered', function () {
 });
 
 test('user who cannot access panel receives forbidden on super admin dashboard', function () {
-    $employer = User::factory()->create([
+    $employer = User::factory()->employer()->create([
         'email' => 'employer@careerhub.test',
     ]);
 
@@ -23,9 +23,8 @@ test('user who cannot access panel receives forbidden on super admin dashboard',
 });
 
 test('user who can access panel reaches super admin dashboard', function () {
-    // Interim: uses current canAccessPanel() until P0-Mariam (#11) adds UserRole.
-    $superAdmin = User::factory()->create([
-        'email' => 'superadmin@gmail.com',
+    $superAdmin = User::factory()->superAdmin()->create([
+        'email' => 'superadmin@careerhub.test',
     ]);
 
     $this->actingAs($superAdmin, 'filament')
