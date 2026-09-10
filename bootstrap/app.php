@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureEmployee;
 use App\Http\Middleware\EnsureEmployer;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -13,11 +14,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
         then: function () {
             require base_path('routes/employer.php');
+            require base_path('routes/employee.php');
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'employer' => EnsureEmployer::class,
+            'employee' => EnsureEmployee::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
