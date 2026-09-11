@@ -43,4 +43,28 @@ class User extends Authenticatable implements FilamentUser // <-- 2. Added 'impl
         return $this->role === UserRole::SuperAdmin
             && $panel->getId() === 'super-admin';
     }
+
+    /**
+     * Whether the user holds the SuperAdmin role.
+     */
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === UserRole::SuperAdmin;
+    }
+
+    /**
+     * Whether the user's account is active.
+     */
+    public function isActive(): bool
+    {
+        return (bool) $this->is_active;
+    }
+
+    /**
+     * Whether the user is currently blocked from creating posts.
+     */
+    public function isBlockedFromPosts(): bool
+    {
+        return (bool) $this->is_blocked_from_posts;
+    }
 }

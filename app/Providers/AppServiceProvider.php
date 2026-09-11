@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\User;
+use App\Policies\UserPolicy;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +22,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // SuperAdmin bypass: short-circuits every ability check.
+        // Returning null (not false) for non-SuperAdmins lets normal
+        // policy resolution continue instead of denying outright.
+        Gate::before(function (User $user, string $ability) {
+            return $user->isSuperAdmin() ? true : null;
+        });
+
+        // Explicit policy registration (in addition to Laravel's
+        // auto-discovery convention, so this is unambiguous in code review).
+        Gate::policy(User::class, UserPolicy::class);
     }
 }
