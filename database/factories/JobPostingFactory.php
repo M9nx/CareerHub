@@ -41,4 +41,19 @@ class JobPostingFactory extends Factory
             'published_at' => null,
         ]);
     }
+
+    public function closed(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => JobPostingStatus::Closed,
+            'published_at' => $attributes['published_at'] ?? now(),
+        ]);
+    }
+
+    public function archived(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => JobPostingStatus::Archived,
+        ]);
+    }
 }
