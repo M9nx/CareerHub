@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
@@ -28,7 +29,21 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        if ($request->user()->role === UserRole::Employer) {
+            return redirect()->intended(
+                route('employer.dashboard', absolute: false)
+            );
+        }
+
+        if ($request->user()->role === UserRole::Employee) {
+            return redirect()->intended(
+                route('employee.dashboard', absolute: false)
+            );
+        }
+
+        return redirect()->intended(
+            route('dashboard', absolute: false)
+        );
     }
 
     /**
@@ -45,3 +60,4 @@ class AuthenticatedSessionController extends Controller
         return redirect('/');
     }
 }
+
