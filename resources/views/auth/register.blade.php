@@ -16,6 +16,39 @@
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
+        <!-- Role -->
+        <div class="mt-4">
+            <x-input-label :value="__('Register as')" />
+
+            <div class="mt-2 space-y-2">
+                <label class="flex items-center">
+                    <input
+                        type="radio"
+                        name="role"
+                        value="Employer"
+                        class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800"
+                        @checked(old('role', 'Employer') === 'Employer')
+                        required
+                    />
+                    <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Employer') }}</span>
+                </label>
+
+                <label class="flex items-center">
+                    <input
+                        type="radio"
+                        name="role"
+                        value="Employee"
+                        class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800"
+                        @checked(old('role') === 'Employee')
+                        required
+                    />
+                    <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Employee') }}</span>
+                </label>
+            </div>
+
+            <x-input-error :messages="$errors->get('role')" class="mt-2" />
+        </div>
+
         <!-- Password -->
         <div class="mt-4">
             <x-input-label for="password" :value="__('Password')" />

@@ -29,21 +29,11 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        if ($request->user()->role === UserRole::Employer) {
-            return redirect()->intended(
-                route('employer.dashboard', absolute: false)
-            );
-        }
-
-        if ($request->user()->role === UserRole::Employee) {
-            return redirect()->intended(
-                route('employee.dashboard', absolute: false)
-            );
-        }
-
-        return redirect()->intended(
-            route('dashboard', absolute: false)
-        );
+        return match ($request->user()->role) {
+            UserRole::Employer => to_route('employer.dashboard'),
+            UserRole::Employee => to_route('employee.dashboard'),
+            default => redirect()->intended(route('dashboard', absolute: false)),
+        };
     }
 
     /**
@@ -60,4 +50,3 @@ class AuthenticatedSessionController extends Controller
         return redirect('/');
     }
 }
-
