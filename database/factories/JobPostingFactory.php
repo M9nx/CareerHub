@@ -17,7 +17,7 @@ class JobPostingFactory extends Factory
     public function definition(): array
     {
         return [
-            'employer_id' => User::factory(),
+            'employer_id' => User::factory()->employer(),
             'title' => fake()->jobTitle(),
             'description' => fake()->paragraphs(3, true),
             'status' => JobPostingStatus::Draft,
