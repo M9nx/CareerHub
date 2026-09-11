@@ -12,7 +12,7 @@ test('legacy admin panel route is not registered', function () {
         ->assertNotFound();
 });
 
-test('user who cannot access panel receives forbidden on super admin dashboard', function () {
+test('employer cannot access super admin dashboard', function () {
     $employer = User::factory()->employer()->create([
         'email' => 'employer@careerhub.test',
     ]);
@@ -22,7 +22,17 @@ test('user who cannot access panel receives forbidden on super admin dashboard',
         ->assertForbidden();
 });
 
-test('user who can access panel reaches super admin dashboard', function () {
+test('employee cannot access super admin dashboard', function () {
+    $employee = User::factory()->employee()->create([
+        'email' => 'employee@careerhub.test',
+    ]);
+
+    $this->actingAs($employee, 'filament')
+        ->get('/super-admin')
+        ->assertForbidden();
+});
+
+test('super admin can access super admin dashboard', function () {
     $superAdmin = User::factory()->superAdmin()->create([
         'email' => 'superadmin@careerhub.test',
     ]);
