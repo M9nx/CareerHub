@@ -134,33 +134,32 @@
                         {{ __('Dashboard') }}
                     </x-responsive-nav-link>
 
-                    <x-responsive-nav-link
-                        :href="route('employer.jobs')"
-                        :active="request()->routeIs('employer.jobs*')"
-                    >
-                        {{ __('Jobs') }}
-                    </x-responsive-nav-link>
+                    @if (Route::has('employer.jobs'))
+                        <x-responsive-nav-link
+                            :href="route('employer.jobs')"
+                            :active="request()->routeIs('employer.jobs*')"
+                        >
+                            {{ __('Jobs') }}
+                        </x-responsive-nav-link>
+                    @endif
 
-                    <x-responsive-nav-link
-                        :href="route('employer.applications')"
-                        :active="request()->routeIs('employer.applications*')"
-                    >
-                        {{ __('Applications') }}
-                    </x-responsive-nav-link>
+                    @if (Route::has('employer.applications'))
+                        <x-responsive-nav-link
+                            :href="route('employer.applications')"
+                            :active="request()->routeIs('employer.applications*')"
+                        >
+                            {{ __('Applications') }}
+                        </x-responsive-nav-link>
+                    @endif
 
-                    <x-responsive-nav-link
-                        :href="route('employer.posts')"
-                        :active="request()->routeIs('employer.posts*')"
-                    >
-                        {{ __('Posts') }}
-                    </x-responsive-nav-link>
-
-                    <x-responsive-nav-link
-                        :href="route('profile.edit')"
-                        :active="request()->routeIs('profile.*')"
-                    >
-                        {{ __('Profile') }}
-                    </x-responsive-nav-link>
+                    @if (Route::has('employer.posts'))
+                        <x-responsive-nav-link
+                            :href="route('employer.posts')"
+                            :active="request()->routeIs('employer.posts*')"
+                        >
+                            {{ __('Posts') }}
+                        </x-responsive-nav-link>
+                    @endif
 
                 @elseif (auth()->user()->role === \App\Enums\UserRole::Employee)
 
@@ -171,33 +170,32 @@
                         {{ __('Dashboard') }}
                     </x-responsive-nav-link>
 
-                    <x-responsive-nav-link
-                        :href="route('employee.jobs')"
-                        :active="request()->routeIs('employee.jobs*')"
-                    >
-                        {{ __('Jobs') }}
-                    </x-responsive-nav-link>
+                    @if (Route::has('employee.jobs'))
+                        <x-responsive-nav-link
+                            :href="route('employee.jobs')"
+                            :active="request()->routeIs('employee.jobs*')"
+                        >
+                            {{ __('Jobs') }}
+                        </x-responsive-nav-link>
+                    @endif
 
-                    <x-responsive-nav-link
-                        :href="route('employee.applications')"
-                        :active="request()->routeIs('employee.applications*')"
-                    >
-                        {{ __('Applications') }}
-                    </x-responsive-nav-link>
+                    @if (Route::has('employee.applications'))
+                        <x-responsive-nav-link
+                            :href="route('employee.applications')"
+                            :active="request()->routeIs('employee.applications*')"
+                        >
+                            {{ __('Applications') }}
+                        </x-responsive-nav-link>
+                    @endif
 
-                    <x-responsive-nav-link
-                        :href="route('employee.posts')"
-                        :active="request()->routeIs('employee.posts*')"
-                    >
-                        {{ __('Posts') }}
-                    </x-responsive-nav-link>
-
-                    <x-responsive-nav-link
-                        :href="route('profile.edit')"
-                        :active="request()->routeIs('profile.*')"
-                    >
-                        {{ __('Profile') }}
-                    </x-responsive-nav-link>
+                    @if (Route::has('employee.posts'))
+                        <x-responsive-nav-link
+                            :href="route('employee.posts')"
+                            :active="request()->routeIs('employee.posts*')"
+                        >
+                            {{ __('Posts') }}
+                        </x-responsive-nav-link>
+                    @endif
 
                 @endif
 

@@ -6,26 +6,32 @@
         {{ __('Dashboard') }}
     </x-nav-link>
 
-    <x-nav-link
-        :href="route('employer.jobs')"
-        :active="request()->routeIs('employer.jobs*')"
-    >
-        {{ __('Jobs') }}
-    </x-nav-link>
+    @if (Route::has('employer.jobs'))
+        <x-nav-link
+            :href="route('employer.jobs')"
+            :active="request()->routeIs('employer.jobs*')"
+        >
+            {{ __('Jobs') }}
+        </x-nav-link>
+    @endif
 
-    <x-nav-link
-        :href="route('employer.applications')"
-        :active="request()->routeIs('employer.applications*')"
-    >
-        {{ __('Applications') }}
-    </x-nav-link>
+    @if (Route::has('employer.applications'))
+        <x-nav-link
+            :href="route('employer.applications')"
+            :active="request()->routeIs('employer.applications*')"
+        >
+            {{ __('Applications') }}
+        </x-nav-link>
+    @endif
 
-    <x-nav-link
-        :href="route('employer.posts')"
-        :active="request()->routeIs('employer.posts*')"
-    >
-        {{ __('Posts') }}
-    </x-nav-link>
+    @if (Route::has('employer.posts'))
+        <x-nav-link
+            :href="route('employer.posts')"
+            :active="request()->routeIs('employer.posts*')"
+        >
+            {{ __('Posts') }}
+        </x-nav-link>
+    @endif
 
     <x-nav-link
         :href="route('profile.edit')"
