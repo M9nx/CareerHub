@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\User;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -44,7 +46,20 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+function actingAsEmployer(array $attributes = []): Authenticatable
 {
-    // ..
+    $user = User::factory()->employer()->create($attributes);
+
+    test()->actingAs($user);
+
+    return $user;
+}
+
+function actingAsEmployee(array $attributes = []): Authenticatable
+{
+    $user = User::factory()->employee()->create($attributes);
+
+    test()->actingAs($user);
+
+    return $user;
 }

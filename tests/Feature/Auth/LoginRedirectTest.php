@@ -1,41 +1,30 @@
 <?php
 
-namespace Tests\Feature\Auth;
-
-use App\Enums\UserRole;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
-class LoginRedirectTest extends TestCase
-{
-    use RefreshDatabase;
+test('employer is redirected to employer dashboard after login', function () {
+    $user = User::factory()->employer()->create();
 
-    public function test_employer_is_redirected_to_employer_dashboard_after_login(): void
-    {
-        $user = User::factory()->create([
-            'role' => UserRole::Employer,
-        ]);
+    $this->post('/login', [
+        'email' => $user->email,
+        'password' => 'password',
+    ])->assertRedirect(route('employer.dashboard'));
+});
 
-        $response = $this->post('/login', [
-            'email' => $user->email,
-            'password' => 'password',
-        ]);
+test('employee is redirected to employee dashboard after login', function () {
+    $user = User::factory()->employee()->create();
 
-        $response->assertRedirect(route('employer.dashboard'));
-    }
+    $this->post('/login', [
+        'email' => $user->email,
+        'password' => 'password',
+    ])->assertRedirect(route('employee.dashboard'));
+});
 
-    public function test_employee_is_redirected_to_employee_dashboard_after_login(): void
-    {
-        $user = User::factory()->create([
-            'role' => UserRole::Employee,
-        ]);
+test('super admin is redirected to default dashboard after login', function () {
+    $user = User::factory()->superAdmin()->create();
 
-        $response = $this->post('/login', [
-            'email' => $user->email,
-            'password' => 'password',
-        ]);
-
-        $response->assertRedirect(route('employee.dashboard'));
-    }
-}
+    $this->post('/login', [
+        'email' => $user->email,
+        'password' => 'password',
+    ])->assertRedirect(route('dashboard', absolute: false));
+});
