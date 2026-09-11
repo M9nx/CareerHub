@@ -6,7 +6,7 @@ use App\Models\User;
 use Illuminate\Support\Carbon;
 
 it('persists a published job posting with casts and employer relationship', function () {
-    $employer = User::factory()->create();
+    $employer = User::factory()->employer()->create();
 
     $jobPosting = JobPosting::factory()
         ->published()
@@ -25,4 +25,22 @@ it('persists a published job posting with casts and employer relationship', func
         'status' => JobPostingStatus::Published->value,
         'is_active' => true,
     ]);
+});
+
+it('creates a published job posting with the published factory state', function () {
+    $jobPosting = JobPosting::factory()
+        ->published()
+        ->create();
+
+    expect($jobPosting->status)->toBe(JobPostingStatus::Published)
+        ->and($jobPosting->published_at)->toBeInstanceOf(Carbon::class);
+});
+
+it('creates a draft job posting with the draft factory state', function () {
+    $jobPosting = JobPosting::factory()
+        ->draft()
+        ->create();
+
+    expect($jobPosting->status)->toBe(JobPostingStatus::Draft)
+        ->and($jobPosting->published_at)->toBeNull();
 });
