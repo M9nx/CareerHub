@@ -27,9 +27,7 @@ class PostFactory extends Factory
 
         return [
             'author_id' => User::factory()
-                ->state(['role' => $authorRole])
-                ->create()
-                ->id,
+                ->state(['role' => $authorRole]),
             'author_role' => $authorRole,
             'title' => fake()->sentence(6),
             'body' => fake()->paragraphs(3, true),
