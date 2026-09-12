@@ -10,16 +10,17 @@ use Filament\Panel;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Jeffgreco13\FilamentBreezy\Traits\TwoFactorAuthenticatable; // <-- 1. Added import for 2FA
+use Jeffgreco13\FilamentBreezy\Traits\TwoFactorAuthenticatable;
 
 #[Fillable(['name', 'email', 'password', 'role', 'is_active', 'is_blocked_from_posts'])]
 #[Hidden(['password', 'remember_token'])]
-class User extends Authenticatable implements FilamentUser // <-- 2. Added 'implements FilamentUser'
+class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, TwoFactorAuthenticatable; // <-- 3. Added the 2FA trait here
+    use HasFactory, Notifiable, TwoFactorAuthenticatable;
 
     /**
      * Get the attributes that should be cast.
@@ -34,7 +35,6 @@ class User extends Authenticatable implements FilamentUser // <-- 2. Added 'impl
             'role' => UserRole::class,
             'is_active' => 'boolean',
             'is_blocked_from_posts' => 'boolean',
-
         ];
     }
 
@@ -44,6 +44,7 @@ class User extends Authenticatable implements FilamentUser // <-- 2. Added 'impl
             && $panel->getId() === 'super-admin';
     }
 
+<<<<<<< HEAD
     /**
      * Whether the user holds the SuperAdmin role.
      */
@@ -66,5 +67,15 @@ class User extends Authenticatable implements FilamentUser // <-- 2. Added 'impl
     public function isBlockedFromPosts(): bool
     {
         return (bool) $this->is_blocked_from_posts;
+=======
+    public function employerProfile(): HasOne
+    {
+        return $this->hasOne(EmployerProfile::class);
+    }
+
+    public function employeeProfile(): HasOne
+    {
+        return $this->hasOne(EmployeeProfile::class);
+>>>>>>> origin/main
     }
 }
