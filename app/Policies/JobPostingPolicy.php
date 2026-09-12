@@ -31,18 +31,33 @@ class JobPostingPolicy
 
     public function create(User $user): bool
     {
-        return $user->role === UserRole::Employer;
+        return $user->role === UserRole::SuperAdmin
+            || (
+                $user->role === UserRole::Employer
+                && $user->is_active
+                && ! $user->is_blocked_from_posts
+            );
     }
 
     public function update(User $user, JobPosting $jobPosting): bool
     {
-        return $user->role === UserRole::Employer
-            && $jobPosting->employer_id === $user->id;
+        return $user->role === UserRole::SuperAdmin
+            || (
+                $user->role === UserRole::Employer
+                && $user->is_active
+                && ! $user->is_blocked_from_posts
+                && $jobPosting->employer_id === $user->id
+            );
     }
 
     public function delete(User $user, JobPosting $jobPosting): bool
     {
-        return $user->role === UserRole::Employer
-            && $jobPosting->employer_id === $user->id;
+        return $user->role === UserRole::SuperAdmin
+            || (
+                $user->role === UserRole::Employer
+                && $user->is_active
+                && ! $user->is_blocked_from_posts
+                && $jobPosting->employer_id === $user->id
+            );
     }
 }
