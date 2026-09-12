@@ -8,27 +8,29 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('applications', function (Blueprint $table) {$table->id();
-        $table->foreignId('job_posting_id')
-    ->constrained('job_postings')
-    ->cascadeOnDelete();
+        Schema::create('applications', function (Blueprint $table) {
+            $table->id();
 
-    $table->foreignId('employee_id')
-    ->constrained('users')
-    ->cascadeOnDelete();
+            $table->foreignId('job_posting_id')
+                ->constrained('job_postings')
+                ->cascadeOnDelete();
 
-    $table->string('status');
+            $table->foreignId('employee_id')
+                ->constrained('users')
+                ->cascadeOnDelete();
 
-    $table->boolean('is_active')->default(true);
+            $table->string('status');
 
-    $table->text('cover_letter')->nullable();
+            $table->boolean('is_active')->default(true);
 
-    $table->timestamp('cancelled_at')->nullable();
+            $table->text('cover_letter')->nullable();
 
-    $table->timestamps();
+            $table->timestamp('cancelled_at')->nullable();
 
-    $table->unique(['employee_id', 'job_posting_id']);
-});
+            $table->timestamps();
+
+            $table->unique(['employee_id', 'job_posting_id']);
+        });
     }
 
     public function down(): void
