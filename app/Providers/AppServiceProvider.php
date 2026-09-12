@@ -5,6 +5,9 @@ namespace App\Providers;
 use App\Models\User;
 use App\Policies\UserPolicy;
 use Illuminate\Support\Facades\Gate;
+use App\Models\Application;
+use App\Policies\ApplicationPolicy;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -32,5 +35,8 @@ class AppServiceProvider extends ServiceProvider
         // Explicit policy registration (in addition to Laravel's
         // auto-discovery convention, so this is unambiguous in code review).
         Gate::policy(User::class, UserPolicy::class);
+    }
+}
+        Gate::policy(Application::class, ApplicationPolicy::class);
     }
 }
