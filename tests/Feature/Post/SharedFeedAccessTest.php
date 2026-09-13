@@ -1,58 +1,93 @@
 <?php
 
-namespace Tests\Feature\Post;
-
 use App\Enums\PostStatus;
-use App\Enums\UserRole;
 use App\Models\Post;
-use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
-class SharedFeedAccessTest extends TestCase
-{
-    use RefreshDatabase;
+test('guest is redirected to login from the feed', function () {
+    $this->get(route('feed.index'))
+        ->assertRedirect(route('login'));
+});
 
-    public function test_employer_can_access_the_feed(): void
-    {
-        $employer = User::factory()->create([
-            'role' => UserRole::Employer,
-        ]);
+test('employer can access the feed', function () {
+    actingAsEmployer();
 
-        $response = $this->actingAs($employer)->get(route('feed.index'));
+    $this->get(route('feed.index'))
+        ->assertOk()
+        ->assertSee(__('Feed'))
+        ->assertSee(__('No published posts available.'));
+});
 
-        $response->assertOk();
-    }
+test('employee can access the feed', function () {
+    actingAsEmployee();
 
-    public function test_employee_can_access_the_feed(): void
-    {
-        $employee = User::factory()->create([
-            'role' => UserRole::Employee,
-        ]);
+    $this->get(route('feed.index'))
+        ->assertOk()
+        ->assertSee(__('Feed'))
+        ->assertSee(__('No published posts available.'));
+});
 
-        $response = $this->actingAs($employee)->get(route('feed.index'));
+test('feed displays published posts', function () {
+    $employee = actingAsEmployee();
 
-        $response->assertOk();
-    }
+    Post::factory()->for($employee, 'author')->published()->create([
+        'title' => 'Published Career Post',
+        'body' => 'Published career body',
+        'author_role' => $employee->role,
+    ]);
 
-    public function test_feed_displays_published_posts(): void
-    {
-        $employee = User::factory()->create([
-            'role' => UserRole::Employee,
-        ]);
+    $this->get(route('feed.index'))
+        ->assertOk()
+        ->assertSee('Published Career Post')
+        ->assertSee('Published career body')
+        ->assertSee($employee->name);
+});
 
-        Post::factory()->published()->create([
-            'title' => 'Published Career Post',
-            'author_id' => $employee->id,
-            'author_role' => UserRole::Employee,
-            'status' => PostStatus::Published,
-            'is_active' => true,
-        ]);
+test('feed hides unpublished posts', function (PostStatus $status) {
+    $employee = actingAsEmployee();
 
-        $response = $this->actingAs($employee)->get(route('feed.index'));
+    Post::factory()->for($employee, 'author')->create([
+        'title' => 'Unpublished Career Post',
+        'status' => $status,
+        'author_role' => $employee->role,
+    ]);
 
-        $response
-            ->assertOk()
-            ->assertSee('Published Career Post');
-    }
-}
+    $this->get(route('feed.index'))
+        ->assertOk()
+        ->assertDontSee('Unpublished Career Post')
+        ->assertSee(__('No published posts available.'));
+})->with([
+    'draft' => PostStatus::Draft,
+    'hidden' => PostStatus::Hidden,
+    'archived' => PostStatus::Archived,
+]);
+
+test('feed hides inactive published posts', function () {
+    $employee = actingAsEmployee();
+
+    Post::factory()->for($employee, 'author')->published()->create([
+        'title' => 'Inactive Career Post',
+        'is_active' => false,
+        'author_role' => $employee->role,
+    ]);
+
+    $this->get(route('feed.index'))
+        ->assertOk()
+        ->assertDontSee('Inactive Career Post')
+        ->assertSee(__('No published posts available.'));
+});
+
+test('feed escapes post title and body', function () {
+    $employee = actingAsEmployee();
+
+    Post::factory()->for($employee, 'author')->published()->create([
+        'title' => '<script>alert("xss")</script>',
+        'body' => '<img src=x onerror=alert(1)>',
+        'author_role' => $employee->role,
+    ]);
+
+    $this->get(route('feed.index'))
+        ->assertOk()
+        ->assertDontSee('<script>alert("xss")</script>', false)
+        ->assertSee('&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;', false)
+        ->assertDontSee('<img src=x onerror=alert(1)>', false);
+});
