@@ -17,12 +17,8 @@ class PostPolicyTest extends TestCase
             'is_blocked_from_posts' => true,
         ]);
 
-        $post = Post::factory()->make([
-            'author_id' => $user->id,
-        ]);
-
         $this->assertFalse(
-            $user->can('create', [Post::class, $post])
+            $user->can('create', Post::class)
         );
     }
 

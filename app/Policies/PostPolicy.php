@@ -28,7 +28,7 @@ class PostPolicy
      */
     public function create(User $user): bool
     {
-        return ! $user->is_blocked_from_posts;
+        return ! $user->isBlockedFromPosts();
     }
 
     /**
