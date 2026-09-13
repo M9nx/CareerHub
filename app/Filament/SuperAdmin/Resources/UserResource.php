@@ -64,11 +64,15 @@ class UserResource extends Resource
                 Select::make('role')
                     ->options(static::roleOptions())
                     ->required()
-                    ->native(false),
+                    ->native(false)
+                    ->disabled(fn (?User $record): bool => static::isCurrentUser($record))
+                    ->dehydrated(fn (?User $record): bool => ! static::isCurrentUser($record)),
 
                 Toggle::make('is_active')
                     ->label('Active')
-                    ->default(true),
+                    ->default(true)
+                    ->disabled(fn (?User $record): bool => static::isCurrentUser($record))
+                    ->dehydrated(fn (?User $record): bool => ! static::isCurrentUser($record)),
 
                 Toggle::make('is_blocked_from_posts')
                     ->label('Blocked from posting')
@@ -113,21 +117,28 @@ class UserResource extends Resource
                     ->label('Activate')
                     ->icon(Heroicon::OutlinedCheckCircle)
                     ->color('success')
-                    ->visible(fn (User $record): bool => ! $record->isActive())
+                    ->visible(fn (User $record): bool => ! $record->isActive() && ! static::isCurrentUser($record))
                     ->requiresConfirmation()
-                    ->action(fn (User $record) => $record->update(['is_active' => true])),
+                    ->action(function (User $record): void {
+                        abort_if(static::isCurrentUser($record), 403);
+                        $record->update(['is_active' => true]);
+                    }),
 
                 Action::make('deactivate')
                     ->label('Deactivate')
                     ->icon(Heroicon::OutlinedXCircle)
                     ->color('danger')
-                    ->visible(fn (User $record): bool => $record->isActive())
+                    ->visible(fn (User $record): bool => $record->isActive() && ! static::isCurrentUser($record))
                     ->requiresConfirmation()
-                    ->action(fn (User $record) => $record->update(['is_active' => false])),
+                    ->action(function (User $record): void {
+                        abort_if(static::isCurrentUser($record), 403);
+                        $record->update(['is_active' => false]);
+                    }),
 
                 Action::make('changeRole')
                     ->label('Change role')
                     ->icon(Heroicon::OutlinedUserCircle)
+                    ->visible(fn (User $record): bool => ! static::isCurrentUser($record))
                     ->schema([
                         Select::make('role')
                             ->options(static::roleOptions())
@@ -138,10 +149,13 @@ class UserResource extends Resource
                         'role' => $record->role->value,
                     ])
                     ->action(function (User $record, array $data): void {
+                        abort_if(static::isCurrentUser($record), 403);
                         $record->update(['role' => $data['role']]);
                     }),
 
-                DeleteAction::make(),
+                DeleteAction::make()
+                    ->hidden(fn (User $record): bool => static::isCurrentUser($record))
+                    ->before(fn (User $record) => abort_if(static::isCurrentUser($record), 403)),
             ]);
     }
 
@@ -157,5 +171,10 @@ class UserResource extends Resource
     public static function canAccess(): bool
     {
         return auth()->user()?->isSuperAdmin() ?? false;
+    }
+
+    protected static function isCurrentUser(?User $record): bool
+    {
+        return $record !== null && $record->is(auth()->user());
     }
 }

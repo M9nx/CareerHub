@@ -18,18 +18,26 @@ class EditUser extends EditRecord
             Action::make('deactivate')
                 ->label('Deactivate')
                 ->color('danger')
-                ->visible(fn (User $record): bool => $record->isActive())
+                ->visible(fn (User $record): bool => $record->isActive() && $record->isNot(auth()->user()))
                 ->requiresConfirmation()
-                ->action(fn (User $record) => $record->update(['is_active' => false])),
+                ->action(function (User $record): void {
+                    abort_if($record->is(auth()->user()), 403);
+                    $record->update(['is_active' => false]);
+                }),
 
             Action::make('activate')
                 ->label('Activate')
                 ->color('success')
-                ->visible(fn (User $record): bool => ! $record->isActive())
+                ->visible(fn (User $record): bool => ! $record->isActive() && $record->isNot(auth()->user()))
                 ->requiresConfirmation()
-                ->action(fn (User $record) => $record->update(['is_active' => true])),
+                ->action(function (User $record): void {
+                    abort_if($record->is(auth()->user()), 403);
+                    $record->update(['is_active' => true]);
+                }),
 
-            DeleteAction::make(),
+            DeleteAction::make()
+                ->hidden(fn (User $record): bool => $record->is(auth()->user()))
+                ->before(fn (User $record) => abort_if($record->is(auth()->user()), 403)),
         ];
     }
 }
