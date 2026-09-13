@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\Application;
 use App\Policies\ApplicationPolicy;
+use App\Services\LocalDocumentStorage;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -14,7 +15,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        app()->singleton(LocalDocumentStorage::class, function () {
+            return new LocalDocumentStorage;
+        });
     }
 
     /**
