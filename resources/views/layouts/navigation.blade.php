@@ -134,9 +134,9 @@
                         {{ __('Dashboard') }}
                     </x-responsive-nav-link>
 
-                    @if (Route::has('employer.jobs'))
+                    @if (Route::has('employer.jobs.index'))
                         <x-responsive-nav-link
-                            :href="route('employer.jobs')"
+                            :href="route('employer.jobs.index')"
                             :active="request()->routeIs('employer.jobs*')"
                         >
                             {{ __('Jobs') }}

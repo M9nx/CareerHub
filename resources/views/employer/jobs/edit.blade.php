@@ -1,116 +1,95 @@
 <x-app-layout>
+    <x-slot name="header">
+        <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
+            {{ __('Edit Job Posting') }}
+        </h2>
+    </x-slot>
+
     <div class="py-12">
         <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
-            <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <div class="mb-6">
-                        <h1 class="text-2xl font-semibold">Edit Job Posting</h1>
-                        <p class="mt-1 text-sm text-gray-600">
-                            Update your job posting.
-                        </p>
-                    </div>
-
-                    @if ($errors->any())
-                        <div class="mb-6 rounded-md bg-red-100 p-4 text-sm text-red-800">
-                            <ul class="list-disc space-y-1 pl-5">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-
-                    <form
-                        method="POST"
-                        action="{{ route('employer.jobs.update', $job) }}"
-                        class="space-y-6"
-                    >
+            <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
+                <div class="p-6 text-gray-900 dark:text-gray-100">
+                    <form method="POST" action="{{ route('employer.jobs.update', $job) }}" class="space-y-6">
                         @csrf
                         @method('PATCH')
 
                         <div>
-                            <label for="title" class="block text-sm font-medium text-gray-700">
-                                Title
-                            </label>
-
-                            <input
+                            <x-input-label for="title" :value="__('Title')" />
+                            <x-text-input
                                 id="title"
                                 name="title"
                                 type="text"
-                                value="{{ old('title', $job->title) }}"
+                                class="mt-1 block w-full"
+                                :value="old('title', $job->title)"
                                 required
+                                autofocus
                                 maxlength="255"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-500 focus:ring-gray-500"
-                            >
+                            />
+                            <x-input-error class="mt-2" :messages="$errors->get('title')" />
                         </div>
 
                         <div>
-                            <label for="description" class="block text-sm font-medium text-gray-700">
-                                Description
-                            </label>
-
+                            <x-input-label for="description" :value="__('Description')" />
                             <textarea
                                 id="description"
                                 name="description"
                                 rows="8"
                                 required
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-500 focus:ring-gray-500"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:focus:border-indigo-600 dark:focus:ring-indigo-600"
                             >{{ old('description', $job->description) }}</textarea>
+                            <x-input-error class="mt-2" :messages="$errors->get('description')" />
                         </div>
 
                         <div>
-                            <label for="status" class="block text-sm font-medium text-gray-700">
-                                Status
-                            </label>
-
+                            <x-input-label for="status" :value="__('Status')" />
                             <select
                                 id="status"
                                 name="status"
                                 required
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-500 focus:ring-gray-500"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:focus:border-indigo-600 dark:focus:ring-indigo-600"
                             >
-                                @foreach (['draft', 'published', 'closed', 'archived'] as $status)
-                                    <option
-                                        value="{{ $status }}"
-                                        @selected(old('status', $job->status->value) === $status)
-                                    >
-                                        {{ ucfirst($status) }}
+                                @foreach ($statuses as $status)
+                                    <option value="{{ $status->value }}" @selected(old('status', $job->status->value) === $status->value)>
+                                        {{ $status->name }}
                                     </option>
                                 @endforeach
                             </select>
+                            <x-input-error class="mt-2" :messages="$errors->get('status')" />
                         </div>
 
                         <div class="flex items-center justify-end gap-3">
                             <a
                                 href="{{ route('employer.jobs.index') }}"
-                                class="rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                                class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-widest text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-500 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                             >
-                                Cancel
+                                {{ __('Cancel') }}
                             </a>
-
-                            <button
-                                type="submit"
-                                class="rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700"
-                            >
-                                Update Job
-                            </button>
+                            <x-primary-button>
+                                {{ __('Update Job') }}
+                            </x-primary-button>
                         </div>
                     </form>
 
-                    <div class="mt-8 border-t border-gray-200 pt-6">
-                        <form
-                            method="POST"
-                            action="{{ route('employer.jobs.destroy', $job) }}"
-                        >
+                    @if ($job->status === \App\Enums\JobPostingStatus::Draft)
+                        <form method="POST" action="{{ route('employer.jobs.update', $job) }}" class="mt-6">
+                            @csrf
+                            @method('PATCH')
+                            <input type="hidden" name="title" value="{{ $job->title }}">
+                            <input type="hidden" name="description" value="{{ $job->description }}">
+                            <input type="hidden" name="status" value="{{ \App\Enums\JobPostingStatus::Published->value }}">
+                            <x-primary-button>
+                                {{ __('Publish') }}
+                            </x-primary-button>
+                        </form>
+                    @endif
+
+                    <div class="mt-8 border-t border-gray-200 pt-6 dark:border-gray-700">
+                        <form method="POST" action="{{ route('employer.jobs.destroy', $job) }}">
                             @csrf
                             @method('DELETE')
-
-                            <button
-                                type="submit"
-                                class="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-500"
-                            >
-                                Delete Job
-                            </button>
+                            <x-danger-button>
+                                {{ __('Delete Job') }}
+                            </x-danger-button>
                         </form>
                     </div>
                 </div>
