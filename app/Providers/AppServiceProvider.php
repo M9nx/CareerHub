@@ -15,8 +15,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-          app()->singleton(LocalDocumentStorage::class, function () {
-        return new LocalDocumentStorage();
+        app()->singleton(LocalDocumentStorage::class, function () {
+            return new LocalDocumentStorage;
         });
     }
 
