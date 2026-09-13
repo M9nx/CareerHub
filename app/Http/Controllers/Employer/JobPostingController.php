@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Employer;
 
+use App\Enums\JobPostingStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Employer\StoreJobPostingRequest;
 use App\Http\Requests\Employer\UpdateJobPostingRequest;
@@ -75,6 +76,39 @@ class JobPostingController extends Controller
         return redirect()
             ->route('employer.jobs.index')
             ->with('success', __('Job posting updated successfully.'));
+    }
+
+    /**
+     * Publish the specified job posting.
+     */
+    public function publish(JobPosting $job): RedirectResponse
+    {
+        Gate::authorize('update', $job);
+
+        $job->update([
+            'status' => JobPostingStatus::Published,
+            'published_at' => now(),
+        ]);
+
+        return redirect()
+            ->route('employer.jobs.edit', $job)
+            ->with('success', __('Job posting published successfully.'));
+    }
+
+    /**
+     * Close the specified job posting.
+     */
+    public function close(JobPosting $job): RedirectResponse
+    {
+        Gate::authorize('update', $job);
+
+        $job->update([
+            'status' => JobPostingStatus::Closed,
+        ]);
+
+        return redirect()
+            ->route('employer.jobs.edit', $job)
+            ->with('success', __('Job posting closed successfully.'));
     }
 
     /**
