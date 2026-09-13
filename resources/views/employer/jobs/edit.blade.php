@@ -10,6 +10,12 @@
                         </p>
                     </div>
 
+                    @if (session('success'))
+                        <div class="mb-6 rounded-md bg-green-100 p-4 text-sm text-green-800">
+                            {{ session('success') }}
+                        </div>
+                    @endif
+
                     @if ($errors->any())
                         <div class="mb-6 rounded-md bg-red-100 p-4 text-sm text-red-800">
                             <ul class="list-disc space-y-1 pl-5">
@@ -98,6 +104,38 @@
                     </form>
 
                     <div class="mt-8 border-t border-gray-200 pt-6">
+                        <div class="flex items-center gap-3">
+                            <form
+                                method="POST"
+                                action="{{ route('employer.jobs.publish', $job) }}"
+                            >
+                                @csrf
+
+                                <button
+                                    type="submit"
+                                    class="rounded-md bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-500"
+                                >
+                                    Publish
+                                </button>
+                            </form>
+
+                            <form
+                                method="POST"
+                                action="{{ route('employer.jobs.close', $job) }}"
+                            >
+                                @csrf
+
+                                <button
+                                    type="submit"
+                                    class="rounded-md bg-yellow-600 px-4 py-2 text-sm font-semibold text-white hover:bg-yellow-500"
+                                >
+                                    Close
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 border-t border-gray-200 pt-6">
                         <form
                             method="POST"
                             action="{{ route('employer.jobs.destroy', $job) }}"
