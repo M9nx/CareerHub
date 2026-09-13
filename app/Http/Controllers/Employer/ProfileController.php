@@ -33,6 +33,6 @@ class ProfileController extends Controller
 
         return redirect()
             ->route('employer.profile.edit')
-            ->with('success', 'Profile updated successfully.');
+            ->with('success', __('Profile updated successfully.'));
     }
 }
