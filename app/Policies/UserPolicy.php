@@ -43,6 +43,11 @@ class UserPolicy
      */
     public function delete(User $user, User $model): bool
     {
+        return $user->isSuperAdmin() && $user->isNot($model);
+    }
+
+    public function deleteAny(User $user): bool
+    {
         return $user->isSuperAdmin();
     }
 
