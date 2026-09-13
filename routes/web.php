@@ -5,7 +5,18 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    if (auth()->check()) {
+        $user = auth()->user();
+
+        return match ($user->role) {
+            UserRole::Employer => redirect()->route('employer.dashboard'),
+            UserRole::Employee => redirect()->route('employee.dashboard'),
+            UserRole::SuperAdmin => redirect('/super-admin'),
+            default => redirect()->route('dashboard'),
+        };
+    }
+
+    return view('landing');
 });
 
 Route::get('/dashboard', function () {
@@ -17,6 +28,10 @@ Route::get('/dashboard', function () {
 
     if ($user->role === UserRole::Employee) {
         return redirect()->route('employee.dashboard');
+    }
+
+    if ($user->role === UserRole::SuperAdmin) {
+        return redirect('/super-admin');
     }
 
     return view('dashboard');

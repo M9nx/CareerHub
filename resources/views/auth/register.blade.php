@@ -27,7 +27,7 @@
                         name="role"
                         value="Employer"
                         class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800"
-                        @checked(old('role', 'Employer') === 'Employer')
+                        @checked(old('role', request('role', 'Employer')) === 'Employer')
                         required
                     />
                     <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Employer') }}</span>
@@ -39,7 +39,7 @@
                         name="role"
                         value="Employee"
                         class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800"
-                        @checked(old('role') === 'Employee')
+                        @checked(old('role', request('role')) === 'Employee')
                         required
                     />
                     <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Employee') }}</span>

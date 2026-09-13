@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Enums\UserRole;
 use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
@@ -10,6 +9,7 @@ use Filament\Panel;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -44,6 +44,7 @@ class User extends Authenticatable implements FilamentUser
             && $panel->getId() === 'super-admin';
     }
 
+ HEAD
     /**
      * Whether the user holds the SuperAdmin role.
      */
@@ -52,17 +53,11 @@ class User extends Authenticatable implements FilamentUser
         return $this->role === UserRole::SuperAdmin;
     }
 
-    /**
-     * Whether the user's account is active.
-     */
     public function isActive(): bool
     {
         return (bool) $this->is_active;
     }
 
-    /**
-     * Whether the user is currently blocked from creating posts.
-     */
     public function isBlockedFromPosts(): bool
     {
         return (bool) $this->is_blocked_from_posts;
@@ -76,5 +71,6 @@ class User extends Authenticatable implements FilamentUser
     public function employeeProfile(): HasOne
     {
         return $this->hasOne(EmployeeProfile::class);
+ origin/main
     }
 }
