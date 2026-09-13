@@ -19,6 +19,10 @@ Route::get('/dashboard', function () {
         return redirect()->route('employee.dashboard');
     }
 
+    if ($user->role === UserRole::SuperAdmin) {
+        return redirect('/super-admin');
+    }
+
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
