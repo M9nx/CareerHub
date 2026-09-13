@@ -44,6 +44,21 @@ class User extends Authenticatable implements FilamentUser
             && $panel->getId() === 'super-admin';
     }
 
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === UserRole::SuperAdmin;
+    }
+
+    public function isActive(): bool
+    {
+        return (bool) $this->is_active;
+    }
+
+    public function isBlockedFromPosts(): bool
+    {
+        return (bool) $this->is_blocked_from_posts;
+    }
+
     public function employerProfile(): HasOne
     {
         return $this->hasOne(EmployerProfile::class);

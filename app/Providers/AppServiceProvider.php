@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Models\Application;
+use App\Models\User;
 use App\Policies\ApplicationPolicy;
+use App\Policies\UserPolicy;
 use App\Services\LocalDocumentStorage;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -25,6 +27,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Gate::before(function (User $user, string $ability): ?bool {
+            return $user->isSuperAdmin() ? true : null;
+        });
+
+        Gate::policy(User::class, UserPolicy::class);
         Gate::policy(Application::class, ApplicationPolicy::class);
     }
 }
