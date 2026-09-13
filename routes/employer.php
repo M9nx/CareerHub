@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Employer\DashboardController;
+use App\Http\Controllers\Employer\JobPostingController;
 use App\Http\Controllers\Employer\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -15,4 +16,8 @@ Route::middleware(['web', 'auth', 'employer'])
 
         Route::patch('/profile', [ProfileController::class, 'update'])
             ->name('employer.profile.update');
+
+        Route::resource('jobs', JobPostingController::class)
+            ->except(['show'])
+            ->names('employer.jobs');
     });
