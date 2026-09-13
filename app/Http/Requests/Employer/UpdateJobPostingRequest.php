@@ -2,9 +2,11 @@
 
 namespace App\Http\Requests\Employer;
 
+use App\Enums\JobPostingStatus;
 use App\Models\JobPosting;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Enum;
 
 class UpdateJobPostingRequest extends FormRequest
 {
@@ -16,20 +18,16 @@ class UpdateJobPostingRequest extends FormRequest
             && ($this->user()?->can('update', $jobPosting) ?? false);
     }
 
+    /**
+     * @return array<string, list<string|Enum>>
+     */
     public function rules(): array
     {
         return [
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
-            'status' => [
-                'required',
-                Rule::in([
-                    'draft',
-                    'published',
-                    'closed',
-                    'archived',
-                ]),
-            ],
+            'status' => ['required', Rule::enum(JobPostingStatus::class)],
+            'employer_id' => ['prohibited'],
         ];
     }
 }

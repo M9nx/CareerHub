@@ -1,276 +1,198 @@
 <?php
 
-namespace Tests\Feature\JobPosting;
-
 use App\Enums\JobPostingStatus;
 use App\Models\JobPosting;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
-class EmployerJobPostingTest extends TestCase
-{
-    use RefreshDatabase;
+test('employer can view their job postings and not others', function () {
+    $employer = actingAsEmployer();
 
-    public function test_employer_can_view_their_job_postings(): void
-    {
-        $employer = User::factory()->employer()->create();
+    JobPosting::factory()->for($employer, 'employer')->create([
+        'title' => 'Own Backend Role',
+    ]);
 
-        $ownJob = JobPosting::factory()->create([
-            'employer_id' => $employer->id,
-        ]);
+    JobPosting::factory()->create([
+        'title' => 'Other Employer Role',
+    ]);
 
-        JobPosting::factory()->create();
+    $this->get(route('employer.jobs.index'))
+        ->assertOk()
+        ->assertSee('Own Backend Role')
+        ->assertSee(__('Jobs'))
+        ->assertDontSee('Other Employer Role');
+});
 
-        $response = $this
-            ->actingAs($employer)
-            ->get(route('employer.jobs.index'));
+test('employer can view the create job form', function () {
+    actingAsEmployer();
 
-        $response->assertOk();
-        $response->assertSee($ownJob->title);
-    }
+    $this->get(route('employer.jobs.create'))
+        ->assertOk()
+        ->assertSee(__('Create Job Posting'));
+});
 
-    public function test_employer_can_view_create_job_form(): void
-    {
-        $employer = User::factory()->employer()->create([
-            'is_active' => true,
-            'is_blocked_from_posts' => false,
-        ]);
+test('employer can create a job posting', function () {
+    $employer = actingAsEmployer();
 
-        $response = $this
-            ->actingAs($employer)
-            ->get(route('employer.jobs.create'));
+    $this->post(route('employer.jobs.store'), [
+        'title' => 'Laravel Developer',
+        'description' => 'Build and maintain Laravel applications.',
+        'status' => JobPostingStatus::Draft->value,
+    ])
+        ->assertRedirect(route('employer.jobs.index'))
+        ->assertSessionHas('success', __('Job posting created successfully.'));
 
-        $response->assertOk();
-        $response->assertSee('Create Job Posting');
-    }
+    $this->assertDatabaseHas('job_postings', [
+        'employer_id' => $employer->id,
+        'title' => 'Laravel Developer',
+        'description' => 'Build and maintain Laravel applications.',
+        'status' => JobPostingStatus::Draft->value,
+    ]);
+});
 
-    public function test_employer_can_create_a_job_posting(): void
-    {
-        $employer = User::factory()->employer()->create([
-            'is_active' => true,
-            'is_blocked_from_posts' => false,
-        ]);
+test('employer can edit and update their own job posting', function () {
+    $employer = actingAsEmployer();
+    $job = JobPosting::factory()->for($employer, 'employer')->draft()->create();
 
-        $response = $this
-            ->actingAs($employer)
-            ->post(route('employer.jobs.store'), [
-                'title' => 'Laravel Developer',
-                'description' => 'Build and maintain Laravel applications.',
-                'status' => JobPostingStatus::Draft->value,
-            ]);
+    $this->get(route('employer.jobs.edit', $job))
+        ->assertOk()
+        ->assertSee($job->title)
+        ->assertSee(__('Publish'));
 
-        $response
-            ->assertRedirect(route('employer.jobs.index'))
-            ->assertSessionHas('success');
+    $this->patch(route('employer.jobs.update', $job), [
+        'title' => 'Updated Laravel Developer',
+        'description' => 'Updated job description.',
+        'status' => JobPostingStatus::Published->value,
+    ])
+        ->assertRedirect(route('employer.jobs.index'))
+        ->assertSessionHas('success', __('Job posting updated successfully.'));
 
-        $this->assertDatabaseHas('job_postings', [
-            'employer_id' => $employer->id,
-            'title' => 'Laravel Developer',
-            'description' => 'Build and maintain Laravel applications.',
-            'status' => JobPostingStatus::Draft->value,
-        ]);
-    }
+    $job->refresh();
 
-    public function test_employer_can_edit_their_own_job_posting(): void
-    {
-        $employer = User::factory()->employer()->create([
-            'is_active' => true,
-            'is_blocked_from_posts' => false,
-        ]);
+    expect($job->title)->toBe('Updated Laravel Developer')
+        ->and($job->description)->toBe('Updated job description.')
+        ->and($job->status)->toBe(JobPostingStatus::Published)
+        ->and($job->published_at)->not->toBeNull()
+        ->and($job->employer_id)->toBe($employer->id);
+});
 
-        $job = JobPosting::factory()->create([
-            'employer_id' => $employer->id,
-        ]);
+test('employer cannot change employer id on update', function () {
+    $employer = actingAsEmployer();
+    $otherEmployer = User::factory()->employer()->create();
+    $job = JobPosting::factory()->for($employer, 'employer')->create();
 
-        $response = $this
-            ->actingAs($employer)
-            ->get(route('employer.jobs.edit', $job));
-
-        $response->assertOk();
-        $response->assertSee($job->title);
-    }
-
-    public function test_employer_can_update_their_own_job_posting(): void
-    {
-        $employer = User::factory()->employer()->create([
-            'is_active' => true,
-            'is_blocked_from_posts' => false,
-        ]);
-
-        $job = JobPosting::factory()->create([
-            'employer_id' => $employer->id,
-            'status' => JobPostingStatus::Draft,
-        ]);
-
-        $response = $this
-            ->actingAs($employer)
-            ->patch(route('employer.jobs.update', $job), [
-                'title' => 'Updated Laravel Developer',
-                'description' => 'Updated job description.',
-                'status' => JobPostingStatus::Published->value,
-            ]);
-
-        $response
-            ->assertRedirect(route('employer.jobs.index'))
-            ->assertSessionHas('success');
-
-        $this->assertDatabaseHas('job_postings', [
-            'id' => $job->id,
-            'employer_id' => $employer->id,
-            'title' => 'Updated Laravel Developer',
-            'description' => 'Updated job description.',
-            'status' => JobPostingStatus::Published->value,
-        ]);
-    }
-
-    public function test_employer_cannot_edit_another_employers_job_posting(): void
-    {
-        $employer = User::factory()->employer()->create([
-            'is_active' => true,
-            'is_blocked_from_posts' => false,
-        ]);
-
-        $otherEmployer = User::factory()->employer()->create([
-            'is_active' => true,
-            'is_blocked_from_posts' => false,
-        ]);
-
-        $job = JobPosting::factory()->create([
+    $this->from(route('employer.jobs.edit', $job))
+        ->patch(route('employer.jobs.update', $job), [
+            'title' => $job->title,
+            'description' => $job->description,
+            'status' => $job->status->value,
             'employer_id' => $otherEmployer->id,
+        ])
+        ->assertRedirect(route('employer.jobs.edit', $job))
+        ->assertSessionHasErrors('employer_id');
+
+    expect($job->fresh()->employer_id)->toBe($employer->id);
+});
+
+test('employer cannot edit update or delete another employers job posting', function () {
+    $employer = actingAsEmployer();
+    $job = JobPosting::factory()->create([
+        'title' => 'Other Employer Role',
+    ]);
+
+    $this->get(route('employer.jobs.edit', $job))->assertForbidden();
+
+    $this->patch(route('employer.jobs.update', $job), [
+        'title' => 'Unauthorized Update',
+        'description' => 'This should not be allowed.',
+        'status' => JobPostingStatus::Draft->value,
+    ])->assertForbidden();
+
+    $this->delete(route('employer.jobs.destroy', $job))->assertForbidden();
+
+    $this->assertDatabaseHas('job_postings', [
+        'id' => $job->id,
+        'title' => 'Other Employer Role',
+    ]);
+});
+
+test('employer can delete their own job posting', function () {
+    $employer = actingAsEmployer();
+    $job = JobPosting::factory()->for($employer, 'employer')->create();
+
+    $this->delete(route('employer.jobs.destroy', $job))
+        ->assertRedirect(route('employer.jobs.index'))
+        ->assertSessionHas('success', __('Job posting deleted successfully.'));
+
+    $this->assertDatabaseMissing('job_postings', [
+        'id' => $job->id,
+    ]);
+});
+
+test('blocked employer cannot create a job posting', function () {
+    actingAsEmployer(['is_blocked_from_posts' => true]);
+
+    $this->get(route('employer.jobs.create'))->assertForbidden();
+
+    $this->post(route('employer.jobs.store'), [
+        'title' => 'Blocked Job',
+        'description' => 'This should not be created.',
+        'status' => JobPostingStatus::Draft->value,
+    ])->assertForbidden();
+
+    $this->assertDatabaseMissing('job_postings', [
+        'title' => 'Blocked Job',
+    ]);
+});
+
+test('job posting creation requires valid data', function () {
+    actingAsEmployer();
+
+    $this->from(route('employer.jobs.create'))
+        ->post(route('employer.jobs.store'), [
+            'title' => '',
+            'description' => '',
+            'status' => 'invalid-status',
+        ])
+        ->assertRedirect(route('employer.jobs.create'))
+        ->assertInvalid([
+            'title' => __('validation.required', ['attribute' => 'title']),
+            'description' => __('validation.required', ['attribute' => 'description']),
+            'status' => __('validation.enum', ['attribute' => 'status']),
         ]);
+});
 
-        $response = $this
-            ->actingAs($employer)
-            ->get(route('employer.jobs.edit', $job));
+test('guest is redirected to login from employer jobs', function () {
+    $this->get(route('employer.jobs.index'))
+        ->assertRedirect(route('login'));
 
-        $response->assertForbidden();
-    }
+    $this->post(route('employer.jobs.store'), [
+        'title' => 'Guest Job',
+        'description' => 'Guests cannot create jobs.',
+        'status' => JobPostingStatus::Draft->value,
+    ])->assertRedirect(route('login'));
+});
 
-    public function test_employer_cannot_update_another_employers_job_posting(): void
-    {
-        $employer = User::factory()->employer()->create([
-            'is_active' => true,
-            'is_blocked_from_posts' => false,
-        ]);
+test('employee cannot access employer jobs', function () {
+    actingAsEmployee();
 
-        $otherEmployer = User::factory()->employer()->create([
-            'is_active' => true,
-            'is_blocked_from_posts' => false,
-        ]);
+    $this->get(route('employer.jobs.index'))->assertForbidden();
 
-        $job = JobPosting::factory()->create([
-            'employer_id' => $otherEmployer->id,
-        ]);
+    $this->post(route('employer.jobs.store'), [
+        'title' => 'Employee Job',
+        'description' => 'Employees cannot create employer jobs.',
+        'status' => JobPostingStatus::Draft->value,
+    ])->assertForbidden();
+});
 
-        $response = $this
-            ->actingAs($employer)
-            ->patch(route('employer.jobs.update', $job), [
-                'title' => 'Unauthorized Update',
-                'description' => 'This should not be allowed.',
-                'status' => JobPostingStatus::Draft->value,
-            ]);
+test('job posting titles are escaped on the index', function () {
+    $employer = actingAsEmployer();
 
-        $response->assertForbidden();
+    JobPosting::factory()->for($employer, 'employer')->create([
+        'title' => '<script>alert("xss")</script>',
+    ]);
 
-        $this->assertDatabaseMissing('job_postings', [
-            'id' => $job->id,
-            'title' => 'Unauthorized Update',
-        ]);
-    }
-
-    public function test_employer_cannot_delete_another_employers_job_posting(): void
-    {
-        $employer = User::factory()->employer()->create([
-            'is_active' => true,
-            'is_blocked_from_posts' => false,
-        ]);
-
-        $otherEmployer = User::factory()->employer()->create([
-            'is_active' => true,
-            'is_blocked_from_posts' => false,
-        ]);
-
-        $job = JobPosting::factory()->create([
-            'employer_id' => $otherEmployer->id,
-        ]);
-
-        $response = $this
-            ->actingAs($employer)
-            ->delete(route('employer.jobs.destroy', $job));
-
-        $response->assertForbidden();
-
-        $this->assertDatabaseHas('job_postings', [
-            'id' => $job->id,
-        ]);
-    }
-
-    public function test_employer_can_delete_their_own_job_posting(): void
-    {
-        $employer = User::factory()->employer()->create([
-            'is_active' => true,
-            'is_blocked_from_posts' => false,
-        ]);
-
-        $job = JobPosting::factory()->create([
-            'employer_id' => $employer->id,
-        ]);
-
-        $response = $this
-            ->actingAs($employer)
-            ->delete(route('employer.jobs.destroy', $job));
-
-        $response
-            ->assertRedirect(route('employer.jobs.index'))
-            ->assertSessionHas('success');
-
-        $this->assertDatabaseMissing('job_postings', [
-            'id' => $job->id,
-        ]);
-    }
-
-    public function test_employer_cannot_create_job_posting_when_blocked(): void
-    {
-        $employer = User::factory()->employer()->create([
-            'is_active' => true,
-            'is_blocked_from_posts' => true,
-        ]);
-
-        $response = $this
-            ->actingAs($employer)
-            ->post(route('employer.jobs.store'), [
-                'title' => 'Blocked Job',
-                'description' => 'This should not be created.',
-                'status' => JobPostingStatus::Draft->value,
-            ]);
-
-        $response->assertForbidden();
-
-        $this->assertDatabaseMissing('job_postings', [
-            'title' => 'Blocked Job',
-        ]);
-    }
-
-    public function test_job_posting_creation_requires_valid_data(): void
-    {
-        $employer = User::factory()->employer()->create([
-            'is_active' => true,
-            'is_blocked_from_posts' => false,
-        ]);
-
-        $response = $this
-            ->actingAs($employer)
-            ->post(route('employer.jobs.store'), [
-                'title' => '',
-                'description' => '',
-                'status' => 'invalid-status',
-            ]);
-
-        $response->assertSessionHasErrors([
-            'title',
-            'description',
-            'status',
-        ]);
-    }
-}
+    $this->get(route('employer.jobs.index'))
+        ->assertOk()
+        ->assertDontSee('<script>alert("xss")</script>', false)
+        ->assertSee('&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;', false);
+});

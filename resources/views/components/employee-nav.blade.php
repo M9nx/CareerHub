@@ -13,9 +13,9 @@
         {{ __('Feed') }}
     </x-nav-link>
 
-    @if (Route::has('employee.jobs'))
+    @if (Route::has('employee.jobs.index'))
         <x-nav-link
-            :href="route('employee.jobs')"
+            :href="route('employee.jobs.index')"
             :active="request()->routeIs('employee.jobs*')"
         >
             {{ __('Jobs') }}

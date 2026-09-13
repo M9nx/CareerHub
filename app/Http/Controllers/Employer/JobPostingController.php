@@ -9,42 +9,42 @@ use App\Http\Requests\Employer\UpdateJobPostingRequest;
 use App\Models\JobPosting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class JobPostingController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request): View
     {
+        Gate::authorize('viewAny', JobPosting::class);
+
         $jobs = JobPosting::query()
-            ->where('employer_id', $request->user()->id)
+            ->whereBelongsTo($request->user(), 'employer')
             ->latest()
             ->get();
 
         return view('employer.jobs.index', compact('jobs'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create(): View
     {
         Gate::authorize('create', JobPosting::class);
 
-        return view('employer.jobs.create');
+        return view('employer.jobs.create', [
+            'statuses' => JobPostingStatus::cases(),
+        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreJobPostingRequest $request): RedirectResponse
     {
         JobPosting::create([
             'employer_id' => $request->user()->id,
-            ...$request->validated(),
+            ...$this->publicationAttributes($request->safe()->only([
+                'title',
+                'description',
+                'status',
+            ])),
         ]);
 
         return redirect()
@@ -52,38 +52,35 @@ class JobPostingController extends Controller
             ->with('success', __('Job posting created successfully.'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(JobPosting $job): View
     {
         Gate::authorize('update', $job);
 
-        return view('employer.jobs.edit', compact('job'));
+        return view('employer.jobs.edit', [
+            'job' => $job,
+            'statuses' => JobPostingStatus::cases(),
+        ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(
         UpdateJobPostingRequest $request,
         JobPosting $job
     ): RedirectResponse {
-        Gate::authorize('update', $job);
-
-        $job->update($request->validated());
+        $job->update($this->publicationAttributes(
+            $request->safe()->only(['title', 'description', 'status']),
+            $job,
+        ));
 
         return redirect()
             ->route('employer.jobs.index')
             ->with('success', __('Job posting updated successfully.'));
     }
 
-    /**
-     * Publish the specified job posting.
-     */
     public function publish(JobPosting $job): RedirectResponse
     {
         Gate::authorize('update', $job);
+
+        abort_unless($job->status === JobPostingStatus::Draft, 403);
 
         $job->update([
             'status' => JobPostingStatus::Published,
@@ -95,12 +92,11 @@ class JobPostingController extends Controller
             ->with('success', __('Job posting published successfully.'));
     }
 
-    /**
-     * Close the specified job posting.
-     */
     public function close(JobPosting $job): RedirectResponse
     {
         Gate::authorize('update', $job);
+
+        abort_unless($job->status === JobPostingStatus::Published, 403);
 
         $job->update([
             'status' => JobPostingStatus::Closed,
@@ -111,9 +107,6 @@ class JobPostingController extends Controller
             ->with('success', __('Job posting closed successfully.'));
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(JobPosting $job): RedirectResponse
     {
         Gate::authorize('delete', $job);
@@ -123,5 +116,21 @@ class JobPostingController extends Controller
         return redirect()
             ->route('employer.jobs.index')
             ->with('success', __('Job posting deleted successfully.'));
+    }
+
+    /**
+     * @param  array{title: string, description: string, status: string}  $attributes
+     * @return array{title: string, description: string, status: string, published_at?: Carbon}
+     */
+    private function publicationAttributes(array $attributes, ?JobPosting $job = null): array
+    {
+        if (
+            $attributes['status'] === JobPostingStatus::Published->value
+            && ($job === null || $job->published_at === null)
+        ) {
+            $attributes['published_at'] = now();
+        }
+
+        return $attributes;
     }
 }

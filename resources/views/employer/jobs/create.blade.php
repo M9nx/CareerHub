@@ -1,94 +1,71 @@
 <x-app-layout>
+    <x-slot name="header">
+        <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
+            {{ __('Create Job Posting') }}
+        </h2>
+    </x-slot>
+
     <div class="py-12">
         <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
-            <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <div class="mb-6">
-                        <h1 class="text-2xl font-semibold">Create Job Posting</h1>
-                        <p class="mt-1 text-sm text-gray-600">
-                            Add a new job posting.
-                        </p>
-                    </div>
-
-                    @if ($errors->any())
-                        <div class="mb-6 rounded-md bg-red-100 p-4 text-sm text-red-800">
-                            <ul class="list-disc space-y-1 pl-5">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-
+            <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
+                <div class="p-6 text-gray-900 dark:text-gray-100">
                     <form method="POST" action="{{ route('employer.jobs.store') }}" class="space-y-6">
                         @csrf
 
                         <div>
-                            <label for="title" class="block text-sm font-medium text-gray-700">
-                                Title
-                            </label>
-
-                            <input
+                            <x-input-label for="title" :value="__('Title')" />
+                            <x-text-input
                                 id="title"
                                 name="title"
                                 type="text"
-                                value="{{ old('title') }}"
+                                class="mt-1 block w-full"
+                                :value="old('title')"
                                 required
+                                autofocus
                                 maxlength="255"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-500 focus:ring-gray-500"
-                            >
+                            />
+                            <x-input-error class="mt-2" :messages="$errors->get('title')" />
                         </div>
 
                         <div>
-                            <label for="description" class="block text-sm font-medium text-gray-700">
-                                Description
-                            </label>
-
+                            <x-input-label for="description" :value="__('Description')" />
                             <textarea
                                 id="description"
                                 name="description"
                                 rows="8"
                                 required
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-500 focus:ring-gray-500"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:focus:border-indigo-600 dark:focus:ring-indigo-600"
                             >{{ old('description') }}</textarea>
+                            <x-input-error class="mt-2" :messages="$errors->get('description')" />
                         </div>
 
                         <div>
-                            <label for="status" class="block text-sm font-medium text-gray-700">
-                                Status
-                            </label>
-
+                            <x-input-label for="status" :value="__('Status')" />
                             <select
                                 id="status"
                                 name="status"
                                 required
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-gray-500 focus:ring-gray-500"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:focus:border-indigo-600 dark:focus:ring-indigo-600"
                             >
-                                @foreach (['draft', 'published', 'closed', 'archived'] as $status)
-                                    <option
-                                        value="{{ $status }}"
-                                        @selected(old('status', 'draft') === $status)
-                                    >
-                                        {{ ucfirst($status) }}
+                                @foreach ($statuses as $status)
+                                    <option value="{{ $status->value }}" @selected(old('status', \App\Enums\JobPostingStatus::Draft->value) === $status->value)>
+                                        {{ $status->name }}
                                     </option>
                                 @endforeach
                             </select>
+                            <x-input-error class="mt-2" :messages="$errors->get('status')" />
                         </div>
 
                         <div class="flex items-center justify-end gap-3">
                             <a
                                 href="{{ route('employer.jobs.index') }}"
-                                class="rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                                class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-widest text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-500 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                             >
-                                Cancel
+                                {{ __('Cancel') }}
                             </a>
-
-                            <button
-                                type="submit"
-                                class="rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700"
-                            >
-                                Create Job
-                            </button>
+                            <x-primary-button>
+                                {{ __('Create Job') }}
+                            </x-primary-button>
                         </div>
                     </form>
                 </div>
