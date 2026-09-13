@@ -23,6 +23,26 @@ class JobPostingResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'title';
 
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->isSuperAdmin() ?? false;
+    }
+
+    public static function canCreate(): bool
+    {
+        return false;
+    }
+
+    public static function canEdit($record): bool
+    {
+        return false;
+    }
+
+    public static function canDelete($record): bool
+    {
+        return false;
+    }
+
     public static function infolist(Schema $schema): Schema
     {
         return $schema
@@ -41,6 +61,7 @@ class JobPostingResource extends Resource
     {
         return $table
             ->recordTitleAttribute('title')
+            ->modifyQueryUsing(fn ($query) => $query->with('employer'))
             ->columns([
                 TextColumn::make('title')
                     ->searchable(),
@@ -52,38 +73,10 @@ class JobPostingResource extends Resource
                 TextColumn::make('status')
                     ->badge(),
             ])
-            ->Actions([
+            ->recordActions([
                 ViewAction::make(),
-
-                Action::make('forceClose')
-                    ->label('Force Close')
-                    ->icon('heroicon-o-x-circle')
-                    ->color('danger')
-                    ->requiresConfirmation()
-                    ->visible(fn (JobPosting $record): bool => $record->status !== JobPostingStatus::Closed)
-                    ->action(function (JobPosting $record): void {
-                        $record->update(['status' => JobPostingStatus::Closed]);
-
-                        Notification::make()
-                            ->title('Job posting closed successfully')
-                            ->success()
-                            ->send();
-                    }),
-
-                Action::make('archive')
-                    ->label('Archive')
-                    ->icon('heroicon-o-archive-box')
-                    ->color('warning')
-                    ->requiresConfirmation()
-                    ->visible(fn (JobPosting $record): bool => $record->status !== JobPostingStatus::Archived)
-                    ->action(function (JobPosting $record): void {
-                        $record->update(['status' => JobPostingStatus::Archived]);
-
-                        Notification::make()
-                            ->title('Job posting archived successfully')
-                            ->success()
-                            ->send();
-                    }),
+                static::forceCloseAction(),
+                static::archiveAction(),
             ]);
     }
 
@@ -91,6 +84,43 @@ class JobPostingResource extends Resource
     {
         return [
             'index' => Pages\ManageJobPostings::route('/'),
+            'view' => Pages\ViewJobPosting::route('/{record}'),
         ];
+    }
+
+    public static function forceCloseAction(): Action
+    {
+        return Action::make('forceClose')
+            ->label('Force Close')
+            ->icon(Heroicon::OutlinedXCircle)
+            ->color('danger')
+            ->requiresConfirmation()
+            ->visible(fn (JobPosting $record): bool => $record->status !== JobPostingStatus::Closed)
+            ->action(function (JobPosting $record): void {
+                $record->update(['status' => JobPostingStatus::Closed]);
+
+                Notification::make()
+                    ->title(__('Job posting closed successfully'))
+                    ->success()
+                    ->send();
+            });
+    }
+
+    public static function archiveAction(): Action
+    {
+        return Action::make('archive')
+            ->label('Archive')
+            ->icon(Heroicon::OutlinedArchiveBox)
+            ->color('warning')
+            ->requiresConfirmation()
+            ->visible(fn (JobPosting $record): bool => $record->status !== JobPostingStatus::Archived)
+            ->action(function (JobPosting $record): void {
+                $record->update(['status' => JobPostingStatus::Archived]);
+
+                Notification::make()
+                    ->title(__('Job posting archived successfully'))
+                    ->success()
+                    ->send();
+            });
     }
 }
