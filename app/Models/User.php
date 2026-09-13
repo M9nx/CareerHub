@@ -22,11 +22,6 @@ class User extends Authenticatable implements FilamentUser
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, TwoFactorAuthenticatable;
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -44,10 +39,6 @@ class User extends Authenticatable implements FilamentUser
             && $panel->getId() === 'super-admin';
     }
 
- HEAD
-    /**
-     * Whether the user holds the SuperAdmin role.
-     */
     public function isSuperAdmin(): bool
     {
         return $this->role === UserRole::SuperAdmin;
@@ -71,6 +62,10 @@ class User extends Authenticatable implements FilamentUser
     public function employeeProfile(): HasOne
     {
         return $this->hasOne(EmployeeProfile::class);
- origin/main
+    }
+
+    public function posts(): HasMany
+    {
+        return $this->hasMany(Post::class, 'author_id');
     }
 }
