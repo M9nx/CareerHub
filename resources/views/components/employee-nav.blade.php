@@ -6,9 +6,16 @@
         {{ __('Dashboard') }}
     </x-nav-link>
 
-    @if (Route::has('employee.jobs'))
+    <x-nav-link
+        :href="route('feed.index')"
+        :active="request()->routeIs('feed.index')"
+    >
+        {{ __('Feed') }}
+    </x-nav-link>
+
+    @if (Route::has('employee.jobs.index'))
         <x-nav-link
-            :href="route('employee.jobs')"
+            :href="route('employee.jobs.index')"
             :active="request()->routeIs('employee.jobs*')"
         >
             {{ __('Jobs') }}
