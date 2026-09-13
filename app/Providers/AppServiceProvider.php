@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Models\Application;
+use App\Models\JobPosting;
 use App\Models\User;
+use App\Observers\JobPostingObserver;
 use App\Policies\ApplicationPolicy;
 use App\Policies\UserPolicy;
 use App\Services\LocalDocumentStorage;
@@ -33,5 +35,7 @@ class AppServiceProvider extends ServiceProvider
 
         Gate::policy(User::class, UserPolicy::class);
         Gate::policy(Application::class, ApplicationPolicy::class);
+
+        JobPosting::observe(JobPostingObserver::class);
     }
 }
