@@ -6,7 +6,18 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    if (auth()->check()) {
+        $user = auth()->user();
+
+        return match ($user->role) {
+            UserRole::Employer => redirect()->route('employer.dashboard'),
+            UserRole::Employee => redirect()->route('employee.dashboard'),
+            UserRole::SuperAdmin => redirect('/super-admin'),
+            default => redirect()->route('dashboard'),
+        };
+    }
+
+    return view('landing');
 });
 
 Route::get('/dashboard', function () {
