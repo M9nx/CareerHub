@@ -9,6 +9,12 @@
         <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
             <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
+                    @if (session('success'))
+                        <p class="mb-4 text-sm font-medium text-green-600 dark:text-green-400">
+                            {{ session('success') }}
+                        </p>
+                    @endif
+
                     <form method="POST" action="{{ route('employer.jobs.update', $job) }}" class="space-y-6">
                         @csrf
                         @method('PATCH')
@@ -71,14 +77,19 @@
                     </form>
 
                     @if ($job->status === \App\Enums\JobPostingStatus::Draft)
-                        <form method="POST" action="{{ route('employer.jobs.update', $job) }}" class="mt-6">
+                        <form method="POST" action="{{ route('employer.jobs.publish', $job) }}" class="mt-6">
                             @csrf
-                            @method('PATCH')
-                            <input type="hidden" name="title" value="{{ $job->title }}">
-                            <input type="hidden" name="description" value="{{ $job->description }}">
-                            <input type="hidden" name="status" value="{{ \App\Enums\JobPostingStatus::Published->value }}">
                             <x-primary-button>
                                 {{ __('Publish') }}
+                            </x-primary-button>
+                        </form>
+                    @endif
+
+                    @if ($job->status === \App\Enums\JobPostingStatus::Published)
+                        <form method="POST" action="{{ route('employer.jobs.close', $job) }}" class="mt-6">
+                            @csrf
+                            <x-primary-button>
+                                {{ __('Close') }}
                             </x-primary-button>
                         </form>
                     @endif

@@ -20,4 +20,10 @@ Route::middleware(['web', 'auth', 'employer'])
         Route::resource('jobs', JobPostingController::class)
             ->except(['show'])
             ->names('employer.jobs');
+
+        Route::post('jobs/{job}/publish', [JobPostingController::class, 'publish'])
+            ->name('employer.jobs.publish');
+
+        Route::post('jobs/{job}/close', [JobPostingController::class, 'close'])
+            ->name('employer.jobs.close');
     });

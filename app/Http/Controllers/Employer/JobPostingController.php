@@ -76,6 +76,37 @@ class JobPostingController extends Controller
             ->with('success', __('Job posting updated successfully.'));
     }
 
+    public function publish(JobPosting $job): RedirectResponse
+    {
+        Gate::authorize('update', $job);
+
+        abort_unless($job->status === JobPostingStatus::Draft, 403);
+
+        $job->update([
+            'status' => JobPostingStatus::Published,
+            'published_at' => now(),
+        ]);
+
+        return redirect()
+            ->route('employer.jobs.edit', $job)
+            ->with('success', __('Job posting published successfully.'));
+    }
+
+    public function close(JobPosting $job): RedirectResponse
+    {
+        Gate::authorize('update', $job);
+
+        abort_unless($job->status === JobPostingStatus::Published, 403);
+
+        $job->update([
+            'status' => JobPostingStatus::Closed,
+        ]);
+
+        return redirect()
+            ->route('employer.jobs.edit', $job)
+            ->with('success', __('Job posting closed successfully.'));
+    }
+
     public function destroy(JobPosting $job): RedirectResponse
     {
         Gate::authorize('delete', $job);
