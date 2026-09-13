@@ -1,122 +1,136 @@
 <?php
 
-namespace Tests\Feature\JobPosting;
-
 use App\Enums\JobPostingStatus;
 use App\Models\JobPosting;
-use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
-class EmployerJobTransitionTest extends TestCase
-{
-    use RefreshDatabase;
+test('employer can publish their own draft job posting', function () {
+    $employer = actingAsEmployer();
+    $job = JobPosting::factory()->for($employer, 'employer')->draft()->create();
 
-    public function test_employer_can_publish_their_own_job_posting(): void
-    {
-        $employer = User::factory()->employer()->create([
-            'is_active' => true,
-            'is_blocked_from_posts' => false,
-        ]);
+    $this->post(route('employer.jobs.publish', $job))
+        ->assertRedirect(route('employer.jobs.edit', $job))
+        ->assertSessionHas('success', __('Job posting published successfully.'));
 
-        $job = JobPosting::factory()->draft()->create([
-            'employer_id' => $employer->id,
-            'published_at' => null,
-        ]);
+    $job->refresh();
 
-        $response = $this
-            ->actingAs($employer)
-            ->post(route('employer.jobs.publish', $job));
+    expect($job->status)->toBe(JobPostingStatus::Published)
+        ->and($job->published_at)->not->toBeNull();
+});
 
-        $response
-            ->assertRedirect(route('employer.jobs.edit', $job))
-            ->assertSessionHas('success');
+test('employer can close their own published job posting', function () {
+    $employer = actingAsEmployer();
+    $job = JobPosting::factory()->for($employer, 'employer')->published()->create();
+    $publishedAt = $job->published_at;
 
-        $job->refresh();
+    $this->post(route('employer.jobs.close', $job))
+        ->assertRedirect(route('employer.jobs.edit', $job))
+        ->assertSessionHas('success', __('Job posting closed successfully.'));
 
-        $this->assertSame(JobPostingStatus::Published, $job->status);
-        $this->assertNotNull($job->published_at);
-    }
+    $job->refresh();
 
-    public function test_employer_can_close_their_own_job_posting(): void
-    {
-        $employer = User::factory()->employer()->create([
-            'is_active' => true,
-            'is_blocked_from_posts' => false,
-        ]);
+    expect($job->status)->toBe(JobPostingStatus::Closed)
+        ->and($job->published_at?->equalTo($publishedAt))->toBeTrue();
+});
 
-        $job = JobPosting::factory()->published()->create([
-            'employer_id' => $employer->id,
-            'published_at' => now(),
-        ]);
+test('draft edit page shows the publish action', function () {
+    $employer = actingAsEmployer();
+    $job = JobPosting::factory()->for($employer, 'employer')->draft()->create();
 
-        $response = $this
-            ->actingAs($employer)
-            ->post(route('employer.jobs.close', $job));
+    $this->get(route('employer.jobs.edit', $job))
+        ->assertOk()
+        ->assertSee(__('Publish'))
+        ->assertSee(route('employer.jobs.publish', $job), false)
+        ->assertDontSee(route('employer.jobs.close', $job), false);
+});
 
-        $response
-            ->assertRedirect(route('employer.jobs.edit', $job))
-            ->assertSessionHas('success');
+test('published edit page shows the close action', function () {
+    $employer = actingAsEmployer();
+    $job = JobPosting::factory()->for($employer, 'employer')->published()->create();
 
-        $this->assertDatabaseHas('job_postings', [
-            'id' => $job->id,
-            'status' => JobPostingStatus::Closed->value,
-        ]);
-    }
+    $this->get(route('employer.jobs.edit', $job))
+        ->assertOk()
+        ->assertSee(__('Close'))
+        ->assertSee(route('employer.jobs.close', $job), false)
+        ->assertDontSee(route('employer.jobs.publish', $job), false);
+});
 
-    public function test_employer_cannot_publish_another_employers_job_posting(): void
-    {
-        $employer = User::factory()->employer()->create([
-            'is_active' => true,
-            'is_blocked_from_posts' => false,
-        ]);
+test('employer cannot publish a job posting that is not a draft', function (string $state) {
+    $employer = actingAsEmployer();
+    $job = JobPosting::factory()->for($employer, 'employer')->{$state}()->create();
+    $status = $job->status;
+    $publishedAt = $job->published_at;
 
-        $otherEmployer = User::factory()->employer()->create([
-            'is_active' => true,
-            'is_blocked_from_posts' => false,
-        ]);
+    $this->post(route('employer.jobs.publish', $job))->assertForbidden();
 
-        $job = JobPosting::factory()->draft()->create([
-            'employer_id' => $otherEmployer->id,
-        ]);
+    $job->refresh();
 
-        $response = $this
-            ->actingAs($employer)
-            ->post(route('employer.jobs.publish', $job));
+    expect($job->status)->toBe($status)
+        ->and($job->published_at?->toJSON())->toBe($publishedAt?->toJSON());
+})->with([
+    'published',
+    'closed',
+    'archived',
+]);
 
-        $response->assertForbidden();
+test('employer cannot close a job posting that is not published', function (string $state) {
+    $employer = actingAsEmployer();
+    $job = JobPosting::factory()->for($employer, 'employer')->{$state}()->create();
+    $status = $job->status;
 
-        $this->assertDatabaseHas('job_postings', [
-            'id' => $job->id,
-            'status' => JobPostingStatus::Draft->value,
-        ]);
-    }
+    $this->post(route('employer.jobs.close', $job))->assertForbidden();
 
-    public function test_employer_cannot_close_another_employers_job_posting(): void
-    {
-        $employer = User::factory()->employer()->create([
-            'is_active' => true,
-            'is_blocked_from_posts' => false,
-        ]);
+    expect($job->fresh()->status)->toBe($status);
+})->with([
+    'draft',
+    'closed',
+    'archived',
+]);
 
-        $otherEmployer = User::factory()->employer()->create([
-            'is_active' => true,
-            'is_blocked_from_posts' => false,
-        ]);
+test('employer cannot transition another employers job posting', function (string $state, string $routeName) {
+    actingAsEmployer();
+    $job = JobPosting::factory()->{$state}()->create();
+    $status = $job->status;
 
-        $job = JobPosting::factory()->published()->create([
-            'employer_id' => $otherEmployer->id,
-        ]);
+    $this->post(route($routeName, $job))->assertForbidden();
 
-        $response = $this
-            ->actingAs($employer)
-            ->post(route('employer.jobs.close', $job));
+    expect($job->fresh()->status)->toBe($status);
+})->with([
+    'publish' => ['draft', 'employer.jobs.publish'],
+    'close' => ['published', 'employer.jobs.close'],
+]);
 
-        $response->assertForbidden();
+test('blocked employer cannot transition a job posting', function (string $state, string $routeName) {
+    $employer = actingAsEmployer(['is_blocked_from_posts' => true]);
+    $job = JobPosting::factory()->for($employer, 'employer')->{$state}()->create();
+    $status = $job->status;
 
-        $this->assertDatabaseHas('job_postings', [
-            'id' => $job->id,
-            'status' => JobPostingStatus::Published->value,
-        ]);
-    }
-}
+    $this->post(route($routeName, $job))->assertForbidden();
+
+    expect($job->fresh()->status)->toBe($status);
+})->with([
+    'publish' => ['draft', 'employer.jobs.publish'],
+    'close' => ['published', 'employer.jobs.close'],
+]);
+
+test('guest is redirected to login from job transitions', function (string $state, string $routeName) {
+    $job = JobPosting::factory()->{$state}()->create();
+
+    $this->post(route($routeName, $job))
+        ->assertRedirect(route('login'));
+})->with([
+    'publish' => ['draft', 'employer.jobs.publish'],
+    'close' => ['published', 'employer.jobs.close'],
+]);
+
+test('employee cannot transition employer job postings', function (string $state, string $routeName) {
+    actingAsEmployee();
+    $job = JobPosting::factory()->{$state}()->create();
+    $status = $job->status;
+
+    $this->post(route($routeName, $job))->assertForbidden();
+
+    expect($job->fresh()->status)->toBe($status);
+})->with([
+    'publish' => ['draft', 'employer.jobs.publish'],
+    'close' => ['published', 'employer.jobs.close'],
+]);
