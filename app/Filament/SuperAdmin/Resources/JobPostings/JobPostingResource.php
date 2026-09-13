@@ -2,10 +2,13 @@
 
 namespace App\Filament\SuperAdmin\Resources\JobPostings;
 
+use App\Enums\JobPostingStatus;
 use App\Models\JobPosting;
 use BackedEnum;
+use Filament\Actions\Action;
 use Filament\Actions\ViewAction;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -27,7 +30,10 @@ class JobPostingResource extends Resource
                 TextEntry::make('title'),
                 TextEntry::make('employer.name')
                     ->label('Employer'),
-                TextEntry::make('status'),
+                TextEntry::make('status')
+                    ->badge(),
+                TextEntry::make('description')
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -43,10 +49,41 @@ class JobPostingResource extends Resource
                     ->label('Employer')
                     ->searchable(),
 
-                TextColumn::make('status'),
+                TextColumn::make('status')
+                    ->badge(),
             ])
-            ->recordActions([
+            ->Actions([
                 ViewAction::make(),
+
+                Action::make('forceClose')
+                    ->label('Force Close')
+                    ->icon('heroicon-o-x-circle')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->visible(fn (JobPosting $record): bool => $record->status !== JobPostingStatus::Closed)
+                    ->action(function (JobPosting $record): void {
+                        $record->update(['status' => JobPostingStatus::Closed]);
+
+                        Notification::make()
+                            ->title('Job posting closed successfully')
+                            ->success()
+                            ->send();
+                    }),
+
+                Action::make('archive')
+                    ->label('Archive')
+                    ->icon('heroicon-o-archive-box')
+                    ->color('warning')
+                    ->requiresConfirmation()
+                    ->visible(fn (JobPosting $record): bool => $record->status !== JobPostingStatus::Archived)
+                    ->action(function (JobPosting $record): void {
+                        $record->update(['status' => JobPostingStatus::Archived]);
+
+                        Notification::make()
+                            ->title('Job posting archived successfully')
+                            ->success()
+                            ->send();
+                    }),
             ]);
     }
 
