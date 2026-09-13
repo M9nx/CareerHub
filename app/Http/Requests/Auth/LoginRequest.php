@@ -51,6 +51,14 @@ class LoginRequest extends FormRequest
         }
 
         RateLimiter::clear($this->throttleKey());
+
+        if ($this->user()?->isSuperAdmin()) {
+            Auth::guard('web')->logout();
+
+            throw ValidationException::withMessages([
+                'email' => __('Please sign in at :url.', ['url' => url('/super-admin/login')]),
+            ]);
+        }
     }
 
     /**

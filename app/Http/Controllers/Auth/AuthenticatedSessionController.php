@@ -32,8 +32,21 @@ class AuthenticatedSessionController extends Controller
         return match ($request->user()->role) {
             UserRole::Employer => to_route('employer.dashboard'),
             UserRole::Employee => to_route('employee.dashboard'),
-            default => redirect()->intended(route('dashboard', absolute: false)),
+            default => $this->logoutAndRedirectToFilamentLogin($request),
         };
+    }
+
+    /**
+     * SuperAdmin must use the Filament panel, never a Breeze web session.
+     */
+    private function logoutAndRedirectToFilamentLogin(Request $request): RedirectResponse
+    {
+        Auth::guard('web')->logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect('/super-admin/login');
     }
 
     /**
