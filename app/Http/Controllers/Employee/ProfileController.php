@@ -6,7 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Employee\UpdateEmployeeProfileRequest;
 use App\Services\LocalDocumentStorage;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ProfileController extends Controller
 {
@@ -56,6 +59,55 @@ class ProfileController extends Controller
         }
 
         return redirect()->route('profile.edit');
+    }
+
+    public function downloadCv(Request $request): StreamedResponse
+    {
+        $profile = $request->user()->employeeProfile;
+
+        abort_unless(
+            $profile !== null && filled($profile->cv_path),
+            404,
+        );
+
+        abort_unless(
+            Storage::disk('public')->exists($profile->cv_path),
+            404,
+        );
+
+        $downloadName = sprintf(
+            '%s-cv.%s',
+            Str::slug($request->user()->name) ?: 'employee',
+            pathinfo($profile->cv_path, PATHINFO_EXTENSION) ?: 'pdf',
+        );
+
+        return Storage::disk('public')->download($profile->cv_path, $downloadName);
+    }
+
+    public function downloadApplicationImage(Request $request): StreamedResponse
+    {
+        $profile = $request->user()->employeeProfile;
+
+        abort_unless(
+            $profile !== null && filled($profile->application_image_path),
+            404,
+        );
+
+        abort_unless(
+            Storage::disk('public')->exists($profile->application_image_path),
+            404,
+        );
+
+        $downloadName = sprintf(
+            '%s-application-image.%s',
+            Str::slug($request->user()->name) ?: 'employee',
+            pathinfo($profile->application_image_path, PATHINFO_EXTENSION) ?: 'jpg',
+        );
+
+        return Storage::disk('public')->download(
+            $profile->application_image_path,
+            $downloadName,
+        );
     }
 
     private function deleteStoredFile(?string $path): void
