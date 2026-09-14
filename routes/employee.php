@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Employee\ApplicationController;
 use App\Http\Controllers\Employee\DashboardController;
 use App\Http\Controllers\Employee\JobBrowseController;
 use Illuminate\Support\Facades\Route;
@@ -15,4 +16,15 @@ Route::middleware(['web', 'auth', 'employee'])
 
         Route::get('/jobs/{jobPosting}', [JobBrowseController::class, 'show'])
             ->name('employee.jobs.show');
+
+        Route::get('/applications', [ApplicationController::class, 'index'])
+            ->name('employee.applications.index');
+
+        Route::post('/applications', [ApplicationController::class, 'store'])
+            ->name('employee.applications.store');
+
+        Route::patch(
+            '/applications/{application}/cancel',
+            [ApplicationController::class, 'cancel']
+        )->name('employee.applications.cancel');
     });

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Employer\ApplicationController;
 use App\Http\Controllers\Employer\DashboardController;
 use App\Http\Controllers\Employer\JobPostingController;
 use App\Http\Controllers\Employer\ProfileController;
@@ -26,4 +27,13 @@ Route::middleware(['web', 'auth', 'employer'])
 
         Route::post('jobs/{job}/close', [JobPostingController::class, 'close'])
             ->name('employer.jobs.close');
+
+        Route::get('/applications', [ApplicationController::class, 'index'])
+            ->name('employer.applications.index');
+
+        Route::get('/applications/{application}', [ApplicationController::class, 'show'])
+            ->name('employer.applications.show');
+
+        Route::patch('/applications/{application}', [ApplicationController::class, 'update'])
+            ->name('employer.applications.update');
     });
