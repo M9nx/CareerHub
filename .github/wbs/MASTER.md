@@ -3,7 +3,7 @@
 > **Epic / Master:** [#1](https://github.com/M9nx/CareerHub/issues/1)  
 > **Repo:** [M9nx/CareerHub](https://github.com/M9nx/CareerHub) · Branch: `main` (protected)  
 > **Stack:** Laravel **13** · PHP **8.5** · Filament **5** · Breeze **2.4** · Pest **5**  
-> **Sprint:** 8 days · 6 members · 48 leaf packages (8 hours each)
+> **Sprint:** 8-day MVP (P0–P7) · P8 professional product (M9nx) · 6 members on P0–P6 · P7 is a single M9nx package
 
 ---
 
@@ -11,7 +11,7 @@
 
 | Member | Primary feature thread |
 |--------|------------------------|
-| **M9nx** | Foundation, Auth, CRM, Integration |
+| **M9nx** | Foundation, Auth, CRM, Integration, P7 release, P8 professional product |
 | **Mariam** | SuperAdmin Users + Filament platform |
 | **Omar** | Job postings (`job_postings` table) |
 | **Eldeep** | Applications workflow |
@@ -24,7 +24,7 @@
 
 | # | Decision |
 |---|----------|
-| 1 | **Posts = shared feed** — Employer + Employee share `/feed`; SuperAdmin moderates via Filament |
+| 1 | **Posts = shared feed** — Employer + Employee share `/feed`; SuperAdmin moderates via Filament. **P8 upgrades `/feed` to a mixed chronological timeline.** |
 | 2 | **Open registration** for **Employer** and **Employee** (role at signup) |
 | 3 | **Cancel = `Cancelled` status** — employee cancel action sets terminal `Cancelled` |
 | 4 | **SuperAdmin = Filament only** at `/super-admin`; Employer `/employer/*`; Employee `/employee/*` |
@@ -89,10 +89,17 @@ Master #1
 ├── Phase P4 #37 — Day 5 Applications
 ├── Phase P5 #44 — Day 6 Posts Feed+Moderation
 ├── Phase P6 #51 — Day 7 Profiles+Storage
-└── Phase P7 #58 — Day 8 Integration QA Release
+├── Phase P7 #58 — Day 8 Integration QA Release (M9nx; no member leaves)
+└── Phase P8 #98 — Day 9 Professional product
+    ├── P8-Timeline #99
+    ├── P8-Composer #100
+    ├── P8-Inbox #101
+    ├── P8-Discovery #102
+    ├── P8-UI #103
+    └── P8-Harden #104
 ```
 
-Each **leaf** is one 8-hour vertical slice spanning migration → model → policy → controller/resource → views → tests for that day's scope.
+Each **leaf** is one 8-hour vertical slice spanning migration → model → policy → controller/resource → views → tests for that day's scope. P7 has no leaves: [#58](https://github.com/M9nx/CareerHub/issues/58) is the work package (member leaves #59–#64 closed as not planned).
 
 ---
 
@@ -107,7 +114,8 @@ Each **leaf** is one 8-hour vertical slice spanning migration → model → poli
 | P4 | #37 | Day 5 | Applications | #38, #39, #40, #41, #42, #43 | not-started |
 | P5 | #44 | Day 6 | Posts Feed and Moderation | #45, #46, #47, #48, #49, #50 | not-started |
 | P6 | #51 | Day 7 | Profiles and Storage | #52, #53, #54, #55, #56, #57 | not-started |
-| P7 | #58 | Day 8 | Integration QA and Release | #59, #60, #61, #62, #63, #64 | not-started |
+| P7 | #58 | Day 8 | Integration QA and Release | — (work is #58 itself) | not-started |
+| P8 | #98 | Day 9 | Professional product | #99, #100, #101, #102, #103, #104 | not-started |
 
 ---
 
@@ -157,12 +165,13 @@ Each **leaf** is one 8-hour vertical slice spanning migration → model → poli
 | P6-Eldeep | #55 | Eldeep | P6 | `feat/#55-application-timeline` | P5-Eldeep | not-started |
 | P6-Basha | #56 | Basha | P6 | `feat/#56-feed-blocked-user-ux` | P5-Basha | not-started |
 | P6-Youmna | #57 | Youmna | P6 | `feat/#57-profile-download-docs` | P5-Youmna | not-started |
-| P7-M9nx | #59 | M9nx | P7 | `feat/#59-integration-release` | - | not-started |
-| P7-Mariam | #60 | Mariam | P7 | `feat/#60-sa-regression-audit` | P6-Mariam | not-started |
-| P7-Omar | #61 | Omar | P7 | `feat/#61-jobs-e2e-regression` | P6-Omar | not-started |
-| P7-Eldeep | #62 | Eldeep | P7 | `feat/#62-applications-e2e-regression` | P6-Eldeep | not-started |
-| P7-Basha | #63 | Basha | P7 | `feat/#63-posts-e2e-regression` | P6-Basha | not-started |
-| P7-Youmna | #64 | Youmna | P7 | `feat/#64-profiles-e2e-regression` | P6-Youmna | not-started |
+| P7 | #58 | M9nx | P7 | `feat/#58-integration-release` | - | not-started |
+| P8-Timeline | #99 | M9nx | P8 | `feat/#99-timeline-feed` | - | not-started |
+| P8-Composer | #100 | M9nx | P8 | `feat/#100-timeline-composer` | - | not-started |
+| P8-Inbox | #101 | M9nx | P8 | `feat/#101-notification-inbox` | - | not-started |
+| P8-Discovery | #102 | M9nx | P8 | `feat/#102-discovery-search` | - | not-started |
+| P8-UI | #103 | M9nx | P8 | `feat/#103-professional-ui` | - | not-started |
+| P8-Harden | #104 | M9nx | P8 | `feat/#104-production-hardening` | - | not-started |
 
 ---
 
@@ -178,6 +187,7 @@ Each **leaf** is one 8-hour vertical slice spanning migration → model → poli
 | P5 | [P5.md](./P5.md) | 6 | Posts Feed and Moderation |
 | P6 | [P6.md](./P6.md) | 7 | Profiles and Storage |
 | P7 | [P7.md](./P7.md) | 8 | Integration QA and Release |
+| P8 | [P8.md](./P8.md) | 9 | Professional product |
 
 ---
 
@@ -235,6 +245,6 @@ Each **leaf** is one 8-hour vertical slice spanning migration → model → poli
 ## 12. Related references
 
 - [MASTER-WBS-v2.md](../MASTER-WBS-v2.md) — architecture deep-dive
-- Phase appendices: [P0](./P0.md) · [P1](./P1.md) · [P2](./P2.md) · [P3](./P3.md) · [P4](./P4.md) · [P5](./P5.md) · [P6](./P6.md) · [P7](./P7.md)
+- Phase appendices: [P0](./P0.md) · [P1](./P1.md) · [P2](./P2.md) · [P3](./P3.md) · [P4](./P4.md) · [P5](./P5.md) · [P6](./P6.md) · [P7](./P7.md) · [P8](./P8.md)
 - Issue hierarchy is tracked via GitHub **sub-issues** on this master issue and each phase issue (sections 5–6 list all issue numbers).
 
