@@ -1,151 +1,117 @@
 <?php
 
-namespace Tests\Feature\Post;
-
 use App\Enums\PostStatus;
 use App\Enums\UserRole;
 use App\Models\Post;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
-class EmployerPostCrudTest extends TestCase
-{
-    use RefreshDatabase;
+test('employer can create a published post', function () {
+    $employer = actingAsEmployer();
 
-    public function test_employer_can_create_a_published_post(): void
-    {
-        $employer = User::factory()->create([
-            'role' => UserRole::Employer,
-        ]);
+    $this->post(route('employer.posts.store'), [
+        'title' => 'Employer Career Post',
+        'body' => 'This is an employer career post.',
+        'publish' => '1',
+    ])
+        ->assertRedirect(route('employer.posts.index'))
+        ->assertSessionHas('success', __('Post created successfully.'));
 
-        $response = $this->actingAs($employer)->post(
-            route('employer.posts.store'),
-            [
-                'title' => 'Employer Career Post',
-                'body' => 'This is an employer career post.',
-                'publish' => '1',
-            ]
-        );
+    $this->assertDatabaseHas('posts', [
+        'author_id' => $employer->id,
+        'author_role' => UserRole::Employer->value,
+        'title' => 'Employer Career Post',
+        'body' => 'This is an employer career post.',
+        'status' => PostStatus::Published->value,
+        'is_active' => true,
+    ]);
+});
 
-        $response
-            ->assertRedirect(route('employer.posts.index'))
-            ->assertSessionHas('success', 'Post created successfully.');
+test('published employer post is visible on the shared feed', function () {
+    $employer = actingAsEmployer();
 
-        $this->assertDatabaseHas('posts', [
-            'author_id' => $employer->id,
-            'author_role' => UserRole::Employer->value,
-            'title' => 'Employer Career Post',
-            'body' => 'This is an employer career post.',
-            'status' => PostStatus::Published->value,
-            'is_active' => true,
-        ]);
-    }
+    Post::factory()->for($employer, 'author')->published()->create([
+        'author_role' => UserRole::Employer,
+        'title' => 'Employer Feed Post',
+    ]);
 
-    public function test_published_employer_post_is_visible_on_shared_feed(): void
-    {
-        $employer = User::factory()->create([
-            'role' => UserRole::Employer,
-        ]);
+    $this->get(route('feed.index'))
+        ->assertOk()
+        ->assertSee('Employer Feed Post');
+});
 
-        Post::factory()->published()->create([
-            'author_id' => $employer->id,
-            'author_role' => UserRole::Employer,
-            'title' => 'Employer Feed Post',
-            'status' => PostStatus::Published,
-            'is_active' => true,
-        ]);
+test('employer can update own post', function () {
+    $employer = actingAsEmployer();
+    $post = Post::factory()->for($employer, 'author')->create([
+        'author_role' => UserRole::Employer,
+        'title' => 'Old Employer Post',
+    ]);
 
-        $response = $this->actingAs($employer)->get(route('feed.index'));
+    $this->put(route('employer.posts.update', $post), [
+        'title' => 'Updated Employer Post',
+        'body' => 'Updated employer post body.',
+        'publish' => '1',
+    ])->assertRedirect(route('employer.posts.index'));
 
-        $response
-            ->assertOk()
-            ->assertSee('Employer Feed Post');
-    }
+    $this->assertDatabaseHas('posts', [
+        'id' => $post->id,
+        'author_id' => $employer->id,
+        'title' => 'Updated Employer Post',
+        'body' => 'Updated employer post body.',
+        'status' => PostStatus::Published->value,
+    ]);
+});
 
-    public function test_employer_can_update_own_post(): void
-    {
-        $employer = User::factory()->create([
-            'role' => UserRole::Employer,
-        ]);
+test('employer can delete own post', function () {
+    $employer = actingAsEmployer();
+    $post = Post::factory()->for($employer, 'author')->create([
+        'author_role' => UserRole::Employer,
+    ]);
 
-        $post = Post::factory()->create([
-            'author_id' => $employer->id,
-            'author_role' => UserRole::Employer,
-            'title' => 'Old Employer Post',
-        ]);
+    $this->delete(route('employer.posts.destroy', $post))
+        ->assertRedirect(route('employer.posts.index'));
 
-        $response = $this->actingAs($employer)->put(
-            route('employer.posts.update', $post),
-            [
-                'title' => 'Updated Employer Post',
-                'body' => 'Updated employer post body.',
-                'publish' => '1',
-            ]
-        );
+    $this->assertDatabaseMissing('posts', [
+        'id' => $post->id,
+    ]);
+});
 
-        $response->assertRedirect(route('employer.posts.index'));
+test('employer cannot update another users post', function () {
+    actingAsEmployer();
+    $otherEmployer = User::factory()->employer()->create();
+    $post = Post::factory()->for($otherEmployer, 'author')->create([
+        'author_role' => UserRole::Employer,
+    ]);
 
-        $this->assertDatabaseHas('posts', [
-            'id' => $post->id,
-            'author_id' => $employer->id,
-            'title' => 'Updated Employer Post',
-            'body' => 'Updated employer post body.',
-            'status' => PostStatus::Published->value,
-        ]);
-    }
+    $this->put(route('employer.posts.update', $post), [
+        'title' => 'Unauthorized Update',
+        'body' => 'This update should not be allowed.',
+        'publish' => '1',
+    ])->assertForbidden();
 
-    public function test_employer_can_delete_own_post(): void
-    {
-        $employer = User::factory()->create([
-            'role' => UserRole::Employer,
-        ]);
+    $this->assertDatabaseMissing('posts', [
+        'id' => $post->id,
+        'title' => 'Unauthorized Update',
+    ]);
+});
 
-        $post = Post::factory()->create([
-            'author_id' => $employer->id,
-            'author_role' => UserRole::Employer,
-        ]);
+test('employer post show route is not registered', function () {
+    $employer = actingAsEmployer();
+    $post = Post::factory()->for($employer, 'author')->create([
+        'author_role' => UserRole::Employer,
+    ]);
 
-        $response = $this->actingAs($employer)->delete(
-            route('employer.posts.destroy', $post)
-        );
+    $this->get('/employer/posts/'.$post->id)->assertMethodNotAllowed();
+});
 
-        $response->assertRedirect(route('employer.posts.index'));
+test('employer posts index lists own posts', function () {
+    $employer = actingAsEmployer();
+    Post::factory()->for($employer, 'author')->create([
+        'author_role' => UserRole::Employer,
+        'title' => 'Own Employer Post',
+    ]);
 
-        $this->assertDatabaseMissing('posts', [
-            'id' => $post->id,
-        ]);
-    }
-
-    public function test_employer_cannot_update_another_users_post(): void
-    {
-        $employer = User::factory()->create([
-            'role' => UserRole::Employer,
-        ]);
-
-        $otherEmployer = User::factory()->create([
-            'role' => UserRole::Employer,
-        ]);
-
-        $post = Post::factory()->create([
-            'author_id' => $otherEmployer->id,
-            'author_role' => UserRole::Employer,
-        ]);
-
-        $response = $this->actingAs($employer)->put(
-            route('employer.posts.update', $post),
-            [
-                'title' => 'Unauthorized Update',
-                'body' => 'This update should not be allowed.',
-                'publish' => '1',
-            ]
-        );
-
-        $response->assertForbidden();
-
-        $this->assertDatabaseMissing('posts', [
-            'id' => $post->id,
-            'title' => 'Unauthorized Update',
-        ]);
-    }
-}
+    $this->get(route('employer.posts.index'))
+        ->assertOk()
+        ->assertSee('Own Employer Post')
+        ->assertSee(route('employer.posts.create'), false);
+});
