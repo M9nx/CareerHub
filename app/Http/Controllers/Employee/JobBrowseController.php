@@ -12,11 +12,22 @@ class JobBrowseController extends Controller
 {
     public function index(Request $request): View
     {
+        $search = $request->string('search')->trim()->toString();
+
         $jobs = JobPosting::published()
-            ->when($request->search, fn ($query) => $query->where('title', 'like', '%'.$request->search.'%'))
+            ->when($search !== '', function ($query) use ($search): void {
+                $query->whereRaw(
+                    'title LIKE ? ESCAPE ?',
+                    [
+                        '%'.addcslashes($search, '%_\\').'%',
+                        '\\',
+                    ]
+                );
+            })
             ->with(['employer.employerProfile'])
             ->latest()
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString();
 
         return view('employee.jobs.index', compact('jobs'));
     }
