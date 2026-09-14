@@ -9,20 +9,17 @@ uses(RefreshDatabase::class);
 test('employer can update company name', function () {
     $user = User::factory()->employer()->create();
 
-    EmployerProfile::factory()->create([
-        'user_id' => $user->id,
+    EmployerProfile::factory()->for($user)->create([
         'company_name' => 'Old Company',
     ]);
 
-    $response = $this->actingAs($user)->patch(
+    $this->actingAs($user)->patch(
         route('employer.profile.update'),
         [
             'company_name' => 'New Company',
         ]
-    );
-
-    $response
-        ->assertRedirect(route('employer.profile.edit'))
+    )
+        ->assertRedirect(route('profile.edit'))
         ->assertSessionHas('success', __('Profile updated successfully.'));
 
     $this->assertDatabaseHas('employer_profiles', [
@@ -31,23 +28,27 @@ test('employer can update company name', function () {
     ]);
 });
 
-test('employer can view profile edit page', function () {
+test('employer company name appears on the breeze profile page', function () {
     $user = User::factory()->employer()->create();
 
-    EmployerProfile::factory()->create([
-        'user_id' => $user->id,
+    EmployerProfile::factory()->for($user)->create([
         'company_name' => 'Test Company',
     ]);
 
-    $response = $this->actingAs($user)->get(
-        route('employer.profile.edit')
-    );
-
-    $response
+    $this->actingAs($user)
+        ->get(route('profile.edit'))
         ->assertOk()
-        ->assertSee('Edit Employer Profile')
+        ->assertSee('Company')
         ->assertSee('Company Name')
         ->assertSee('Test Company');
+});
+
+test('employer profile route redirects to the breeze profile page', function () {
+    $user = User::factory()->employer()->create();
+
+    $this->actingAs($user)
+        ->get(route('employer.profile.edit'))
+        ->assertRedirect(route('profile.edit'));
 });
 
 test('employer profile is created when missing', function () {
@@ -57,11 +58,9 @@ test('employer profile is created when missing', function () {
         'user_id' => $user->id,
     ]);
 
-    $response = $this->actingAs($user)->get(
-        route('employer.profile.edit')
-    );
-
-    $response->assertOk();
+    $this->actingAs($user)
+        ->get(route('profile.edit'))
+        ->assertOk();
 
     $this->assertDatabaseHas('employer_profiles', [
         'user_id' => $user->id,
@@ -71,19 +70,16 @@ test('employer profile is created when missing', function () {
 test('empty company name fails validation', function () {
     $user = User::factory()->employer()->create();
 
-    EmployerProfile::factory()->create([
-        'user_id' => $user->id,
+    EmployerProfile::factory()->for($user)->create([
         'company_name' => 'Existing Company',
     ]);
 
-    $response = $this->actingAs($user)->patch(
+    $this->actingAs($user)->patch(
         route('employer.profile.update'),
         [
             'company_name' => '',
         ]
-    );
-
-    $response
+    )
         ->assertSessionHasErrors('company_name')
         ->assertInvalid(['company_name' => __('validation.required', ['attribute' => 'company name'])]);
 });
@@ -91,17 +87,16 @@ test('empty company name fails validation', function () {
 test('company name longer than 255 characters fails validation', function () {
     $user = User::factory()->employer()->create();
 
-    EmployerProfile::factory()->create([
-        'user_id' => $user->id,
+    EmployerProfile::factory()->for($user)->create([
         'company_name' => 'Existing Company',
     ]);
 
     $this->actingAs($user)
-        ->from(route('employer.profile.edit'))
+        ->from(route('profile.edit'))
         ->patch(route('employer.profile.update'), [
             'company_name' => str_repeat('a', 256),
         ])
-        ->assertRedirect(route('employer.profile.edit'))
+        ->assertRedirect(route('profile.edit'))
         ->assertSessionHasErrors('company_name')
         ->assertInvalid(['company_name' => __('validation.max.string', ['attribute' => 'company name', 'max' => 255])]);
 });
@@ -127,4 +122,13 @@ test('employee cannot view or update employer profile', function () {
             'company_name' => 'Unauthorized Company',
         ])
         ->assertForbidden();
+});
+
+test('employee breeze profile does not show employer company fields', function () {
+    $user = User::factory()->employee()->create();
+
+    $this->actingAs($user)
+        ->get(route('profile.edit'))
+        ->assertOk()
+        ->assertDontSee(__('Update the company name shown on your job postings.'));
 });

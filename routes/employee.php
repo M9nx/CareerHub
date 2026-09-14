@@ -4,6 +4,7 @@ use App\Http\Controllers\Employee\ApplicationController;
 use App\Http\Controllers\Employee\DashboardController;
 use App\Http\Controllers\Employee\JobBrowseController;
 use App\Http\Controllers\Employee\PostController;
+use App\Http\Controllers\Employee\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web', 'auth', 'employee'])
@@ -11,6 +12,12 @@ Route::middleware(['web', 'auth', 'employee'])
     ->group(function () {
         Route::get('/dashboard', DashboardController::class)
             ->name('employee.dashboard');
+
+        Route::get('/profile', [ProfileController::class, 'edit'])
+            ->name('employee.profile.edit');
+
+        Route::patch('/profile', [ProfileController::class, 'update'])
+            ->name('employee.profile.update');
 
         Route::get('/jobs', [JobBrowseController::class, 'index'])
             ->name('employee.jobs.index');
@@ -30,5 +37,6 @@ Route::middleware(['web', 'auth', 'employee'])
         )->name('employee.applications.cancel');
 
         Route::resource('posts', PostController::class)
+            ->except(['show'])
             ->names('employee.posts');
     });
