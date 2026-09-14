@@ -5,22 +5,12 @@ namespace App\Http\Controllers\Employer;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Employer\UpdateEmployerProfileRequest;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
-    public function edit(Request $request): View
+    public function edit(): RedirectResponse
     {
-        $profile = $request->user()->employerProfile;
-
-        if (! $profile) {
-            $profile = $request->user()->employerProfile()->create([
-                'company_name' => '',
-            ]);
-        }
-
-        return view('employer.profile.edit', compact('profile'));
+        return redirect()->route('profile.edit');
     }
 
     public function update(
@@ -32,7 +22,7 @@ class ProfileController extends Controller
         );
 
         return redirect()
-            ->route('employer.profile.edit')
+            ->route('profile.edit')
             ->with('success', __('Profile updated successfully.'));
     }
 }

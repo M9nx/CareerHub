@@ -1,9 +1,19 @@
-```blade
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-            {{ __('My Applications') }}
-        </h2>
+        <div class="flex items-center justify-between gap-4">
+            <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
+                {{ __('My Posts') }}
+            </h2>
+
+            @can('create', App\Models\Post::class)
+                <a
+                    href="{{ route('employer.posts.create') }}"
+                    class="inline-flex items-center rounded-md bg-gray-800 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white hover:bg-gray-700 dark:bg-gray-200 dark:text-gray-800 dark:hover:bg-white"
+                >
+                    {{ __('Create Post') }}
+                </a>
+            @endcan
+        </div>
     </x-slot>
 
     <div class="py-12">
@@ -16,59 +26,50 @@
                         </p>
                     @endif
 
-                    @if ($applications->isEmpty())
+                    @if ($posts->isEmpty())
                         <p class="text-gray-600 dark:text-gray-400">
-                            {{ __('You have not submitted any applications yet.') }}
+                            {{ __('You have not created any posts yet.') }}
                         </p>
                     @else
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                                 <thead>
                                     <tr class="text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                        <th class="px-4 py-3">{{ __('Job') }}</th>
+                                        <th class="px-4 py-3">{{ __('Title') }}</th>
                                         <th class="px-4 py-3">{{ __('Status') }}</th>
                                         <th class="px-4 py-3 text-right">{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                                    @foreach ($applications as $application)
+                                    @foreach ($posts as $post)
                                         <tr>
                                             <td class="px-4 py-3">
-                                                {{ $application->jobPosting->title }}
+                                                {{ $post->title }}
                                             </td>
-
                                             <td class="px-4 py-3">
-                                                @include(
-                                                    'employee.applications.partials.status-badge',
-                                                    ['application' => $application]
-                                                )
+                                                {{ str($post->status->name)->headline() }}
                                             </td>
+                                            <td class="px-4 py-3">
+                                                <div class="flex items-center justify-end gap-3">
+                                                    <a
+                                                        href="{{ route('employer.posts.edit', $post) }}"
+                                                        class="text-sm font-semibold text-indigo-600 underline-offset-4 hover:underline dark:text-indigo-400"
+                                                    >
+                                                        {{ __('Edit') }}
+                                                    </a>
 
-                                            <td class="px-4 py-3 text-right">
-                                                <a
-                                                    href="{{ route('employee.applications.show', $application) }}"
-                                                    class="mr-3 text-blue-600 hover:underline"
-                                                >
-                                                    {{ __('View') }}
-                                                </a>
-
-                                                @if (in_array($application->status, [
-                                                    \App\Enums\ApplicationStatus::Submitted,
-                                                    \App\Enums\ApplicationStatus::UnderReview,
-                                                ], true))
                                                     <form
                                                         method="POST"
-                                                        action="{{ route('employee.applications.cancel', $application) }}"
-                                                        class="inline"
+                                                        action="{{ route('employer.posts.destroy', $post) }}"
                                                     >
                                                         @csrf
-                                                        @method('PATCH')
+                                                        @method('DELETE')
 
                                                         <x-danger-button>
-                                                            {{ __('Cancel') }}
+                                                            {{ __('Delete') }}
                                                         </x-danger-button>
                                                     </form>
-                                                @endif
+                                                </div>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -81,5 +82,3 @@
         </div>
     </div>
 </x-app-layout>
-```
-

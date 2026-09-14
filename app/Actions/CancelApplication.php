@@ -4,6 +4,7 @@ namespace App\Actions;
 
 use App\Enums\ApplicationStatus;
 use App\Models\Application;
+use App\Notifications\ApplicationStatusChangedNotification;
 
 class CancelApplication
 {
@@ -22,6 +23,12 @@ class CancelApplication
             'status' => ApplicationStatus::Cancelled,
             'cancelled_at' => now(),
         ]);
+
+        $application->loadMissing(['jobPosting.employer']);
+
+        $application->jobPosting->employer->notify(
+            new ApplicationStatusChangedNotification($application)
+        );
 
         return $application;
     }

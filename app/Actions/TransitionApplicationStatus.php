@@ -36,6 +36,8 @@ class TransitionApplicationStatus
             'status' => $newStatus,
         ]);
 
+        $application->loadMissing(['employee', 'jobPosting']);
+
         $application->employee->notify(
             new ApplicationStatusChangedNotification($application)
         );

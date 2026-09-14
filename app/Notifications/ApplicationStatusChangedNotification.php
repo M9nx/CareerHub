@@ -22,14 +22,15 @@ class ApplicationStatusChangedNotification extends Notification
 
     public function toMail(object $notifiable): MailMessage
     {
+        $this->application->loadMissing('jobPosting');
+
+        $title = $this->application->jobPosting->title;
+        $status = str($this->application->status->name)->headline()->toString();
+
         return (new MailMessage)
-            ->subject('Application Status Updated')
-            ->line(
-                "Your application for {$this->application->jobPosting->title} has been updated."
-            )
-            ->line(
-                "New status: {$this->application->status->value}"
-            );
+            ->subject(__('Application Status Updated'))
+            ->line(__('The application for :title has been updated.', ['title' => $title]))
+            ->line(__('New status: :status', ['status' => $status]));
     }
 
     public function toArray(object $notifiable): array
