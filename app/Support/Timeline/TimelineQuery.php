@@ -46,7 +46,13 @@ class TimelineQuery
     private function posts(): Collection
     {
         return Post::published()
-            ->with('author')
+            ->with([
+                'author',
+                'attachments',
+                'reactions',
+                'sharedPost.author',
+                'sharedPost.attachments',
+            ])
             ->get()
             ->map(fn (Post $post): TimelineItem => TimelineItem::forPost($post));
     }

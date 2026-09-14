@@ -62,4 +62,14 @@ class PostPolicy
     {
         return $post->author_id === $user->id;
     }
+
+    public function react(User $user, Post $post): bool
+    {
+        return ! $user->isBlockedFromPosts();
+    }
+
+    public function share(User $user, Post $post): bool
+    {
+        return ! $user->isBlockedFromPosts();
+    }
 }

@@ -40,6 +40,9 @@ Route::get('/dashboard', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/feed', [FeedController::class, 'index'])->name('feed.index');
+    Route::post('/feed', [FeedController::class, 'store'])->name('feed.store');
+    Route::post('/feed/posts/{post}/react', [FeedController::class, 'react'])->name('feed.posts.react');
+    Route::post('/feed/posts/{post}/share', [FeedController::class, 'share'])->name('feed.posts.share');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
