@@ -97,3 +97,20 @@ test('guest is redirected to login when cancelling an application', function () 
     $this->patch(route('employee.applications.cancel', $application))
         ->assertRedirect(route('login'));
 });
+
+test('cancelled application status is terminal for employer review updates', function () {
+    $employer = actingAsEmployer();
+    $job = JobPosting::factory()->for($employer, 'employer')->published()->create();
+    $application = Application::factory()
+        ->for($job, 'jobPosting')
+        ->create([
+            'status' => ApplicationStatus::Cancelled,
+            'cancelled_at' => now(),
+        ]);
+
+    $this->patch(route('employer.applications.update', $application), [
+        'status' => ApplicationStatus::UnderReview->value,
+    ])->assertForbidden();
+
+    expect($application->fresh()->status)->toBe(ApplicationStatus::Cancelled);
+});
