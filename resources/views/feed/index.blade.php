@@ -35,21 +35,39 @@
                 </div>
             @endif
 
-            @if ($posts->total() === 0)
+            @if ($items->total() === 0)
                 <div class="overflow-hidden bg-white p-6 shadow-sm sm:rounded-lg dark:bg-gray-800">
                     <p class="text-gray-600 dark:text-gray-400">
                         {{ __('No published posts available.') }}
                     </p>
                 </div>
             @else
-                <div class="space-y-6">
-                    @foreach ($posts as $post)
-                        @include('feed.partials.post-card', ['post' => $post])
-                    @endforeach
+                <div class="relative">
+                    <div
+                        class="absolute bottom-0 left-[1.125rem] top-0 w-px bg-gray-200 dark:bg-gray-700"
+                        aria-hidden="true"
+                    ></div>
+
+                    <div class="space-y-8">
+                        @foreach ($items as $item)
+                            <div class="relative pl-12">
+                                <div
+                                    class="absolute left-3 top-6 h-3 w-3 rounded-full border-2 border-white bg-indigo-500 shadow dark:border-gray-900"
+                                    aria-hidden="true"
+                                ></div>
+
+                                <p class="mb-3 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+                                    {{ $item->occurredAt->timezone(config('app.timezone'))->format('M j, Y g:i A') }}
+                                </p>
+
+                                @include('feed.partials.timeline-item', ['item' => $item])
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
 
                 <div class="mt-8">
-                    {{ $posts->links() }}
+                    {{ $items->links() }}
                 </div>
             @endif
         </div>
