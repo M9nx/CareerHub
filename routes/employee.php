@@ -28,8 +28,8 @@ Route::middleware(['web', 'auth', 'employee'])
         Route::get('/applications', [ApplicationController::class, 'index'])
             ->name('employee.applications.index');
 
-        Route::get( '/applications/{application}',[ApplicationController::class, 'show'] )
-            ->name('employee.applications.show');    
+        Route::get('/applications/{application}', [ApplicationController::class, 'show'])
+            ->name('employee.applications.show');
 
         Route::post('/applications', [ApplicationController::class, 'store'])
             ->name('employee.applications.store');
