@@ -19,6 +19,7 @@ class ProfileController extends Controller
     {
         $user = $request->user();
         $employeeProfile = null;
+        $employerProfile = null;
 
         if ($user->role === UserRole::Employee) {
             $employeeProfile = $user->employeeProfile
@@ -27,9 +28,17 @@ class ProfileController extends Controller
                 ]);
         }
 
+        if ($user->role === UserRole::Employer) {
+            $employerProfile = $user->employerProfile
+                ?? $user->employerProfile()->create([
+                    'company_name' => '',
+                ]);
+        }
+
         return view('profile.edit', [
             'user' => $user,
             'employeeProfile' => $employeeProfile,
+            'employerProfile' => $employerProfile,
         ]);
     }
 

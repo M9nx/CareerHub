@@ -6,12 +6,16 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-test('employee profile nav points at the breeze profile page', function () {
+test('profile lives in the account dropdown not the primary nav', function () {
     $user = User::factory()->employee()->create();
 
     $this->actingAs($user)
         ->get(route('employee.dashboard'))
-        ->assertSee(route('profile.edit'), false);
+        ->assertSee(route('profile.edit'), false)
+        ->assertSee(__('Profile'));
+
+    expect(view('components.employee-nav')->render())->not->toContain(__('Profile'));
+    expect(view('components.employer-nav')->render())->not->toContain(__('Profile'));
 });
 
 test('employee career documents appear on the breeze profile page', function () {
