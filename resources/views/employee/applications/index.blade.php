@@ -1,4 +1,3 @@
-```blade
 <x-app-layout>
     <x-slot name="header">
         <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
@@ -45,30 +44,31 @@
                                             </td>
 
                                             <td class="px-4 py-3 text-right">
-                                                <a
-                                                    href="{{ route('employee.applications.show', $application) }}"
-                                                    class="mr-3 text-blue-600 hover:underline"
-                                                >
-                                                    {{ __('View') }}
-                                                </a>
-
-                                                @if (in_array($application->status, [
-                                                    \App\Enums\ApplicationStatus::Submitted,
-                                                    \App\Enums\ApplicationStatus::UnderReview,
-                                                ], true))
-                                                    <form
-                                                        method="POST"
-                                                        action="{{ route('employee.applications.cancel', $application) }}"
-                                                        class="inline"
+                                                <div class="inline-flex items-center gap-3">
+                                                    <a
+                                                        href="{{ route('employee.applications.show', $application) }}"
+                                                        class="text-sm font-semibold text-indigo-600 underline-offset-4 hover:underline dark:text-indigo-400"
                                                     >
-                                                        @csrf
-                                                        @method('PATCH')
+                                                        {{ __('View') }}
+                                                    </a>
 
-                                                        <x-danger-button>
-                                                            {{ __('Cancel') }}
-                                                        </x-danger-button>
-                                                    </form>
-                                                @endif
+                                                    @if (in_array($application->status, [
+                                                        \App\Enums\ApplicationStatus::Submitted,
+                                                        \App\Enums\ApplicationStatus::UnderReview,
+                                                    ], true))
+                                                        <form
+                                                            method="POST"
+                                                            action="{{ route('employee.applications.cancel', $application) }}"
+                                                        >
+                                                            @csrf
+                                                            @method('PATCH')
+
+                                                            <x-danger-button>
+                                                                {{ __('Cancel') }}
+                                                            </x-danger-button>
+                                                        </form>
+                                                    @endif
+                                                </div>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -81,5 +81,3 @@
         </div>
     </div>
 </x-app-layout>
-```
-
