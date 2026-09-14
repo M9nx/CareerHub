@@ -89,7 +89,7 @@ Master #1
 ├── Phase P4 #37 — Day 5 Applications
 ├── Phase P5 #44 — Day 6 Posts Feed+Moderation
 ├── Phase P6 #51 — Day 7 Profiles+Storage
-├── Phase P7 #58 — Day 8 Integration QA Release (M9nx; no member leaves)
+├── Phase P7 #58 — Day 8 Integration QA Release (all original slices; M9nx)
 └── Phase P8 #98 — Day 9 Professional product
     ├── P8-Timeline #99
     ├── P8-Composer #100
@@ -99,7 +99,7 @@ Master #1
     └── P8-Harden #104
 ```
 
-Each **leaf** is one 8-hour vertical slice spanning migration → model → policy → controller/resource → views → tests for that day's scope. P7 has no leaves: [#58](https://github.com/M9nx/CareerHub/issues/58) is the work package (member leaves #59–#64 closed as not planned).
+Each **leaf** is one 8-hour vertical slice spanning migration → model → policy → controller/resource → views → tests for that day's scope. P7 has no member sub-issues: [#58](https://github.com/M9nx/CareerHub/issues/58) owns **all original Day 8 file contracts** (integration, SA regression, jobs, applications, feed, profiles). Leaves #59–#64 stay closed.
 
 ---
 
@@ -114,7 +114,7 @@ Each **leaf** is one 8-hour vertical slice spanning migration → model → poli
 | P4 | #37 | Day 5 | Applications | #38, #39, #40, #41, #42, #43 | not-started |
 | P5 | #44 | Day 6 | Posts Feed and Moderation | #45, #46, #47, #48, #49, #50 | not-started |
 | P6 | #51 | Day 7 | Profiles and Storage | #52, #53, #54, #55, #56, #57 | not-started |
-| P7 | #58 | Day 8 | Integration QA and Release | — (work is #58 itself) | not-started |
+| P7 | #58 | Day 8 | Integration QA and Release | — (all original slices on #58 / M9nx) | not-started |
 | P8 | #98 | Day 9 | Professional product | #99, #100, #101, #102, #103, #104 | not-started |
 
 ---

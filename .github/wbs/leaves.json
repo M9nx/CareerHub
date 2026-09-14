@@ -1680,6 +1680,96 @@
     ]
   },
   {
+    "phase": "P7",
+    "role": "M9nx",
+    "wbs_id": "P7",
+    "title": "Integration QA and Release (all original Day 8 slices)",
+    "task": "All original P7 work moved to M9nx on #58: integration suite and RELEASE.md; SuperAdmin regression; jobs E2E; applications E2E; posts/feed E2E; profiles/storage E2E.",
+    "learn": "E2E testing; release governance; Filament testing; state machine tests; feed integration; file storage integration",
+    "deps": "-",
+    "branch_slug": "integration-release",
+    "files": [
+      {
+        "file": "tests/Feature/Integration/CrossPersonaFlowTest.php",
+        "action": "Create",
+        "what": "Register employer -> post job -> employee apply -> accept.",
+        "example": "Full happy path."
+      },
+      {
+        "file": "docs/RELEASE.md",
+        "action": "Create",
+        "what": "Release checklist: migrate, seed, test, storage:link.",
+        "example": "Demo script steps."
+      },
+      {
+        "file": "tests/Feature/Integration/SuperAdminCrmFlowTest.php",
+        "action": "Create",
+        "what": "SuperAdmin views activity log after workflows.",
+        "example": "CRM entries exist."
+      },
+      {
+        "file": "tests/Feature/SuperAdmin/SuperAdminRegressionTest.php",
+        "action": "Create",
+        "what": "All SA resources 403 for employer/employee.",
+        "example": "User, Job, Application, Post, ActivityLog."
+      },
+      {
+        "file": "tests/Feature/SuperAdmin/UserManagementTest.php",
+        "action": "Modify",
+        "what": "Extend coverage for deactivate.",
+        "example": "Regression additions."
+      },
+      {
+        "file": "tests/Feature/JobPosting/JobPostingE2ETest.php",
+        "action": "Create",
+        "what": "Draft->publish->browse->close lifecycle.",
+        "example": "Single file E2E."
+      },
+      {
+        "file": "tests/Feature/JobPosting/EmployerJobPostingTest.php",
+        "action": "Modify",
+        "what": "Fix any integration failures.",
+        "example": "Suite green."
+      },
+      {
+        "file": "tests/Feature/Application/ApplicationE2ETest.php",
+        "action": "Create",
+        "what": "Apply, review, cancel, accept paths.",
+        "example": "Cancelled is terminal."
+      },
+      {
+        "file": "tests/Feature/Application/EmployeeCancelTest.php",
+        "action": "Modify",
+        "what": "Edge: cannot cancel Accepted.",
+        "example": "Assert 422 or exception."
+      },
+      {
+        "file": "tests/Feature/Post/PostFeedE2ETest.php",
+        "action": "Create",
+        "what": "Both personas post -> feed -> SA hides -> block.",
+        "example": "Full moderation path."
+      },
+      {
+        "file": "tests/Feature/Post/SharedFeedTest.php",
+        "action": "Modify",
+        "what": "Integration fixes.",
+        "example": "Suite green."
+      },
+      {
+        "file": "tests/Feature/Profile/ProfileStorageE2ETest.php",
+        "action": "Create",
+        "what": "Upload CV -> download -> employer sees company.",
+        "example": "Storage integration."
+      },
+      {
+        "file": "tests/Feature/Profile/EmployeeCvUploadTest.php",
+        "action": "Modify",
+        "what": "Regression fixes.",
+        "example": "Suite green."
+      }
+    ]
+  },
+  {
     "phase": "P8",
     "role": "M9nx",
     "wbs_id": "P8-Timeline",
