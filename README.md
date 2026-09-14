@@ -7,6 +7,16 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## Local file storage (CareerHub)
+
+Employee CV and application image uploads use the local `public` disk.
+
+```bash
+php artisan storage:link
+```
+
+Full setup notes: [docs/storage-local-setup.md](docs/storage-local-setup.md).
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
