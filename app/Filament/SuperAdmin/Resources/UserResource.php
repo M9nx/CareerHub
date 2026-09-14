@@ -2,6 +2,7 @@
 
 namespace App\Filament\SuperAdmin\Resources;
 
+use App\Actions\BlockUserFromPosts;
 use App\Enums\UserRole;
 use App\Filament\SuperAdmin\Resources\UserResource\Pages;
 use App\Models\User;
@@ -76,7 +77,10 @@ class UserResource extends Resource
 
                 Toggle::make('is_blocked_from_posts')
                     ->label('Blocked from posting')
-                    ->default(false),
+                    ->helperText('Prefer the table Block/Unblock from posts actions so moderation is logged.')
+                    ->default(false)
+                    ->disabled()
+                    ->dehydrated(false),
             ]);
     }
 
@@ -133,6 +137,28 @@ class UserResource extends Resource
                     ->action(function (User $record): void {
                         abort_if(static::isCurrentUser($record), 403);
                         $record->update(['is_active' => false]);
+                    }),
+
+                Action::make('blockFromPosts')
+                    ->label('Block from posts')
+                    ->icon(Heroicon::OutlinedNoSymbol)
+                    ->color('danger')
+                    ->visible(fn (User $record): bool => ! $record->isBlockedFromPosts() && ! static::isCurrentUser($record))
+                    ->requiresConfirmation()
+                    ->action(function (User $record): void {
+                        abort_if(static::isCurrentUser($record), 403);
+                        app(BlockUserFromPosts::class)->handle($record, true, auth()->user());
+                    }),
+
+                Action::make('unblockFromPosts')
+                    ->label('Unblock from posts')
+                    ->icon(Heroicon::OutlinedCheckCircle)
+                    ->color('success')
+                    ->visible(fn (User $record): bool => $record->isBlockedFromPosts() && ! static::isCurrentUser($record))
+                    ->requiresConfirmation()
+                    ->action(function (User $record): void {
+                        abort_if(static::isCurrentUser($record), 403);
+                        app(BlockUserFromPosts::class)->handle($record, false, auth()->user());
                     }),
 
                 Action::make('changeRole')
