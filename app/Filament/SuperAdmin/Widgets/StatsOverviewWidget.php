@@ -12,17 +12,30 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class StatsOverviewWidget extends BaseWidget
 {
+    public static function canView(): bool
+    {
+        return auth()->user()?->isSuperAdmin() ?? false;
+    }
+
+    public function mount(): void
+    {
+        abort_unless(static::canView(), 403);
+    }
+
     protected function getStats(): array
     {
         return [
-            Stat::make('Total Users', User::count())
-                ->description('All registered users')
+            Stat::make(__('Total Users'), User::query()->count())
+                ->description(__('All registered users'))
                 ->color('success'),
-            Stat::make('Open Jobs', JobPosting::where('status', JobPostingStatus::Published)->count())
-                ->description('Active job postings')
+            Stat::make(__('Open Jobs'), JobPosting::query()->where('status', JobPostingStatus::Published)->count())
+                ->description(__('Published job postings'))
                 ->color('primary'),
-            Stat::make('Pending Applications', Application::where('status', ApplicationStatus::Pending)->count())
-                ->description('Applications awaiting review')
+            Stat::make(
+                __('Pending Applications'),
+                Application::query()->where('status', ApplicationStatus::Submitted)->count()
+            )
+                ->description(__('Applications awaiting review'))
                 ->color('warning'),
         ];
     }

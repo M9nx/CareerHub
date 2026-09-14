@@ -9,6 +9,4 @@ enum ApplicationStatus: string
     case Accepted = 'accepted';
     case Rejected = 'rejected';
     case Cancelled = 'cancelled';
-    case Pending = 'pending';
-
 }
