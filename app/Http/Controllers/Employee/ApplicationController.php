@@ -19,7 +19,8 @@ class ApplicationController extends Controller
         Gate::authorize('create', Application::class);
 
         $applications = Application::query()
-            ->where('employee_id', $request->user()->id)
+            ->whereBelongsTo($request->user(), 'employee')
+            ->with('jobPosting')
             ->latest()
             ->get();
 
@@ -28,8 +29,6 @@ class ApplicationController extends Controller
 
     public function store(StoreApplicationRequest $request): RedirectResponse
     {
-        Gate::authorize('create', Application::class);
-
         Application::create([
             'employee_id' => $request->user()->id,
             'job_posting_id' => $request->validated('job_posting_id'),
@@ -37,10 +36,9 @@ class ApplicationController extends Controller
             'status' => ApplicationStatus::Submitted,
         ]);
 
-        return back()->with(
-            'success',
-            __('Application submitted successfully.')
-        );
+        return redirect()
+            ->route('employee.applications.index')
+            ->with('success', __('Application submitted successfully.'));
     }
 
     public function cancel(
@@ -53,9 +51,6 @@ class ApplicationController extends Controller
 
         return redirect()
             ->route('employee.applications.index')
-            ->with(
-                'success',
-                __('Application cancelled successfully.')
-            );
+            ->with('success', __('Application cancelled successfully.'));
     }
 }

@@ -8,29 +8,26 @@ use App\Models\Application;
 class TransitionApplicationStatus
 {
     /**
-     * @return Application
+     * @return list<ApplicationStatus>
      */
+    public function allowedStatuses(Application $application): array
+    {
+        return match ($application->status) {
+            ApplicationStatus::Submitted => [ApplicationStatus::UnderReview],
+            ApplicationStatus::UnderReview => [
+                ApplicationStatus::Accepted,
+                ApplicationStatus::Rejected,
+            ],
+            default => [],
+        };
+    }
+
     public function handle(
         Application $application,
         ApplicationStatus $newStatus,
     ): Application {
-        $allowedTransitions = [
-            ApplicationStatus::Submitted->value => [
-                ApplicationStatus::UnderReview,
-            ],
-
-            ApplicationStatus::UnderReview->value => [
-                ApplicationStatus::Accepted,
-                ApplicationStatus::Rejected,
-            ],
-        ];
-
-        $allowedStatuses = $allowedTransitions[
-            $application->status->value
-        ] ?? [];
-
         abort_unless(
-            in_array($newStatus, $allowedStatuses, true),
+            in_array($newStatus, $this->allowedStatuses($application), true),
             403
         );
 
@@ -38,6 +35,6 @@ class TransitionApplicationStatus
             'status' => $newStatus,
         ]);
 
-        return $application->fresh();
+        return $application;
     }
 }

@@ -10,14 +10,11 @@ class CancelApplication
     public function handle(Application $application): Application
     {
         abort_if(
-            in_array(
-                $application->status,
-                [
-                    ApplicationStatus::Accepted,
-                    ApplicationStatus::Rejected,
-                ],
-                true
-            ),
+            in_array($application->status, [
+                ApplicationStatus::Accepted,
+                ApplicationStatus::Rejected,
+                ApplicationStatus::Cancelled,
+            ], true),
             403
         );
 
@@ -26,6 +23,6 @@ class CancelApplication
             'cancelled_at' => now(),
         ]);
 
-        return $application->fresh();
+        return $application;
     }
 }

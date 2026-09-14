@@ -9,25 +9,35 @@ use App\Models\Application;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class ApplicationController extends Controller
 {
-    public function index(Request $request): View
-    {
+    public function index(
+        Request $request,
+        TransitionApplicationStatus $transitionApplicationStatus,
+    ): View {
         $applications = Application::query()
-            ->whereHas('jobPosting', function ($query) use ($request) {
-                $query->where('employer_id', $request->user()->id);
-            })
+            ->whereHas(
+                'jobPosting',
+                fn ($query) => $query->whereBelongsTo($request->user(), 'employer')
+            )
+            ->with(['employee', 'jobPosting'])
             ->latest()
             ->get();
 
-        return view('employer.applications.index', compact('applications'));
+        return view('employer.applications.index', [
+            'applications' => $applications,
+            'statusTransition' => $transitionApplicationStatus,
+        ]);
     }
 
     public function show(Application $application): View
     {
         Gate::authorize('update', $application);
+
+        $application->loadMissing(['employee', 'jobPosting']);
 
         return view('employer.applications.show', compact('application'));
     }
@@ -39,13 +49,13 @@ class ApplicationController extends Controller
     ): RedirectResponse {
         Gate::authorize('update', $application);
 
-        $request->validate([
-            'status' => ['required'],
+        $validated = $request->validate([
+            'status' => ['required', Rule::enum(ApplicationStatus::class)],
         ]);
 
         $transitionApplicationStatus->handle(
             $application,
-            ApplicationStatus::from($request->string('status')->value())
+            ApplicationStatus::from($validated['status'])
         );
 
         return back()->with(
