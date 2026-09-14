@@ -143,9 +143,9 @@
                         </x-responsive-nav-link>
                     @endif
 
-                    @if (Route::has('employer.applications'))
+                    @if (Route::has('employer.applications.index'))
                         <x-responsive-nav-link
-                            :href="route('employer.applications')"
+                            :href="route('employer.applications.index')"
                             :active="request()->routeIs('employer.applications*')"
                         >
                             {{ __('Applications') }}
@@ -179,9 +179,9 @@
                         </x-responsive-nav-link>
                     @endif
 
-                    @if (Route::has('employee.applications'))
+                    @if (Route::has('employee.applications.index'))
                         <x-responsive-nav-link
-                            :href="route('employee.applications')"
+                            :href="route('employee.applications.index')"
                             :active="request()->routeIs('employee.applications*')"
                         >
                             {{ __('Applications') }}

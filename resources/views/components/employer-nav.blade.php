@@ -22,9 +22,9 @@
         </x-nav-link>
     @endif
 
-    @if (Route::has('employer.applications'))
+    @if (Route::has('employer.applications.index'))
         <x-nav-link
-            :href="route('employer.applications')"
+            :href="route('employer.applications.index')"
             :active="request()->routeIs('employer.applications*')"
         >
             {{ __('Applications') }}
