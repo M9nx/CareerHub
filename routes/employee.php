@@ -19,6 +19,12 @@ Route::middleware(['web', 'auth', 'employee'])
         Route::patch('/profile', [ProfileController::class, 'update'])
             ->name('employee.profile.update');
 
+        Route::get('/profile/cv/download', [ProfileController::class, 'downloadCv'])
+            ->name('employee.profile.cv.download');
+
+        Route::get('/profile/application-image/download', [ProfileController::class, 'downloadApplicationImage'])
+            ->name('employee.profile.application-image.download');
+
         Route::get('/jobs', [JobBrowseController::class, 'index'])
             ->name('employee.jobs.index');
 
