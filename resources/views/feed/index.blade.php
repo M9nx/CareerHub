@@ -1,16 +1,16 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
             {{ __('Feed') }}
         </h2>
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            @if ($posts->isEmpty())
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                    <p class="text-gray-600">
-                        No published posts available.
+        <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+            @if ($posts->total() === 0)
+                <div class="overflow-hidden bg-white p-6 shadow-sm sm:rounded-lg dark:bg-gray-800">
+                    <p class="text-gray-600 dark:text-gray-400">
+                        {{ __('No published posts available.') }}
                     </p>
                 </div>
             @else
