@@ -12,7 +12,7 @@ class FeedController extends Controller
         $posts = Post::published()
             ->with('author')
             ->latest()
-            ->get();
+            ->paginate(10);
 
         return view('feed.index', compact('posts'));
     }
