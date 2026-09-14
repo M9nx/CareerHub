@@ -66,6 +66,7 @@ class PostModerationResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => $query->with('author')->latest('created_at')->orderByDesc('id'))
             ->recordTitleAttribute('title')
             ->columns([
                 TextColumn::make('title')
@@ -76,7 +77,8 @@ class PostModerationResource extends Resource
                     ->searchable(),
                 TextColumn::make('author_role')
                     ->label('Role')
-                    ->badge(),
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => $state?->label() ?? (string) $state),
                 TextColumn::make('status')
                     ->badge()
                     ->color(fn (PostStatus $state): string => match ($state) {
@@ -118,6 +120,7 @@ class PostModerationResource extends Resource
                     ->label('Block author from posts')
                     ->icon(Heroicon::OutlinedNoSymbol)
                     ->color('gray')
+                    ->visible(fn (Post $record): bool => $record->author !== null)
                     ->url(fn (Post $record): string => UserResource::getUrl('edit', ['record' => $record->author]))
                     ->openUrlInNewTab(),
             ]);
@@ -134,5 +137,10 @@ class PostModerationResource extends Resource
     public static function canAccess(): bool
     {
         return auth()->user()?->isSuperAdmin() ?? false;
+    }
+
+    public static function canCreate(): bool
+    {
+        return false;
     }
 }
