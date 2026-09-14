@@ -34,12 +34,17 @@
                 <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
                     {{ __('Current file:') }}
                     <a
-                        href="{{ Storage::disk('public')->url($profile->cv_path) }}"
+                        href="{{ route('employee.profile.cv.download') }}"
                         class="font-medium text-indigo-600 underline-offset-4 hover:underline dark:text-indigo-400"
-                        target="_blank"
-                        rel="noopener noreferrer"
                     >
                         {{ basename($profile->cv_path) }}
+                    </a>
+                    <span class="text-gray-400 dark:text-gray-500">·</span>
+                    <a
+                        href="{{ route('employee.profile.cv.download') }}"
+                        class="font-medium text-indigo-600 underline-offset-4 hover:underline dark:text-indigo-400"
+                    >
+                        {{ __('Download') }}
                     </a>
                 </p>
             @else
@@ -76,6 +81,13 @@
                     <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
                         {{ __('Current file:') }}
                         {{ basename($profile->application_image_path) }}
+                        <span class="text-gray-400 dark:text-gray-500">·</span>
+                        <a
+                            href="{{ route('employee.profile.application-image.download') }}"
+                            class="font-medium text-indigo-600 underline-offset-4 hover:underline dark:text-indigo-400"
+                        >
+                            {{ __('Download') }}
+                        </a>
                     </p>
                 </div>
             @else
