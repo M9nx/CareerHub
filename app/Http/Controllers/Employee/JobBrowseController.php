@@ -5,13 +5,15 @@ namespace App\Http\Controllers\Employee;
 use App\Enums\JobPostingStatus;
 use App\Http\Controllers\Controller;
 use App\Models\JobPosting;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class JobBrowseController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
         $jobs = JobPosting::published()
+            ->when($request->search, fn ($query) => $query->where('title', 'like', '%'.$request->search.'%'))
             ->with(['employer.employerProfile'])
             ->latest()
             ->paginate(10);
