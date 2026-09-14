@@ -1,91 +1,78 @@
 <?php
 
-namespace Tests\Feature\Post;
-
-use App\Enums\PostStatus;
 use App\Enums\UserRole;
 use App\Models\Post;
-use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
-class BlockedUserFeedTest extends TestCase
-{
-    use RefreshDatabase;
+test('blocked employee can view feed but cannot create a post', function () {
+    $blockedEmployee = actingAsEmployee(['is_blocked_from_posts' => true]);
 
-    public function test_blocked_employee_can_view_feed_but_cannot_create_post(): void
-    {
-        $blockedEmployee = User::factory()->create([
-            'role' => UserRole::Employee,
-            'is_blocked_from_posts' => true,
-        ]);
+    Post::factory()->published()->create([
+        'author_role' => UserRole::Employer,
+        'title' => 'Published Employer Post',
+    ]);
 
-        Post::factory()->published()->create([
-            'author_role' => UserRole::Employer,
-            'status' => PostStatus::Published,
-            'is_active' => true,
-            'title' => 'Published Employer Post',
-        ]);
+    $this->get(route('feed.index'))
+        ->assertOk()
+        ->assertSee('Published Employer Post')
+        ->assertDontSee(__('Create Post'));
 
-        $feedResponse = $this->actingAs($blockedEmployee)
-            ->get(route('feed.index'));
+    $this->get(route('employee.posts.create'))
+        ->assertRedirect(route('feed.index'))
+        ->assertSessionHas('error', __('You are blocked from creating posts.'));
 
-        $feedResponse
-            ->assertOk()
-            ->assertSee('Published Employer Post')
-            ->assertDontSee('Create Post');
-
-        $createResponse = $this->actingAs($blockedEmployee)
-            ->post(route('employee.posts.store'), [
-                'title' => 'Blocked Post',
-                'body' => 'This post should not be created.',
-                'publish' => true,
-            ]);
-
-        $createResponse
-            ->assertRedirect()
-            ->assertSessionHas('error', 'You are blocked from creating posts.');
-
-        $this->assertDatabaseMissing('posts', [
+    $this->from(route('feed.index'))
+        ->followingRedirects()
+        ->post(route('employee.posts.store'), [
             'title' => 'Blocked Post',
-        ]);
-    }
+            'body' => 'This post should not be created.',
+            'publish' => true,
+        ])
+        ->assertOk()
+        ->assertSee(__('You are blocked from creating posts.'));
 
-    public function test_blocked_employer_can_view_feed_but_cannot_create_post(): void
-    {
-        $blockedEmployer = User::factory()->create([
-            'role' => UserRole::Employer,
-            'is_blocked_from_posts' => true,
-        ]);
+    $this->assertDatabaseMissing('posts', [
+        'title' => 'Blocked Post',
+        'author_id' => $blockedEmployee->id,
+    ]);
+});
 
-        Post::factory()->published()->create([
-            'author_role' => UserRole::Employee,
-            'status' => PostStatus::Published,
-            'is_active' => true,
-            'title' => 'Published Employee Post',
-        ]);
+test('blocked employer can view feed but cannot create a post', function () {
+    $blockedEmployer = actingAsEmployer(['is_blocked_from_posts' => true]);
 
-        $feedResponse = $this->actingAs($blockedEmployer)
-            ->get(route('feed.index'));
+    Post::factory()->published()->create([
+        'author_role' => UserRole::Employee,
+        'title' => 'Published Employee Post',
+    ]);
 
-        $feedResponse
-            ->assertOk()
-            ->assertSee('Published Employee Post')
-            ->assertDontSee('Create Post');
+    $this->get(route('feed.index'))
+        ->assertOk()
+        ->assertSee('Published Employee Post')
+        ->assertDontSee(__('Create Post'));
 
-        $createResponse = $this->actingAs($blockedEmployer)
-            ->post(route('employer.posts.store'), [
-                'title' => 'Blocked Employer Post',
-                'body' => 'This post should not be created.',
-                'publish' => true,
-            ]);
+    $this->get(route('employer.posts.create'))
+        ->assertRedirect(route('feed.index'))
+        ->assertSessionHas('error', __('You are blocked from creating posts.'));
 
-        $createResponse
-            ->assertRedirect()
-            ->assertSessionHas('error', 'You are blocked from creating posts.');
-
-        $this->assertDatabaseMissing('posts', [
+    $this->from(route('feed.index'))
+        ->post(route('employer.posts.store'), [
             'title' => 'Blocked Employer Post',
-        ]);
-    }
-}
+            'body' => 'This post should not be created.',
+            'publish' => true,
+        ])
+        ->assertRedirect(route('feed.index'))
+        ->assertSessionHas('error', __('You are blocked from creating posts.'));
+
+    $this->assertDatabaseMissing('posts', [
+        'title' => 'Blocked Employer Post',
+        'author_id' => $blockedEmployer->id,
+    ]);
+});
+
+test('unblocked employee sees create post on the feed', function () {
+    actingAsEmployee();
+
+    $this->get(route('feed.index'))
+        ->assertOk()
+        ->assertSee(__('Create Post'))
+        ->assertSee(route('employee.posts.create'), false);
+});
