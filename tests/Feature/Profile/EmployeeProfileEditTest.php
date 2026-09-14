@@ -30,9 +30,10 @@ test('employee career documents appear on the breeze profile page', function () 
         ->get(route('profile.edit'))
         ->assertOk()
         ->assertSee('Career documents')
-        ->assertSee('CV uploaded')
-        ->assertSee('Application image uploaded')
-        ->assertDontSee('type="file"', false);
+        ->assertSee('existing.pdf')
+        ->assertSee('existing.jpg')
+        ->assertSee('type="file"', false)
+        ->assertSee(route('employee.profile.update'), false);
 });
 
 test('employee profile route redirects to the breeze profile page', function () {
@@ -53,7 +54,7 @@ test('employee profile is created when missing', function () {
     $this->actingAs($user)
         ->get(route('profile.edit'))
         ->assertOk()
-        ->assertSee('CV upload will be available in a later phase.');
+        ->assertSee('No CV uploaded yet.');
 
     $this->assertDatabaseHas('employee_profiles', [
         'user_id' => $user->id,
@@ -143,5 +144,5 @@ test('employer breeze profile does not show employee career documents', function
         ->get(route('profile.edit'))
         ->assertOk()
         ->assertDontSee('Career documents')
-        ->assertDontSee('CV upload will be available in a later phase.');
+        ->assertDontSee('No CV uploaded yet.');
 });
