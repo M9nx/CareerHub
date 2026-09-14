@@ -14,9 +14,6 @@ class UpdateEmployeeProfileRequest extends FormRequest
 
     public function rules(): array
     {
-        return [
-            'cv_path' => ['sometimes', 'nullable', 'string'],
-            'application_image_path' => ['sometimes', 'nullable', 'string'],
-        ];
+        return [];
     }
 }

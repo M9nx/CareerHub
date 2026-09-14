@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Employee;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Employee\UpdateEmployeeProfileRequest;
-use App\Models\EmployeeProfile;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -16,8 +15,8 @@ class ProfileController extends Controller
         $profile = $request->user()->employeeProfile;
 
         if (! $profile) {
-            $profile = EmployeeProfile::create([
-                'user_id' => $request->user()->id,
+            $profile = $request->user()->employeeProfile()->create([
+                'cv_path' => '',
             ]);
         }
 
@@ -30,8 +29,8 @@ class ProfileController extends Controller
         $profile = $request->user()->employeeProfile;
 
         if (! $profile) {
-            $profile = EmployeeProfile::create([
-                'user_id' => $request->user()->id,
+            $profile = $request->user()->employeeProfile()->create([
+                'cv_path' => '',
             ]);
         }
 
@@ -39,6 +38,6 @@ class ProfileController extends Controller
 
         return redirect()
             ->route('employee.profile.edit')
-            ->with('success', 'Profile updated successfully.');
+            ->with('success', __('Profile updated successfully.'));
     }
 }
