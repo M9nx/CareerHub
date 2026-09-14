@@ -24,8 +24,8 @@ class ProfileController extends Controller
     }
 
     public function update(
-        UpdateEmployerProfileRequest $request
-    ): RedirectResponse {
+        UpdateEmployerProfileRequest $request): RedirectResponse
+    {
         $request->user()->employerProfile()->updateOrCreate(
             [],
             $request->validated()
