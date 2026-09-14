@@ -3,6 +3,7 @@
 use App\Http\Controllers\Employee\ApplicationController;
 use App\Http\Controllers\Employee\DashboardController;
 use App\Http\Controllers\Employee\JobBrowseController;
+use App\Http\Controllers\Employee\PostController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web', 'auth', 'employee'])
@@ -27,4 +28,7 @@ Route::middleware(['web', 'auth', 'employee'])
             '/applications/{application}/cancel',
             [ApplicationController::class, 'cancel']
         )->name('employee.applications.cancel');
+
+        Route::resource('posts', PostController::class)
+            ->names('employee.posts');
     });

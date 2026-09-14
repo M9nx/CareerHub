@@ -3,6 +3,7 @@
 use App\Http\Controllers\Employer\ApplicationController;
 use App\Http\Controllers\Employer\DashboardController;
 use App\Http\Controllers\Employer\JobPostingController;
+use App\Http\Controllers\Employer\PostController;
 use App\Http\Controllers\Employer\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -36,4 +37,7 @@ Route::middleware(['web', 'auth', 'employer'])
 
         Route::patch('/applications/{application}', [ApplicationController::class, 'update'])
             ->name('employer.applications.update');
+
+        Route::resource('posts', PostController::class)
+            ->names('employer.posts');
     });
