@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserRole;
 use App\Http\Requests\ProfileUpdateRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -16,8 +17,19 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
+        $user = $request->user();
+        $employeeProfile = null;
+
+        if ($user->role === UserRole::Employee) {
+            $employeeProfile = $user->employeeProfile
+                ?? $user->employeeProfile()->create([
+                    'cv_path' => '',
+                ]);
+        }
+
         return view('profile.edit', [
-            'user' => $request->user(),
+            'user' => $user,
+            'employeeProfile' => $employeeProfile,
         ]);
     }
 

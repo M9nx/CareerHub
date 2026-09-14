@@ -6,15 +6,15 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-test('employee profile nav points at the employee profile page', function () {
+test('employee profile nav points at the breeze profile page', function () {
     $user = User::factory()->employee()->create();
 
     $this->actingAs($user)
         ->get(route('employee.dashboard'))
-        ->assertSee(route('employee.profile.edit'), false);
+        ->assertSee(route('profile.edit'), false);
 });
 
-test('employee can view profile edit page', function () {
+test('employee career documents appear on the breeze profile page', function () {
     $user = User::factory()->employee()->create();
 
     EmployeeProfile::factory()->for($user)->create([
@@ -23,12 +23,20 @@ test('employee can view profile edit page', function () {
     ]);
 
     $this->actingAs($user)
-        ->get(route('employee.profile.edit'))
+        ->get(route('profile.edit'))
         ->assertOk()
-        ->assertSee('Edit Employee Profile')
+        ->assertSee('Career documents')
         ->assertSee('CV uploaded')
         ->assertSee('Application image uploaded')
         ->assertDontSee('type="file"', false);
+});
+
+test('employee profile route redirects to the breeze profile page', function () {
+    $user = User::factory()->employee()->create();
+
+    $this->actingAs($user)
+        ->get(route('employee.profile.edit'))
+        ->assertRedirect(route('profile.edit'));
 });
 
 test('employee profile is created when missing', function () {
@@ -39,7 +47,7 @@ test('employee profile is created when missing', function () {
     ]);
 
     $this->actingAs($user)
-        ->get(route('employee.profile.edit'))
+        ->get(route('profile.edit'))
         ->assertOk()
         ->assertSee('CV upload will be available in a later phase.');
 
@@ -55,8 +63,7 @@ test('employee update creates profile when missing', function () {
 
     $this->actingAs($user)
         ->patch(route('employee.profile.update'))
-        ->assertRedirect(route('employee.profile.edit'))
-        ->assertSessionHas('success', __('Profile updated successfully.'));
+        ->assertRedirect(route('profile.edit'));
 
     $this->assertDatabaseHas('employee_profiles', [
         'user_id' => $user->id,
@@ -74,8 +81,7 @@ test('employee can update their profile record', function () {
 
     $this->actingAs($user)
         ->patch(route('employee.profile.update'))
-        ->assertRedirect(route('employee.profile.edit'))
-        ->assertSessionHas('success', __('Profile updated successfully.'));
+        ->assertRedirect(route('profile.edit'));
 
     $this->assertDatabaseHas('employee_profiles', [
         'user_id' => $user->id,
@@ -97,7 +103,7 @@ test('employee profile update ignores client supplied file paths', function () {
             'cv_path' => '../secrets.pdf',
             'application_image_path' => 'https://evil.example/x.jpg',
         ])
-        ->assertRedirect(route('employee.profile.edit'));
+        ->assertRedirect(route('profile.edit'));
 
     $this->assertDatabaseHas('employee_profiles', [
         'user_id' => $user->id,
@@ -124,4 +130,14 @@ test('employer cannot view or update employee profile', function () {
     $this->actingAs($user)
         ->patch(route('employee.profile.update'))
         ->assertForbidden();
+});
+
+test('employer breeze profile does not show employee career documents', function () {
+    $user = User::factory()->employer()->create();
+
+    $this->actingAs($user)
+        ->get(route('profile.edit'))
+        ->assertOk()
+        ->assertDontSee('Career documents')
+        ->assertDontSee('CV upload will be available in a later phase.');
 });

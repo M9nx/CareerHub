@@ -40,12 +40,10 @@
         </x-nav-link>
     @endif
 
-    @if (Route::has('employee.profile.edit'))
-        <x-nav-link
-            :href="route('employee.profile.edit')"
-            :active="request()->routeIs('employee.profile.*')"
-        >
-            {{ __('Profile') }}
-        </x-nav-link>
-    @endif
+    <x-nav-link
+        :href="route('profile.edit')"
+        :active="request()->routeIs('profile.*')"
+    >
+        {{ __('Profile') }}
+    </x-nav-link>
 </div>
