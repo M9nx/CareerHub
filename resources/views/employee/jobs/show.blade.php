@@ -26,7 +26,7 @@
                     </div>
 
                     <div class="mt-8">
-                        <form method="POST" action="{{ route('employee.applications.store') }}">
+                        <form method="POST" action="{{ route('employee.applications.store') }}" class="space-y-6">
                             @csrf
 
                             <input
@@ -36,40 +36,22 @@
                             >
 
                             <div>
-                                <label
-                                    for="cover_letter"
-                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                                >
-                                    {{ __('Cover Letter') }}
-                                </label>
-
+                                <x-input-label for="cover_letter" :value="__('Cover Letter')" />
                                 <textarea
                                     id="cover_letter"
                                     name="cover_letter"
                                     rows="6"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:focus:border-indigo-600 dark:focus:ring-indigo-600"
                                 >{{ old('cover_letter') }}</textarea>
-
-                                @error('cover_letter')
-                                    <p class="mt-2 text-sm text-red-600">
-                                        {{ $message }}
-                                    </p>
-                                @enderror
+                                <x-input-error class="mt-2" :messages="$errors->get('cover_letter')" />
                             </div>
 
-                            @error('job_posting_id')
-                                <p class="mt-2 text-sm text-red-600">
-                                    {{ $message }}
-                                </p>
-                            @enderror
+                            <x-input-error class="mt-2" :messages="$errors->get('job_posting_id')" />
 
-                            <div class="mt-6 flex items-center gap-4">
-                                <button
-                                    type="submit"
-                                    class="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white hover:bg-indigo-500"
-                                >
+                            <div class="flex items-center gap-4">
+                                <x-primary-button>
                                     {{ __('Apply') }}
-                                </button>
+                                </x-primary-button>
 
                                 <a
                                     href="{{ route('employee.jobs.index') }}"
