@@ -6,6 +6,14 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
+test('employee profile nav points at the employee profile page', function () {
+    $user = User::factory()->employee()->create();
+
+    $this->actingAs($user)
+        ->get(route('employee.dashboard'))
+        ->assertSee(route('employee.profile.edit'), false);
+});
+
 test('employee can view profile edit page', function () {
     $user = User::factory()->employee()->create();
 
