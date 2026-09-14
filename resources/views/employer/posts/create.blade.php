@@ -1,30 +1,19 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
             {{ __('Create Post') }}
         </h2>
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    @if ($errors->any())
-                        <div class="mb-6 rounded-md bg-red-50 p-4">
-                            <ul class="list-disc list-inside text-sm text-red-600">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-
-                    <form method="POST" action="{{ route('employer.posts.store') }}">
+        <div class="mx-auto max-w-3xl sm:px-6 lg:px-8">
+            <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
+                <div class="p-6 text-gray-900 dark:text-gray-100">
+                    <form method="POST" action="{{ route('employer.posts.store') }}" class="space-y-6">
                         @csrf
 
                         <div>
                             <x-input-label for="title" :value="__('Title')" />
-
                             <x-text-input
                                 id="title"
                                 name="title"
@@ -33,46 +22,43 @@
                                 :value="old('title')"
                                 required
                                 autofocus
+                                maxlength="255"
                             />
-
-                            <x-input-error :messages="$errors->get('title')" class="mt-2" />
+                            <x-input-error class="mt-2" :messages="$errors->get('title')" />
                         </div>
 
-                        <div class="mt-6">
+                        <div>
                             <x-input-label for="body" :value="__('Body')" />
-
                             <textarea
                                 id="body"
                                 name="body"
                                 rows="8"
-                                class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
                                 required
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:focus:border-indigo-600 dark:focus:ring-indigo-600"
                             >{{ old('body') }}</textarea>
-
-                            <x-input-error :messages="$errors->get('body')" class="mt-2" />
+                            <x-input-error class="mt-2" :messages="$errors->get('body')" />
                         </div>
 
-                        <div class="mt-6">
+                        <div>
                             <label for="publish" class="inline-flex items-center">
                                 <input
                                     id="publish"
                                     name="publish"
                                     type="checkbox"
                                     value="1"
-                                    class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                                    class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900"
                                     @checked(old('publish'))
                                 >
-
-                                <span class="ms-2 text-sm text-gray-600">
+                                <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">
                                     {{ __('Publish post') }}
                                 </span>
                             </label>
                         </div>
 
-                        <div class="mt-6 flex items-center justify-end gap-4">
+                        <div class="flex items-center justify-end gap-4">
                             <a
                                 href="{{ route('employer.posts.index') }}"
-                                class="text-sm text-gray-600 underline hover:text-gray-900"
+                                class="text-sm text-gray-600 underline hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
                             >
                                 {{ __('Cancel') }}
                             </a>
@@ -87,4 +73,3 @@
         </div>
     </div>
 </x-app-layout>
-
