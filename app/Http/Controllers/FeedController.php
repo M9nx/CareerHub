@@ -11,8 +11,9 @@ class FeedController extends Controller
     {
         $posts = Post::published()
             ->with('author')
-            ->latest()
-            ->get();
+            ->latest('created_at')
+            ->orderByDesc('id')
+            ->paginate(10);
 
         return view('feed.index', compact('posts'));
     }
