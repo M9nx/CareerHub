@@ -1,8 +1,28 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-            {{ __('Feed') }}
-        </h2>
+        <div class="flex items-center justify-between">
+            <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
+                {{ __('Feed') }}
+            </h2>
+
+            @can('create', \App\Models\Post::class)
+                @if (auth()->user()->role === \App\Enums\UserRole::Employer)
+                    <a
+                        href="{{ route('employer.posts.create') }}"
+                        class="rounded-md bg-gray-800 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700"
+                    >
+                        {{ __('Create Post') }}
+                    </a>
+                @elseif (auth()->user()->role === \App\Enums\UserRole::Employee)
+                    <a
+                        href="{{ route('employee.posts.create') }}"
+                        class="rounded-md bg-gray-800 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700"
+                    >
+                        {{ __('Create Post') }}
+                    </a>
+                @endif
+            @endcan
+        </div>
     </x-slot>
 
     <div class="py-12">
