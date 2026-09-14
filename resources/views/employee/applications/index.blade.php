@@ -35,9 +35,14 @@
                                             <td class="px-4 py-3">
                                                 {{ $application->jobPosting->title }}
                                             </td>
+
                                             <td class="px-4 py-3">
-                                                {{ str($application->status->name)->headline() }}
+                                                @include(
+                                                    'employee.applications.partials.status-badge',
+                                                    ['application' => $application]
+                                                )
                                             </td>
+
                                             <td class="px-4 py-3 text-right">
                                                 @if (in_array($application->status, [
                                                     \App\Enums\ApplicationStatus::Submitted,
@@ -49,6 +54,7 @@
                                                     >
                                                         @csrf
                                                         @method('PATCH')
+
                                                         <x-danger-button>
                                                             {{ __('Cancel') }}
                                                         </x-danger-button>
