@@ -4,6 +4,7 @@ namespace App\Actions;
 
 use App\Enums\ApplicationStatus;
 use App\Models\Application;
+use App\Notifications\ApplicationStatusChangedNotification;
 
 class TransitionApplicationStatus
 {
@@ -34,6 +35,10 @@ class TransitionApplicationStatus
         $application->update([
             'status' => $newStatus,
         ]);
+
+        $application->employee->notify(
+            new ApplicationStatusChangedNotification($application)
+        );
 
         return $application;
     }
