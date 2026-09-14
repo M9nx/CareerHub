@@ -1,3 +1,4 @@
+```blade
 <x-app-layout>
     <x-slot name="header">
         <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
@@ -35,10 +36,19 @@
                                             <td class="px-4 py-3">
                                                 {{ $application->jobPosting->title }}
                                             </td>
+
                                             <td class="px-4 py-3">
                                                 {{ str($application->status->name)->headline() }}
                                             </td>
+
                                             <td class="px-4 py-3 text-right">
+                                                <a
+                                                    href="{{ route('employee.applications.show', $application) }}"
+                                                    class="mr-3 text-blue-600 hover:underline"
+                                                >
+                                                    {{ __('View') }}
+                                                </a>
+
                                                 @if (in_array($application->status, [
                                                     \App\Enums\ApplicationStatus::Submitted,
                                                     \App\Enums\ApplicationStatus::UnderReview,
@@ -46,9 +56,11 @@
                                                     <form
                                                         method="POST"
                                                         action="{{ route('employee.applications.cancel', $application) }}"
+                                                        class="inline"
                                                     >
                                                         @csrf
                                                         @method('PATCH')
+
                                                         <x-danger-button>
                                                             {{ __('Cancel') }}
                                                         </x-danger-button>
@@ -66,3 +78,5 @@
         </div>
     </div>
 </x-app-layout>
+```
+

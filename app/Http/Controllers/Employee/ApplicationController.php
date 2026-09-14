@@ -53,4 +53,12 @@ class ApplicationController extends Controller
             ->route('employee.applications.index')
             ->with('success', __('Application cancelled successfully.'));
     }
+    public function show(Application $application): View
+{
+    Gate::authorize('view', $application);
+
+    return view('employee.applications.show', [
+        'application' => $application->load('jobPosting'),
+    ]);
+}
 }
