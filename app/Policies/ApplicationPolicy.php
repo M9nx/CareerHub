@@ -14,6 +14,12 @@ class ApplicationPolicy
         return $user->role === UserRole::Employee;
     }
 
+    public function view(User $user, Application $application): bool
+    {
+        return $user->role === UserRole::Employee
+            && $application->employee_id === $user->id;
+    }
+
     public function cancel(User $user, Application $application): bool
     {
         return $user->role === UserRole::Employee
