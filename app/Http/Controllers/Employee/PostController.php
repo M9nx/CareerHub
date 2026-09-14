@@ -33,6 +33,12 @@ class PostController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        if ($request->user()->isBlockedFromPosts()) {
+            return redirect()
+                ->back()
+                ->with('error', __('You are blocked from creating posts.'));
+        }
+
         Gate::authorize('create', Post::class);
 
         $validated = $request->validate([
