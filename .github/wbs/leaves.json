@@ -1040,7 +1040,7 @@
     "phase": "P4",
     "role": "Mariam",
     "title": "SuperAdmin user block-from-posts action",
-    "task": "UserResource action sets is_blocked_from_posts.",
+    "task": "UserResource table action sets is_blocked_from_posts. Call BlockUserFromPosts from P5-M9nx when present; otherwise toggle the flag on the user.",
     "learn": "Filament actions; user flags",
     "deps": "P2-Mariam",
     "branch_slug": "sa-block-from-posts",
@@ -1050,12 +1050,6 @@
         "action": "Modify",
         "what": "Add block/unblock from posts table action.",
         "example": "Toggles is_blocked_from_posts."
-      },
-      {
-        "file": "app/Actions/BlockUserFromPosts.php",
-        "action": "Create",
-        "what": "Execute block/unblock on User.",
-        "example": "Updates is_blocked_from_posts boolean."
       },
       {
         "file": "tests/Feature/SuperAdmin/BlockUserFromPostsTest.php",
@@ -1281,9 +1275,9 @@
     "phase": "P5",
     "role": "M9nx",
     "title": "Activity logging for posts and moderation",
-    "task": "Log post publish/hide and user block events.",
+    "task": "Log post publish/hide and user block events. Owns BlockUserFromPosts (moved from P4-Mariam).",
     "learn": "CRM hooks; moderation audit",
-    "deps": "P4-M9nx, P5-Basha",
+    "deps": "-",
     "branch_slug": "crm-post-moderation-log",
     "files": [
       {
@@ -1300,9 +1294,9 @@
       },
       {
         "file": "app/Actions/BlockUserFromPosts.php",
-        "action": "Modify",
-        "what": "Log block/unblock via ActivityLogger.",
-        "example": "CRM entry on block."
+        "action": "Create",
+        "what": "Block/unblock a user and log via ActivityLogger.",
+        "example": "Updates is_blocked_from_posts; CRM row on block."
       },
       {
         "file": "tests/Feature/Crm/PostModerationActivityLogTest.php",
@@ -1491,9 +1485,9 @@
     "phase": "P6",
     "role": "M9nx",
     "title": "CareerHub demo seeder",
-    "task": "Seeder with 6 demo users, sample jobs, applications, posts, profiles.",
+    "task": "Seeder with 6 demo users, sample jobs, applications, posts, profiles. Use factories already on main; do not wait for remaining P5 UI packages.",
     "learn": "Database seeders; factory states",
-    "deps": "P5-*",
+    "deps": "-",
     "branch_slug": "demo-seeder",
     "files": [
       {
@@ -1689,9 +1683,9 @@
     "phase": "P7",
     "role": "M9nx",
     "title": "Integration test suite and release checklist",
-    "task": "Cross-feature integration tests; RELEASE.md checklist; update master statuses.",
+    "task": "Cross-feature integration tests; RELEASE.md checklist; update master statuses. Use register/job/apply routes already on main; remaining P6 polish stays with owners.",
     "learn": "E2E testing; release governance",
-    "deps": "P6-*",
+    "deps": "-",
     "branch_slug": "integration-release",
     "files": [
       {

@@ -145,19 +145,19 @@ Each **leaf** is one 8-hour vertical slice spanning migration → model → poli
 | P4-Eldeep | #41 | Eldeep | P4 | `feat/#41-applications-workflow` | P2-Eldeep, P3-Eldeep | not-started |
 | P4-Basha | #42 | Basha | P4 | `feat/#42-persona-post-crud` | P3-Basha | not-started |
 | P4-Youmna | #43 | Youmna | P4 | `feat/#43-employee-profile-edit-base` | P3-Youmna | not-started |
-| P5-M9nx | #45 | M9nx | P5 | `feat/#45-crm-post-moderation-log` | P4-M9nx, P5-Basha | not-started |
+| P5-M9nx | #45 | M9nx | P5 | `feat/#45-crm-post-moderation-log` | - | not-started |
 | P5-Mariam | #46 | Mariam | P5 | `feat/#46-sa-post-moderation` | P4-Mariam, P2-Basha | not-started |
 | P5-Omar | #47 | Omar | P5 | `feat/#47-employee-apply-ui` | P4-Eldeep, P3-Eldeep | not-started |
 | P5-Eldeep | #48 | Eldeep | P5 | `feat/#48-application-notifications` | P4-Eldeep | not-started |
 | P5-Basha | #49 | Basha | P5 | `feat/#49-shared-feed-complete` | P4-Basha | not-started |
 | P5-Youmna | #50 | Youmna | P5 | `feat/#50-employee-cv-upload` | P2-Youmna, P4-Youmna | not-started |
-| P6-M9nx | #52 | M9nx | P6 | `feat/#52-demo-seeder` | P5-* | not-started |
+| P6-M9nx | #52 | M9nx | P6 | `feat/#52-demo-seeder` | - | not-started |
 | P6-Mariam | #53 | Mariam | P6 | `feat/#53-sa-dashboard-widgets` | P5-Mariam | not-started |
 | P6-Omar | #54 | Omar | P6 | `feat/#54-employee-job-filters` | P5-Omar | not-started |
 | P6-Eldeep | #55 | Eldeep | P6 | `feat/#55-application-timeline` | P5-Eldeep | not-started |
 | P6-Basha | #56 | Basha | P6 | `feat/#56-feed-blocked-user-ux` | P5-Basha | not-started |
 | P6-Youmna | #57 | Youmna | P6 | `feat/#57-profile-download-docs` | P5-Youmna | not-started |
-| P7-M9nx | #59 | M9nx | P7 | `feat/#59-integration-release` | P6-* | not-started |
+| P7-M9nx | #59 | M9nx | P7 | `feat/#59-integration-release` | - | not-started |
 | P7-Mariam | #60 | Mariam | P7 | `feat/#60-sa-regression-audit` | P6-Mariam | not-started |
 | P7-Omar | #61 | Omar | P7 | `feat/#61-jobs-e2e-regression` | P6-Omar | not-started |
 | P7-Eldeep | #62 | Eldeep | P7 | `feat/#62-applications-e2e-regression` | P6-Eldeep | not-started |
