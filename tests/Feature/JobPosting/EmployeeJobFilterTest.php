@@ -62,8 +62,8 @@ test('employee job search is preserved across pagination links', function () {
         ->assertOk()
         ->assertSee('Laravel Role #11')
         ->assertDontSee('Unrelated Designer Role')
-        ->assertSee('search=Laravel', false)
-        ->assertSee('page=2', false);
+        ->assertSee('value="Laravel"', false)
+        ->assertSee('Go to page 2', false);
 
     $this->get(route('employee.jobs.index', ['search' => 'Laravel', 'page' => 2]))
         ->assertOk()

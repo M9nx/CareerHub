@@ -71,7 +71,7 @@ test('feed is paginated and keeps empty state for total zero only', function () 
         ->assertOk()
         ->assertSee('Paginated Post #11')
         ->assertDontSee('Paginated Post #01')
-        ->assertSee('page=2', false);
+        ->assertSee('Go to page 2', false);
 
     $this->get(route('feed.index', ['page' => 2]))
         ->assertOk()
@@ -82,8 +82,33 @@ test('feed is paginated and keeps empty state for total zero only', function () 
     $this->get(route('feed.index', ['page' => 99]))
         ->assertOk()
         ->assertDontSee(__('No published posts available.'))
-        ->assertSee('page=2', false);
+        ->assertSee('Go to page 2', false);
 });
+test('posts created through persona controllers appear on the shared feed', function () {
+    actingAsEmployer(['name' => 'HTTP Feed Employer']);
+
+    $this->post(route('employer.posts.store'), [
+        'title' => 'HTTP Employer Feed Post',
+        'body' => 'Created through the employer post controller.',
+        'publish' => '1',
+    ])->assertRedirect(route('employer.posts.index'));
+
+    actingAsEmployee(['name' => 'HTTP Feed Employee']);
+
+    $this->post(route('employee.posts.store'), [
+        'title' => 'HTTP Employee Feed Post',
+        'body' => 'Created through the employee post controller.',
+        'publish' => '1',
+    ])->assertRedirect(route('employee.posts.index'));
+
+    $this->get(route('feed.index'))
+        ->assertOk()
+        ->assertSee('HTTP Employer Feed Post')
+        ->assertSee('HTTP Employee Feed Post')
+        ->assertSee('HTTP Feed Employer')
+        ->assertSee('HTTP Feed Employee');
+});
+
 test('feed role badge uses author_role not the live user role', function () {
     $user = actingAsEmployer(['name' => 'Role Switch Author']);
 

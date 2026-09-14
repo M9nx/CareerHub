@@ -116,3 +116,30 @@ test('employer cannot access the user management panel', function () {
     Livewire::test(ListUsers::class)
         ->assertForbidden();
 });
+
+test('deactivated employer cannot create job postings', function () {
+    $employer = User::factory()->employer()->create([
+        'is_active' => false,
+    ]);
+
+    $this->actingAs($employer)
+        ->get(route('employer.jobs.create'))
+        ->assertForbidden();
+});
+
+test('super admin deactivation persists and blocks employer job creation', function () {
+    $superAdmin = User::factory()->superAdmin()->create();
+    $target = User::factory()->employer()->create(['is_active' => true]);
+
+    $this->actingAs($superAdmin, 'filament');
+
+    Livewire::test(ListUsers::class)
+        ->callAction(TestAction::make('deactivate')->table($target))
+        ->assertSuccessful();
+
+    expect($target->fresh()->is_active)->toBeFalse();
+
+    $this->actingAs($target->fresh())
+        ->get(route('employer.jobs.create'))
+        ->assertForbidden();
+});
