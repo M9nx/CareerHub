@@ -1040,7 +1040,7 @@
     "phase": "P4",
     "role": "Mariam",
     "title": "SuperAdmin user block-from-posts action",
-    "task": "UserResource action sets is_blocked_from_posts.",
+    "task": "UserResource table action sets is_blocked_from_posts. Call BlockUserFromPosts from P5-M9nx when present; otherwise toggle the flag on the user.",
     "learn": "Filament actions; user flags",
     "deps": "P2-Mariam",
     "branch_slug": "sa-block-from-posts",
@@ -1050,12 +1050,6 @@
         "action": "Modify",
         "what": "Add block/unblock from posts table action.",
         "example": "Toggles is_blocked_from_posts."
-      },
-      {
-        "file": "app/Actions/BlockUserFromPosts.php",
-        "action": "Create",
-        "what": "Execute block/unblock on User.",
-        "example": "Updates is_blocked_from_posts boolean."
       },
       {
         "file": "tests/Feature/SuperAdmin/BlockUserFromPostsTest.php",
@@ -1281,9 +1275,9 @@
     "phase": "P5",
     "role": "M9nx",
     "title": "Activity logging for posts and moderation",
-    "task": "Log post publish/hide and user block events.",
+    "task": "Log post publish/hide and user block events. Owns BlockUserFromPosts (moved from P4-Mariam).",
     "learn": "CRM hooks; moderation audit",
-    "deps": "P4-M9nx, P5-Basha",
+    "deps": "-",
     "branch_slug": "crm-post-moderation-log",
     "files": [
       {
@@ -1300,9 +1294,9 @@
       },
       {
         "file": "app/Actions/BlockUserFromPosts.php",
-        "action": "Modify",
-        "what": "Log block/unblock via ActivityLogger.",
-        "example": "CRM entry on block."
+        "action": "Create",
+        "what": "Block/unblock a user and log via ActivityLogger.",
+        "example": "Updates is_blocked_from_posts; CRM row on block."
       },
       {
         "file": "tests/Feature/Crm/PostModerationActivityLogTest.php",
@@ -1491,9 +1485,9 @@
     "phase": "P6",
     "role": "M9nx",
     "title": "CareerHub demo seeder",
-    "task": "Seeder with 6 demo users, sample jobs, applications, posts, profiles.",
+    "task": "Seeder with 6 demo users, sample jobs, applications, posts, profiles. Use factories already on main; do not wait for remaining P5 UI packages.",
     "learn": "Database seeders; factory states",
-    "deps": "P5-*",
+    "deps": "-",
     "branch_slug": "demo-seeder",
     "files": [
       {
@@ -1688,10 +1682,11 @@
   {
     "phase": "P7",
     "role": "M9nx",
-    "title": "Integration test suite and release checklist",
-    "task": "Cross-feature integration tests; RELEASE.md checklist; update master statuses.",
-    "learn": "E2E testing; release governance",
-    "deps": "P6-*",
+    "wbs_id": "P7",
+    "title": "Integration QA and Release (all original Day 8 slices)",
+    "task": "All original P7 work moved to M9nx on #58: integration suite and RELEASE.md; SuperAdmin regression; jobs E2E; applications E2E; posts/feed E2E; profiles/storage E2E.",
+    "learn": "E2E testing; release governance; Filament testing; state machine tests; feed integration; file storage integration",
+    "deps": "-",
     "branch_slug": "integration-release",
     "files": [
       {
@@ -1711,18 +1706,7 @@
         "action": "Create",
         "what": "SuperAdmin views activity log after workflows.",
         "example": "CRM entries exist."
-      }
-    ]
-  },
-  {
-    "phase": "P7",
-    "role": "Mariam",
-    "title": "SuperAdmin regression and access audit",
-    "task": "Audit all Filament resources accessible only to SuperAdmin.",
-    "learn": "Security regression; Filament testing",
-    "deps": "P6-Mariam",
-    "branch_slug": "sa-regression-audit",
-    "files": [
+      },
       {
         "file": "tests/Feature/SuperAdmin/SuperAdminRegressionTest.php",
         "action": "Create",
@@ -1734,18 +1718,7 @@
         "action": "Modify",
         "what": "Extend coverage for deactivate.",
         "example": "Regression additions."
-      }
-    ]
-  },
-  {
-    "phase": "P7",
-    "role": "Omar",
-    "title": "Job postings E2E regression",
-    "task": "Consolidated job posting tests across employer/employee/super-admin.",
-    "learn": "Test consolidation; regression",
-    "deps": "P6-Omar",
-    "branch_slug": "jobs-e2e-regression",
-    "files": [
+      },
       {
         "file": "tests/Feature/JobPosting/JobPostingE2ETest.php",
         "action": "Create",
@@ -1757,18 +1730,7 @@
         "action": "Modify",
         "what": "Fix any integration failures.",
         "example": "Suite green."
-      }
-    ]
-  },
-  {
-    "phase": "P7",
-    "role": "Eldeep",
-    "title": "Applications E2E regression",
-    "task": "Full state machine regression including Cancelled terminal state.",
-    "learn": "State machine tests; cancel edge cases",
-    "deps": "P6-Eldeep",
-    "branch_slug": "applications-e2e-regression",
-    "files": [
+      },
       {
         "file": "tests/Feature/Application/ApplicationE2ETest.php",
         "action": "Create",
@@ -1780,18 +1742,7 @@
         "action": "Modify",
         "what": "Edge: cannot cancel Accepted.",
         "example": "Assert 422 or exception."
-      }
-    ]
-  },
-  {
-    "phase": "P7",
-    "role": "Basha",
-    "title": "Posts and feed E2E regression",
-    "task": "Shared feed + moderation + block user integrated test.",
-    "learn": "Feed integration; moderation",
-    "deps": "P6-Basha",
-    "branch_slug": "posts-e2e-regression",
-    "files": [
+      },
       {
         "file": "tests/Feature/Post/PostFeedE2ETest.php",
         "action": "Create",
@@ -1803,18 +1754,7 @@
         "action": "Modify",
         "what": "Integration fixes.",
         "example": "Suite green."
-      }
-    ]
-  },
-  {
-    "phase": "P7",
-    "role": "Youmna",
-    "title": "Profiles and storage E2E regression",
-    "task": "Profile upload/download integration; storage link verification test.",
-    "learn": "File storage integration",
-    "deps": "P6-Youmna",
-    "branch_slug": "profiles-e2e-regression",
-    "files": [
+      },
       {
         "file": "tests/Feature/Profile/ProfileStorageE2ETest.php",
         "action": "Create",
@@ -1826,6 +1766,312 @@
         "action": "Modify",
         "what": "Regression fixes.",
         "example": "Suite green."
+      }
+    ]
+  },
+  {
+    "phase": "P8",
+    "role": "M9nx",
+    "wbs_id": "P8-Timeline",
+    "title": "Mixed chronological timeline",
+    "task": "Turn /feed from a post-only card list into a mixed chronological timeline (posts, published jobs, viewer-visible application events).",
+    "learn": "Timeline composition queries; pagination of mixed types",
+    "deps": "-",
+    "branch_slug": "timeline-feed",
+    "files": [
+      {
+        "file": "app/Support/Timeline/TimelineItem.php",
+        "action": "Create",
+        "what": "Value object: type, occurred_at, subject, actor.",
+        "example": "Types: post, job_published, application_event."
+      },
+      {
+        "file": "app/Support/Timeline/TimelineQuery.php",
+        "action": "Create",
+        "what": "Merge published posts, published jobs, viewer-visible application events; sort desc; paginate.",
+        "example": "Employer sees applications on own jobs; employee sees own applications."
+      },
+      {
+        "file": "app/Http/Controllers/FeedController.php",
+        "action": "Modify",
+        "what": "Use TimelineQuery; pass $items to the view.",
+        "example": "Keep route feed.index."
+      },
+      {
+        "file": "resources/views/feed/index.blade.php",
+        "action": "Modify",
+        "what": "Timeline layout instead of post-only list.",
+        "example": "Vertical time spine; newest first."
+      },
+      {
+        "file": "resources/views/feed/partials/timeline-item.blade.php",
+        "action": "Create",
+        "what": "Render one item by type.",
+        "example": "Post body, job title link, application status label."
+      },
+      {
+        "file": "tests/Feature/Post/TimelineFeedTest.php",
+        "action": "Create",
+        "what": "Mixed types appear in chronological order; guests redirected.",
+        "example": "Hidden posts and draft jobs omitted."
+      }
+    ]
+  },
+  {
+    "phase": "P8",
+    "role": "M9nx",
+    "wbs_id": "P8-Composer",
+    "title": "In-timeline post composer",
+    "task": "Composer on /feed so Employer and Employee can publish without leaving the timeline. Blocked users cannot create.",
+    "learn": "PostPolicy; Form Requests",
+    "deps": "-",
+    "branch_slug": "timeline-composer",
+    "files": [
+      {
+        "file": "app/Http/Controllers/FeedController.php",
+        "action": "Modify",
+        "what": "Add store for authenticated personas.",
+        "example": "Authorize PostPolicy create."
+      },
+      {
+        "file": "app/Http/Requests/Feed/StoreTimelinePostRequest.php",
+        "action": "Create",
+        "what": "Validate title/body for a published timeline post.",
+        "example": "required body; title optional max 255."
+      },
+      {
+        "file": "routes/web.php",
+        "action": "Modify",
+        "what": "POST /feed for composer submit.",
+        "example": "Named feed.store."
+      },
+      {
+        "file": "resources/views/feed/partials/composer.blade.php",
+        "action": "Create",
+        "what": "Composer form at top of timeline.",
+        "example": "Hidden when @cannot create Post."
+      },
+      {
+        "file": "resources/views/feed/index.blade.php",
+        "action": "Modify",
+        "what": "Include composer partial.",
+        "example": "Flash success after post."
+      },
+      {
+        "file": "tests/Feature/Post/TimelineComposerTest.php",
+        "action": "Create",
+        "what": "Employer and employee publish from /feed; blocked user 403.",
+        "example": "New post appears on timeline."
+      }
+    ]
+  },
+  {
+    "phase": "P8",
+    "role": "M9nx",
+    "wbs_id": "P8-Inbox",
+    "title": "Database notifications and bell inbox",
+    "task": "Database notification inbox (bell + list + mark read). Keep existing mail.",
+    "learn": "Laravel database notifications",
+    "deps": "-",
+    "branch_slug": "notification-inbox",
+    "files": [
+      {
+        "file": "database/migrations/2026_09_15_000001_create_notifications_table.php",
+        "action": "Create",
+        "what": "Laravel notifications table.",
+        "example": "php artisan make:notifications-table shape."
+      },
+      {
+        "file": "app/Notifications/ApplicationStatusChangedNotification.php",
+        "action": "Modify",
+        "what": "via() includes database as well as mail.",
+        "example": "Database payload: job title, status, url."
+      },
+      {
+        "file": "app/Http/Controllers/NotificationInboxController.php",
+        "action": "Create",
+        "what": "index + markAsRead for the authenticated user.",
+        "example": "Only own notifications."
+      },
+      {
+        "file": "routes/web.php",
+        "action": "Modify",
+        "what": "GET /notifications, PATCH /notifications/{id}/read.",
+        "example": "Named notifications.index, notifications.read."
+      },
+      {
+        "file": "resources/views/notifications/index.blade.php",
+        "action": "Create",
+        "what": "Inbox list with unread state.",
+        "example": "Link through to the related application/job."
+      },
+      {
+        "file": "resources/views/components/notification-bell.blade.php",
+        "action": "Create",
+        "what": "Bell with unread count in persona nav.",
+        "example": "Hidden for guests."
+      },
+      {
+        "file": "tests/Feature/Notification/NotificationInboxTest.php",
+        "action": "Create",
+        "what": "Status change writes database notification; owner can mark read; other user 403.",
+        "example": "Notification::fake plus persisted row test."
+      }
+    ]
+  },
+  {
+    "phase": "P8",
+    "role": "M9nx",
+    "wbs_id": "P8-Discovery",
+    "title": "Search, suggested jobs, empty states",
+    "task": "Discovery surface: search jobs and posts, suggested published jobs, honest empty states.",
+    "learn": "Query filters; empty-state UX",
+    "deps": "-",
+    "branch_slug": "discovery-search",
+    "files": [
+      {
+        "file": "app/Http/Controllers/DiscoveryController.php",
+        "action": "Create",
+        "what": "Search published jobs and published posts by title/body.",
+        "example": "Auth required; paginate results."
+      },
+      {
+        "file": "routes/web.php",
+        "action": "Modify",
+        "what": "GET /discover.",
+        "example": "Named discover.index."
+      },
+      {
+        "file": "resources/views/discover/index.blade.php",
+        "action": "Create",
+        "what": "Search field, job hits, post hits, suggested jobs.",
+        "example": "Empty state copy when no matches."
+      },
+      {
+        "file": "resources/views/feed/partials/empty-timeline.blade.php",
+        "action": "Create",
+        "what": "Empty timeline state with link to discover.",
+        "example": "Shown when timeline has zero items."
+      },
+      {
+        "file": "resources/views/components/employer-nav.blade.php",
+        "action": "Modify",
+        "what": "Link to discover.index.",
+        "example": "Discover nav item."
+      },
+      {
+        "file": "resources/views/components/employee-nav.blade.php",
+        "action": "Modify",
+        "what": "Link to discover.index.",
+        "example": "Same for employee."
+      },
+      {
+        "file": "tests/Feature/Discovery/DiscoverySearchTest.php",
+        "action": "Create",
+        "what": "Query matches published job and post; draft omitted; empty state; guest redirected.",
+        "example": "Suggested jobs only Published."
+      }
+    ]
+  },
+  {
+    "phase": "P8",
+    "role": "M9nx",
+    "wbs_id": "P8-UI",
+    "title": "Professional Swiss UI pass",
+    "task": "Professional Swiss/Breeze UI pass on timeline, dashboards, and persona nav.",
+    "learn": "Existing Breeze layouts; Tailwind v4 tokens",
+    "deps": "-",
+    "branch_slug": "professional-ui",
+    "files": [
+      {
+        "file": "resources/views/layouts/app.blade.php",
+        "action": "Modify",
+        "what": "Shared max-width, page header slot, consistent background.",
+        "example": "Do not add a second CSS framework."
+      },
+      {
+        "file": "resources/views/feed/index.blade.php",
+        "action": "Modify",
+        "what": "Professional timeline spacing, type hierarchy, dark variants.",
+        "example": "Matches layout tokens."
+      },
+      {
+        "file": "resources/views/employer/dashboard.blade.php",
+        "action": "Modify",
+        "what": "Dashboard cards/summary using the same tokens.",
+        "example": "Not a new design-system dump."
+      },
+      {
+        "file": "resources/views/employee/dashboard.blade.php",
+        "action": "Modify",
+        "what": "Same treatment as employer dashboard.",
+        "example": "Consistent header + empty hints."
+      },
+      {
+        "file": "resources/css/app.css",
+        "action": "Modify",
+        "what": "Token utilities only if missing (timeline spine, unread pill).",
+        "example": "Tailwind v4 already in the app."
+      },
+      {
+        "file": "tests/Feature/Ui/AuthenticatedShellTest.php",
+        "action": "Create",
+        "what": "Feed and both dashboards 200 for the matching role.",
+        "example": "Guest redirected from feed."
+      }
+    ]
+  },
+  {
+    "phase": "P8",
+    "role": "M9nx",
+    "wbs_id": "P8-Harden",
+    "title": "Production hardening",
+    "task": "Accessible nav, document titles, branded error pages, conservative public meta.",
+    "learn": "Laravel error views; a11y names on nav",
+    "deps": "-",
+    "branch_slug": "production-hardening",
+    "files": [
+      {
+        "file": "resources/views/layouts/navigation.blade.php",
+        "action": "Modify",
+        "what": "aria-current on active persona links; skip-to-content target if missing.",
+        "example": "Visible focus stays."
+      },
+      {
+        "file": "resources/views/layouts/app.blade.php",
+        "action": "Modify",
+        "what": "Per-page title via slot; skip link to #content.",
+        "example": "Title ends with CareerHub."
+      },
+      {
+        "file": "resources/views/errors/404.blade.php",
+        "action": "Create",
+        "what": "Branded 404 using app layout tokens.",
+        "example": "Link home."
+      },
+      {
+        "file": "resources/views/errors/403.blade.php",
+        "action": "Create",
+        "what": "Branded 403.",
+        "example": "Link dashboard/home."
+      },
+      {
+        "file": "resources/views/errors/500.blade.php",
+        "action": "Create",
+        "what": "Branded 500 without leaking exception text.",
+        "example": "Generic message."
+      },
+      {
+        "file": "resources/views/welcome.blade.php",
+        "action": "Modify",
+        "what": "Canonical + Open Graph title/description if missing.",
+        "example": "No new tracking scripts."
+      },
+      {
+        "file": "tests/Feature/Ui/ErrorPagesTest.php",
+        "action": "Create",
+        "what": "404/403 pages render branded copy; 403 for wrong persona.",
+        "example": "assertSee without stack traces."
       }
     ]
   }
