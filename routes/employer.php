@@ -39,5 +39,6 @@ Route::middleware(['web', 'auth', 'employer'])
             ->name('employer.applications.update');
 
         Route::resource('posts', PostController::class)
+            ->except(['show'])
             ->names('employer.posts');
     });

@@ -38,7 +38,7 @@ class PostController extends Controller
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'body' => ['required', 'string'],
-            'publish' => ['nullable', 'boolean'],
+            'publish' => ['sometimes', 'boolean'],
         ]);
 
         Post::create([
@@ -46,7 +46,7 @@ class PostController extends Controller
             'author_role' => $request->user()->role,
             'title' => $validated['title'],
             'body' => $validated['body'],
-            'status' => ! empty($validated['publish'])
+            'status' => $request->boolean('publish')
                 ? PostStatus::Published
                 : PostStatus::Draft,
             'is_active' => true,
@@ -55,13 +55,6 @@ class PostController extends Controller
         return redirect()
             ->route('employer.posts.index')
             ->with('success', __('Post created successfully.'));
-    }
-
-    public function show(Post $post): View
-    {
-        Gate::authorize('view', $post);
-
-        return view('employer.posts.show', compact('post'));
     }
 
     public function edit(Post $post): View
@@ -78,13 +71,13 @@ class PostController extends Controller
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'body' => ['required', 'string'],
-            'publish' => ['nullable', 'boolean'],
+            'publish' => ['sometimes', 'boolean'],
         ]);
 
         $post->update([
             'title' => $validated['title'],
             'body' => $validated['body'],
-            'status' => ! empty($validated['publish'])
+            'status' => $request->boolean('publish')
                 ? PostStatus::Published
                 : PostStatus::Draft,
         ]);
