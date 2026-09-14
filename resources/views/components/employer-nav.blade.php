@@ -31,9 +31,9 @@
         </x-nav-link>
     @endif
 
-    @if (Route::has('employer.posts'))
+    @if (Route::has('employer.posts.index'))
         <x-nav-link
-            :href="route('employer.posts')"
+            :href="route('employer.posts.index')"
             :active="request()->routeIs('employer.posts*')"
         >
             {{ __('Posts') }}
