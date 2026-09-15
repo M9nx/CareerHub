@@ -6,9 +6,12 @@ use App\Actions\SharePostToFeed;
 use App\Actions\StorePostAttachments;
 use App\Actions\TogglePostReaction;
 use App\Enums\PostStatus;
+use App\Enums\UserRole;
 use App\Http\Requests\Feed\ShareTimelinePostRequest;
 use App\Http\Requests\Feed\StoreTimelinePostRequest;
+use App\Models\JobPosting;
 use App\Models\Post;
+use App\Models\User;
 use App\Support\Timeline\TimelineQuery;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -20,9 +23,41 @@ class FeedController extends Controller
 {
     public function index(Request $request): View
     {
-        $items = (new TimelineQuery($request))->paginate($request->user());
+        $viewer = $request->user();
+        $viewer->loadMissing(['employerProfile', 'employeeProfile']);
 
-        return view('feed.index', compact('items'));
+        $items = (new TimelineQuery($request))->paginate($viewer);
+
+        $suggestedJobs = JobPosting::query()
+            ->published()
+            ->with(['employer.employerProfile'])
+            ->latest('published_at')
+            ->limit(5)
+            ->get();
+
+        $suggestedPeople = User::query()
+            ->whereKeyNot($viewer->id)
+            ->whereIn('id', Post::published()->select('author_id'))
+            ->orderBy('name')
+            ->limit(5)
+            ->get();
+
+        $profileChecks = match ($viewer->role) {
+            UserRole::Employee => [
+                ['label' => __('Name on account'), 'complete' => filled($viewer->name)],
+                ['label' => __('CV uploaded'), 'complete' => filled($viewer->employeeProfile?->cv_path)],
+                ['label' => __('Application image'), 'complete' => filled($viewer->employeeProfile?->application_image_path)],
+            ],
+            UserRole::Employer => [
+                ['label' => __('Name on account'), 'complete' => filled($viewer->name)],
+                ['label' => __('Company name'), 'complete' => filled($viewer->employerProfile?->company_name)],
+            ],
+            default => [
+                ['label' => __('Name on account'), 'complete' => filled($viewer->name)],
+            ],
+        };
+
+        return view('feed.index', compact('items', 'suggestedJobs', 'suggestedPeople', 'profileChecks'));
     }
 
     public function store(
