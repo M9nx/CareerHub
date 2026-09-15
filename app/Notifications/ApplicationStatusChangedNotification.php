@@ -15,9 +15,12 @@ class ApplicationStatusChangedNotification extends Notification
         public Application $application,
     ) {}
 
+    /**
+     * @return list<string>
+     */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['mail', 'database'];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -33,9 +36,20 @@ class ApplicationStatusChangedNotification extends Notification
             ->line(__('New status: :status', ['status' => $status]));
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function toArray(object $notifiable): array
     {
+        $this->application->loadMissing('jobPosting');
+
         return [
+            'type' => 'application_status_changed',
+            'message' => __('Application for :title is now :status.', [
+                'title' => $this->application->jobPosting->title,
+                'status' => str($this->application->status->name)->headline()->toString(),
+            ]),
+            'url' => route('employee.applications.index'),
             'application_id' => $this->application->id,
             'job_title' => $this->application->jobPosting->title,
             'status' => $this->application->status->value,

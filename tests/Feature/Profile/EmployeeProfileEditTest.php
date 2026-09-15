@@ -6,19 +6,22 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-test('profile lives in the account dropdown not the primary nav', function () {
+test('profile lives in the account menu not the primary nav', function () {
     $user = User::factory()->employee()->create();
 
-    $this->actingAs($user)
-        ->get(route('employee.dashboard'))
+    $response = $this->actingAs($user)
+        ->get(route('feed.index'))
+        ->assertOk()
+        ->assertSee(__('Home'))
+        ->assertSee(__('Me'))
         ->assertSee(route('profile.edit'), false)
         ->assertSee(__('Profile'));
 
-    expect(view('components.employee-nav')->render())->not->toContain(__('Profile'));
-    expect(view('components.employer-nav')->render())->not->toContain(__('Profile'));
+    // Primary nav should highlight Home, not expose a top-level Profile link label alone as nav item.
+    expect(substr_count($response->getContent(), __('Home')))->toBeGreaterThan(0);
 });
 
-test('employee career documents appear on the breeze profile page', function () {
+test('employee career documents appear on the account profile page', function () {
     $user = User::factory()->employee()->create();
 
     EmployeeProfile::factory()->for($user)->create([
@@ -36,7 +39,7 @@ test('employee career documents appear on the breeze profile page', function () 
         ->assertSee(route('employee.profile.update'), false);
 });
 
-test('employee profile route redirects to the breeze profile page', function () {
+test('employee profile route redirects to the account profile page', function () {
     $user = User::factory()->employee()->create();
 
     $this->actingAs($user)

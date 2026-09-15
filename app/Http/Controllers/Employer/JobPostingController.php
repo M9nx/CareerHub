@@ -43,6 +43,8 @@ class JobPostingController extends Controller
             ...$this->publicationAttributes($request->safe()->only([
                 'title',
                 'description',
+                'location',
+                'employment_type',
                 'status',
             ])),
         ]);
@@ -67,7 +69,7 @@ class JobPostingController extends Controller
         JobPosting $job
     ): RedirectResponse {
         $job->update($this->publicationAttributes(
-            $request->safe()->only(['title', 'description', 'status']),
+            $request->safe()->only(['title', 'description', 'location', 'employment_type', 'status']),
             $job,
         ));
 
@@ -119,8 +121,8 @@ class JobPostingController extends Controller
     }
 
     /**
-     * @param  array{title: string, description: string, status: string}  $attributes
-     * @return array{title: string, description: string, status: string, published_at?: Carbon}
+     * @param  array{title: string, description: string, location?: string|null, employment_type?: string|null, status: string}  $attributes
+     * @return array{title: string, description: string, location?: string|null, employment_type?: string|null, status: string, published_at?: Carbon}
      */
     private function publicationAttributes(array $attributes, ?JobPosting $job = null): array
     {

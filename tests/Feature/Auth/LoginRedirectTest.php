@@ -2,22 +2,22 @@
 
 use App\Models\User;
 
-test('employer is redirected to employer dashboard after login', function () {
+test('employer is redirected to the feed after login', function () {
     $user = User::factory()->employer()->create();
 
     $this->post('/login', [
         'email' => $user->email,
         'password' => 'password',
-    ])->assertRedirect(route('employer.dashboard'));
+    ])->assertRedirect(route('feed.index'));
 });
 
-test('employee is redirected to employee dashboard after login', function () {
+test('employee is redirected to the feed after login', function () {
     $user = User::factory()->employee()->create();
 
     $this->post('/login', [
         'email' => $user->email,
         'password' => 'password',
-    ])->assertRedirect(route('employee.dashboard'));
+    ])->assertRedirect(route('feed.index'));
 });
 
 test('super admin cannot authenticate through breeze login', function () {

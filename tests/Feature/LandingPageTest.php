@@ -70,20 +70,20 @@ test('landing page links preselect employee registration role', function () {
         ->assertSee(route('register', ['role' => 'Employee']), false);
 });
 
-test('authenticated employer is redirected from home to employer dashboard', function () {
+test('authenticated employer is redirected from home to feed', function () {
     $user = User::factory()->employer()->create();
 
     $this->actingAs($user)
         ->get('/')
-        ->assertRedirect(route('employer.dashboard'));
+        ->assertRedirect(route('feed.index'));
 });
 
-test('authenticated employee is redirected from home to employee dashboard', function () {
+test('authenticated employee is redirected from home to feed', function () {
     $user = User::factory()->employee()->create();
 
     $this->actingAs($user)
         ->get('/')
-        ->assertRedirect(route('employee.dashboard'));
+        ->assertRedirect(route('feed.index'));
 });
 
 test('register page honors role query parameter from landing ctas', function () {

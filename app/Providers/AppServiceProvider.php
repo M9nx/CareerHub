@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Contracts\SearchService;
 use App\Models\Application;
 use App\Models\JobPosting;
 use App\Models\Post;
@@ -10,6 +11,7 @@ use App\Observers\JobPostingObserver;
 use App\Observers\PostObserver;
 use App\Policies\ApplicationPolicy;
 use App\Policies\UserPolicy;
+use App\Services\EloquentSearchService;
 use App\Services\LocalDocumentStorage;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -24,6 +26,8 @@ class AppServiceProvider extends ServiceProvider
         app()->singleton(LocalDocumentStorage::class, function () {
             return new LocalDocumentStorage;
         });
+
+        $this->app->bind(SearchService::class, EloquentSearchService::class);
     }
 
     /**

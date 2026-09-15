@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\EmploymentType;
 use App\Enums\JobPostingStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,6 +17,8 @@ class JobPosting extends Model
         'employer_id',
         'title',
         'description',
+        'location',
+        'employment_type',
         'status',
         'is_active',
         'published_at',
@@ -25,6 +28,7 @@ class JobPosting extends Model
     {
         return [
             'status' => JobPostingStatus::class,
+            'employment_type' => EmploymentType::class,
             'is_active' => 'boolean',
             'published_at' => 'datetime',
         ];

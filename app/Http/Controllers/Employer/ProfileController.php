@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Employer;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Employer\UpdateEmployerProfileRequest;
+use App\Services\LocalDocumentStorage;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
@@ -14,12 +16,31 @@ class ProfileController extends Controller
     }
 
     public function update(
-        UpdateEmployerProfileRequest $request
+        UpdateEmployerProfileRequest $request,
+        LocalDocumentStorage $documents,
     ): RedirectResponse {
-        $request->user()->employerProfile()->updateOrCreate(
-            [],
-            $request->validated()
-        );
+        $profile = $request->user()->employerProfile()->firstOrCreate([], [
+            'company_name' => '',
+        ]);
+
+        $attributes = $request->safe()->only([
+            'company_name',
+            'industry',
+            'company_size',
+            'location',
+            'website',
+            'about',
+        ]);
+
+        if ($request->hasFile('logo')) {
+            if (filled($profile->logo_path)) {
+                Storage::disk('public')->delete($profile->logo_path);
+            }
+
+            $attributes['logo_path'] = $documents->store($request->file('logo'), 'company-logos');
+        }
+
+        $profile->update($attributes);
 
         return redirect()
             ->route('profile.edit')

@@ -14,7 +14,7 @@ test('blocked employee can view feed but cannot create a post', function () {
     $this->get(route('feed.index'))
         ->assertOk()
         ->assertSee('Published Employer Post')
-        ->assertDontSee(__('Create Post'));
+        ->assertDontSee(__('Start a post'));
 
     $this->get(route('employee.posts.create'))
         ->assertRedirect(route('feed.index'))
@@ -47,7 +47,7 @@ test('blocked employer can view feed but cannot create a post', function () {
     $this->get(route('feed.index'))
         ->assertOk()
         ->assertSee('Published Employee Post')
-        ->assertDontSee(__('Create Post'));
+        ->assertDontSee(__('Start a post'));
 
     $this->get(route('employer.posts.create'))
         ->assertRedirect(route('feed.index'))
@@ -68,11 +68,11 @@ test('blocked employer can view feed but cannot create a post', function () {
     ]);
 });
 
-test('unblocked employee sees create post on the feed', function () {
+test('unblocked employee sees the feed composer', function () {
     actingAsEmployee();
 
     $this->get(route('feed.index'))
         ->assertOk()
-        ->assertSee(__('Create Post'))
-        ->assertSee(route('employee.posts.create'), false);
+        ->assertSee(__('Start a post'))
+        ->assertSee(route('feed.store'), false);
 });

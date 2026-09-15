@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\UserRole;
 use App\Models\User;
 
 class UserPolicy
@@ -19,7 +20,15 @@ class UserPolicy
      */
     public function view(User $user, User $model): bool
     {
-        return $user->isSuperAdmin();
+        if ($user->isSuperAdmin()) {
+            return true;
+        }
+
+        if (! $user->isActive() || ! $model->isActive()) {
+            return false;
+        }
+
+        return $this->isNetworkPersona($user) && $this->isNetworkPersona($model);
     }
 
     /**
@@ -65,5 +74,10 @@ class UserPolicy
     public function forceDelete(User $user, User $model): bool
     {
         return $user->isSuperAdmin();
+    }
+
+    private function isNetworkPersona(User $user): bool
+    {
+        return in_array($user->role, [UserRole::Employee, UserRole::Employer], true);
     }
 }

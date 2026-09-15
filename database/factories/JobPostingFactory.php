@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\EmploymentType;
 use App\Enums\JobPostingStatus;
 use App\Models\JobPosting;
 use App\Models\User;
@@ -20,6 +21,8 @@ class JobPostingFactory extends Factory
             'employer_id' => User::factory()->employer(),
             'title' => fake()->jobTitle(),
             'description' => fake()->paragraphs(3, true),
+            'location' => fake()->optional()->city(),
+            'employment_type' => fake()->optional()->randomElement(EmploymentType::cases()),
             'status' => JobPostingStatus::Draft,
             'is_active' => true,
             'published_at' => null,

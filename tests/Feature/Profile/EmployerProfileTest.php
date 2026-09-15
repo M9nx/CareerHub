@@ -28,7 +28,7 @@ test('employer can update company name', function () {
     ]);
 });
 
-test('employer company name appears on the breeze profile page', function () {
+test('employer company name appears on the account profile page', function () {
     $user = User::factory()->employer()->create();
 
     EmployerProfile::factory()->for($user)->create([
@@ -43,7 +43,7 @@ test('employer company name appears on the breeze profile page', function () {
         ->assertSee('Test Company');
 });
 
-test('employer profile route redirects to the breeze profile page', function () {
+test('employer profile route redirects to the account profile page', function () {
     $user = User::factory()->employer()->create();
 
     $this->actingAs($user)
@@ -130,5 +130,5 @@ test('employee breeze profile does not show employer company fields', function (
     $this->actingAs($user)
         ->get(route('profile.edit'))
         ->assertOk()
-        ->assertDontSee(__('Update the company name shown on your job postings.'));
+        ->assertDontSee(__('Company details shown on your public profile and job postings.'));
 });

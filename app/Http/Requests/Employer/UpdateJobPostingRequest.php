@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Employer;
 
+use App\Enums\EmploymentType;
 use App\Enums\JobPostingStatus;
 use App\Models\JobPosting;
 use Illuminate\Foundation\Http\FormRequest;
@@ -26,6 +27,8 @@ class UpdateJobPostingRequest extends FormRequest
         return [
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
+            'location' => ['nullable', 'string', 'max:255'],
+            'employment_type' => ['nullable', Rule::enum(EmploymentType::class)],
             'status' => ['required', Rule::enum(JobPostingStatus::class)],
             'employer_id' => ['prohibited'],
         ];

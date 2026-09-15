@@ -13,9 +13,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 use Jeffgreco13\FilamentBreezy\Traits\TwoFactorAuthenticatable;
 
-#[Fillable(['name', 'email', 'password', 'role', 'is_active', 'is_blocked_from_posts'])]
+#[Fillable(['name', 'headline', 'location', 'about', 'avatar_path', 'cover_path', 'email', 'password', 'role', 'is_active', 'is_blocked_from_posts'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements FilamentUser
 {
@@ -59,6 +60,24 @@ class User extends Authenticatable implements FilamentUser
         return (bool) $this->is_blocked_from_posts;
     }
 
+    public function avatarUrl(): ?string
+    {
+        if (! filled($this->avatar_path)) {
+            return null;
+        }
+
+        return Storage::disk('public')->url($this->avatar_path);
+    }
+
+    public function coverUrl(): ?string
+    {
+        if (! filled($this->cover_path)) {
+            return null;
+        }
+
+        return Storage::disk('public')->url($this->cover_path);
+    }
+
     public function employerProfile(): HasOne
     {
         return $this->hasOne(EmployerProfile::class);
@@ -72,5 +91,20 @@ class User extends Authenticatable implements FilamentUser
     public function posts(): HasMany
     {
         return $this->hasMany(Post::class, 'author_id');
+    }
+
+    public function profileExperiences(): HasMany
+    {
+        return $this->hasMany(ProfileExperience::class)->orderByDesc('started_at');
+    }
+
+    public function profileEducations(): HasMany
+    {
+        return $this->hasMany(ProfileEducation::class)->orderByDesc('started_at');
+    }
+
+    public function profileSkills(): HasMany
+    {
+        return $this->hasMany(ProfileSkill::class)->orderBy('sort');
     }
 }

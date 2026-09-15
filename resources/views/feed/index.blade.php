@@ -1,57 +1,43 @@
-<x-app-layout>
-    <x-slot name="header">
-        <div class="flex items-center justify-between gap-4">
-            <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-                {{ __('Feed') }}
-            </h2>
+<x-app.shell-layout :title="__('Home')">
+    <x-app.feed.layout>
+        <x-slot:left>
+            <x-app.feed.profile-summary />
+            <div class="xl:hidden">
+                <x-app.sidebar.profile-completion :checks="$profileChecks" />
+            </div>
+        </x-slot:left>
 
-            @can('create', \App\Models\Post::class)
-                @if (auth()->user()?->role === \App\Enums\UserRole::Employer)
-                    <a
-                        href="{{ route('employer.posts.create') }}"
-                        class="rounded-md bg-gray-800 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700 dark:bg-gray-200 dark:text-gray-800 dark:hover:bg-white"
-                    >
-                        {{ __('Create Post') }}
-                    </a>
-                @elseif (auth()->user()?->role === \App\Enums\UserRole::Employee)
-                    <a
-                        href="{{ route('employee.posts.create') }}"
-                        class="rounded-md bg-gray-800 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700 dark:bg-gray-200 dark:text-gray-800 dark:hover:bg-white"
-                    >
-                        {{ __('Create Post') }}
-                    </a>
-                @endif
-            @endcan
-        </div>
-    </x-slot>
+        <x-slot:right>
+            <x-app.sidebar.profile-completion :checks="$profileChecks" />
+            <x-app.sidebar.job-suggestions :jobs="$suggestedJobs" />
+            <x-app.sidebar.people-suggestions :people="$suggestedPeople" />
+        </x-slot:right>
 
-    <div class="py-12">
-        <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-            @if (session('error'))
-                <div class="mb-6 overflow-hidden bg-white p-4 shadow-sm sm:rounded-lg dark:bg-gray-800">
-                    <p class="text-sm text-red-600 dark:text-red-400">
-                        {{ session('error') }}
-                    </p>
-                </div>
-            @endif
+        @if (session('error'))
+            <div class="app-alert-error" role="alert">
+                {{ session('error') }}
+            </div>
+        @endif
 
-            @if ($posts->total() === 0)
-                <div class="overflow-hidden bg-white p-6 shadow-sm sm:rounded-lg dark:bg-gray-800">
-                    <p class="text-gray-600 dark:text-gray-400">
-                        {{ __('No published posts available.') }}
-                    </p>
-                </div>
-            @else
-                <div class="space-y-6">
-                    @foreach ($posts as $post)
-                        @include('feed.partials.post-card', ['post' => $post])
-                    @endforeach
-                </div>
+        <x-app.feed.composer />
 
-                <div class="mt-8">
-                    {{ $posts->links() }}
-                </div>
-            @endif
-        </div>
-    </div>
-</x-app-layout>
+        @if ($items->total() === 0)
+            <div class="app-card p-8 text-center">
+                <p class="app-empty">{{ __('No published posts available.') }}</p>
+            </div>
+        @else
+            <div class="space-y-3">
+                @foreach ($items as $item)
+                    @include('feed.partials.timeline-item', [
+                        'item' => $item,
+                        'savedPostIds' => $savedPostIds,
+                    ])
+                @endforeach
+            </div>
+
+            <div class="mt-6">
+                {{ $items->links() }}
+            </div>
+        @endif
+    </x-app.feed.layout>
+</x-app.shell-layout>
