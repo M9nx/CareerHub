@@ -6,6 +6,7 @@ use App\Http\Controllers\FeedController;
 use App\Http\Controllers\NetworkController;
 use App\Http\Controllers\PeopleController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -47,6 +48,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/feed/posts/{post}/share', [FeedController::class, 'share'])->name('feed.posts.share');
     Route::post('/feed/posts/{post}/comments', [FeedController::class, 'storeComment'])->name('feed.posts.comments.store');
     Route::delete('/feed/posts/{post}/comments/{comment}', [FeedController::class, 'destroyComment'])->name('feed.posts.comments.destroy');
+
+    Route::get('/search', SearchController::class)->name('search.index');
 
     Route::get('/people/{user}', [PeopleController::class, 'show'])->name('people.show');
 
