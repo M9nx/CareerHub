@@ -250,6 +250,66 @@
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
     }
+
+    /* Authenticated app shell (feed + future P8 UI) */
+    .app-feed-column {
+        @apply mx-auto w-full max-w-[40rem] px-4 py-10 md:px-0 md:py-14;
+    }
+
+    .app-page-title {
+        @apply text-balance text-3xl font-light tracking-tight text-[var(--landing-ink)] md:text-4xl;
+    }
+
+    .app-card {
+        @apply border border-[var(--landing-rule)] bg-[var(--landing-card)];
+        border-radius: var(--landing-radius);
+    }
+
+    .app-avatar {
+        @apply flex h-11 w-11 shrink-0 items-center justify-center bg-[var(--landing-accent-muted)] text-sm font-medium text-[var(--landing-accent)];
+        border-radius: 9999px;
+    }
+
+    .app-nav-link {
+        @apply inline-flex min-h-[44px] items-center text-sm opacity-60 motion-safe:transition hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--landing-accent)];
+    }
+
+    .app-nav-link.is-active {
+        @apply font-medium opacity-100;
+    }
+
+    .app-textarea {
+        @apply w-full resize-none border-0 bg-transparent text-base leading-relaxed text-[var(--landing-ink)] placeholder:text-[var(--landing-muted)] focus:outline-none focus:ring-0;
+    }
+
+    .app-action {
+        @apply inline-flex min-h-[44px] items-center gap-2 text-sm opacity-60 motion-safe:transition hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--landing-accent)];
+    }
+
+    .app-action.is-active {
+        @apply font-medium text-[var(--landing-accent)] opacity-100;
+    }
+
+    .app-badge {
+        @apply inline-flex items-center rounded-full bg-[var(--landing-accent-muted)] px-2.5 py-0.5 text-xs font-medium text-[var(--landing-accent)];
+    }
+
+    .app-embed {
+        @apply mt-4 border border-[var(--landing-rule)] bg-[var(--landing-canvas)] p-4;
+        border-radius: calc(var(--landing-radius) - 0.125rem);
+    }
+
+    .app-file-input {
+        @apply sr-only;
+    }
+
+    .app-file-trigger {
+        @apply inline-flex min-h-[44px] cursor-pointer items-center gap-2 text-sm opacity-60 motion-safe:transition hover:opacity-100;
+    }
+
+    .app-alert-error {
+        @apply app-card mb-6 border-[#C8102E]/30 bg-[#C8102E]/5 p-4 text-sm text-[#C8102E];
+    }
 }
 
 @keyframes landing-loader-slide {
