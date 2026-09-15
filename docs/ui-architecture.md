@@ -1,7 +1,7 @@
 # CareerHub UI Architecture & Implementation Plan
 
 **Date:** 2026-09-15  
-**Status:** Milestone 3 complete — ready for Milestone 4 (network)  
+**Status:** Milestone 4 complete — ready for Milestone 5 (discovery)  
 **Companion:** [`linkedin-gap-analysis.md`](./linkedin-gap-analysis.md), [`CODEBASE_AUDIT.md`](./CODEBASE_AUDIT.md)
 
 ---
@@ -454,7 +454,20 @@ Aligned with product brief:
 
 ---
 
-**Next:** Milestone 4 — connections / network (CH-SOCIAL-001+) after Milestone 3 sign-off.
+**Next:** Milestone 5 — discovery / search (CH-SEARCH-001+) after Milestone 4 sign-off.
+
+---
+
+## 16. Milestone 4 status (2026-09-15)
+
+**Completed:** CH-SOCIAL-001, CH-SOCIAL-002, CH-SOCIAL-003, CH-SOCIAL-004.
+
+Shipped:
+- `connections` table with pending/accepted/rejected/withdrawn
+- Connect / Accept / Ignore / Withdraw / Remove actions + policies
+- `/network` page (invitations, sent, connections, suggestions)
+- Deterministic people suggestions (active authors, ordered by name)
+- Header Network link + profile connection CTAs
 
 ---
 
