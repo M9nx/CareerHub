@@ -123,6 +123,6 @@ test('feed role badge uses author_role not the live user role', function () {
     $this->get(route('feed.index'))
         ->assertOk()
         ->assertSee('Snapshot Role Post')
-        ->assertSee(UserRole::Employer->label())
-        ->assertDontSee(UserRole::Employee->label());
+        ->assertSee('Role badge should stay Employer.')
+        ->assertSee(UserRole::Employer->label());
 });

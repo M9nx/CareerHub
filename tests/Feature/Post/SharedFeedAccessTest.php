@@ -13,7 +13,7 @@ test('employer can access the feed', function () {
 
     $this->get(route('feed.index'))
         ->assertOk()
-        ->assertSee(__('Feed'))
+        ->assertSee(__('Home'))
         ->assertSee(__('No published posts available.'));
 });
 
@@ -22,7 +22,7 @@ test('employee can access the feed', function () {
 
     $this->get(route('feed.index'))
         ->assertOk()
-        ->assertSee(__('Feed'))
+        ->assertSee(__('Home'))
         ->assertSee(__('No published posts available.'));
 });
 
