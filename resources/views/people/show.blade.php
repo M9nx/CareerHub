@@ -39,6 +39,8 @@
                             <a href="{{ route('profile.edit') }}" class="app-link mt-4 inline-flex">
                                 {{ __('Edit profile') }}
                             </a>
+                        @else
+                            <x-app.connection-actions :person="$person" :connection="$connection" />
                         @endif
                     </div>
                 </div>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Connection;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
@@ -23,9 +24,15 @@ class PeopleController extends Controller
             ->limit(5)
             ->get();
 
+        $viewer = auth()->user();
+        $connection = $viewer->is($user)
+            ? null
+            : Connection::between($viewer, $user);
+
         return view('people.show', [
             'person' => $user,
             'recentPosts' => $recentPosts,
+            'connection' => $connection,
         ]);
     }
 }
