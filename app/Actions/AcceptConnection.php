@@ -4,6 +4,7 @@ namespace App\Actions;
 
 use App\Enums\ConnectionStatus;
 use App\Models\Connection;
+use App\Notifications\ConnectionAcceptedNotification;
 
 class AcceptConnection
 {
@@ -13,6 +14,10 @@ class AcceptConnection
             'status' => ConnectionStatus::Accepted,
         ]);
 
-        return $connection->fresh(['requester', 'addressee']);
+        $connection = $connection->fresh(['requester', 'addressee']);
+
+        $connection->requester->notify(new ConnectionAcceptedNotification($connection));
+
+        return $connection;
     }
 }

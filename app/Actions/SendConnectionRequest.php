@@ -6,6 +6,7 @@ use App\Enums\ConnectionStatus;
 use App\Enums\UserRole;
 use App\Models\Connection;
 use App\Models\User;
+use App\Notifications\ConnectionRequestReceivedNotification;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Validation\ValidationException;
 
@@ -38,14 +39,18 @@ class SendConnectionRequest
                 'status' => ConnectionStatus::Pending,
             ]);
 
-            return $existing->fresh(['requester', 'addressee']);
+            $connection = $existing->fresh(['requester', 'addressee']);
+        } else {
+            $connection = Connection::create([
+                'requester_id' => $requester->id,
+                'addressee_id' => $addressee->id,
+                'status' => ConnectionStatus::Pending,
+            ])->load(['requester', 'addressee']);
         }
 
-        return Connection::create([
-            'requester_id' => $requester->id,
-            'addressee_id' => $addressee->id,
-            'status' => ConnectionStatus::Pending,
-        ]);
+        $addressee->notify(new ConnectionRequestReceivedNotification($connection));
+
+        return $connection;
     }
 
     private function isNetworkPersona(User $user): bool
