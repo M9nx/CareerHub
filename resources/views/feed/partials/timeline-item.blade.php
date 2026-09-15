@@ -18,15 +18,31 @@
         <article id="post-{{ $post->id }}" class="app-card overflow-hidden">
             <div class="p-4 sm:p-5">
                 <div class="flex items-start gap-3">
-                    <div class="app-avatar">
-                        {{ str($author?->name ?? '?')->substr(0, 1)->upper() }}
-                    </div>
+                    @if ($author?->avatarUrl())
+                        <a href="{{ route('people.show', $author) }}" class="shrink-0">
+                            <img
+                                src="{{ $author->avatarUrl() }}"
+                                alt=""
+                                class="h-11 w-11 rounded-full object-cover ring-1 ring-[var(--app-border)]"
+                            />
+                        </a>
+                    @else
+                        <a href="{{ $author ? route('people.show', $author) : '#' }}" class="app-avatar shrink-0">
+                            {{ str($author?->name ?? '?')->substr(0, 1)->upper() }}
+                        </a>
+                    @endif
 
                     <div class="min-w-0 flex-1">
                         <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
-                            <p class="font-medium text-[var(--app-text)]">
-                                {{ $author?->name ?? __('Unknown author') }}
-                            </p>
+                            @if ($author)
+                                <a href="{{ route('people.show', $author) }}" class="font-medium text-[var(--app-text)] hover:underline">
+                                    {{ $author->name }}
+                                </a>
+                            @else
+                                <p class="font-medium text-[var(--app-text)]">
+                                    {{ __('Unknown author') }}
+                                </p>
+                            @endif
                             <span class="opacity-30">·</span>
                             <time
                                 datetime="{{ $item->occurredAt->toIso8601String() }}"
@@ -35,6 +51,12 @@
                                 {{ $item->occurredAt->timezone(config('app.timezone'))->diffForHumans() }}
                             </time>
                         </div>
+
+                        @if (filled($author?->headline))
+                            <p class="mt-1 text-sm text-[var(--app-text-muted)]">
+                                {{ $author->headline }}
+                            </p>
+                        @endif
 
                         <div class="mt-1 flex items-center gap-2">
                             <span class="app-badge">

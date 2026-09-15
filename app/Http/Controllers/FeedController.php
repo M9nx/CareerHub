@@ -47,12 +47,19 @@ class FeedController extends Controller
         $profileChecks = match ($viewer->role) {
             UserRole::Employee => [
                 ['label' => __('Name on account'), 'complete' => filled($viewer->name)],
+                ['label' => __('Headline'), 'complete' => filled($viewer->headline)],
+                ['label' => __('Location'), 'complete' => filled($viewer->location)],
+                ['label' => __('Profile photo'), 'complete' => filled($viewer->avatar_path)],
                 ['label' => __('CV uploaded'), 'complete' => filled($viewer->employeeProfile?->cv_path)],
                 ['label' => __('Application image'), 'complete' => filled($viewer->employeeProfile?->application_image_path)],
             ],
             UserRole::Employer => [
                 ['label' => __('Name on account'), 'complete' => filled($viewer->name)],
+                ['label' => __('Headline'), 'complete' => filled($viewer->headline)],
+                ['label' => __('Location'), 'complete' => filled($viewer->location)],
+                ['label' => __('Profile photo'), 'complete' => filled($viewer->avatar_path)],
                 ['label' => __('Company name'), 'complete' => filled($viewer->employerProfile?->company_name)],
+                ['label' => __('Company industry'), 'complete' => filled($viewer->employerProfile?->industry)],
             ],
             default => [
                 ['label' => __('Name on account'), 'complete' => filled($viewer->name)],
