@@ -1,7 +1,7 @@
 # CareerHub UI Architecture & Implementation Plan
 
 **Date:** 2026-09-15  
-**Status:** Milestone 2 complete — ready for Milestone 3 (identity)  
+**Status:** Milestone 3 complete — ready for Milestone 4 (network)  
 **Companion:** [`linkedin-gap-analysis.md`](./linkedin-gap-analysis.md), [`CODEBASE_AUDIT.md`](./CODEBASE_AUDIT.md)
 
 ---
@@ -454,7 +454,22 @@ Aligned with product brief:
 
 ---
 
-**Next:** Milestone 3 — identity / profile expansion (CH-DOC-003+) after Milestone 2 sign-off.
+**Next:** Milestone 4 — connections / network (CH-SOCIAL-001+) after Milestone 3 sign-off.
+
+---
+
+## 15. Milestone 3 status (2026-09-15)
+
+**Completed:** CH-DOC-003, CH-PROF-001, CH-PROF-002, CH-PROF-003.
+
+Shipped:
+- Profile expansion plan decisions
+- `users` identity columns (headline, location, about, avatar)
+- Employer company enrichment + logo
+- Public profile at `/people/{user}`
+- Feed summary / completion / author links updated
+
+**Deferred:** CH-PROF-004 experience / education / skills tables.
 
 ---
 
