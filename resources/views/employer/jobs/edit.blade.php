@@ -19,6 +19,25 @@
             </div>
 
             <div>
+                <x-input-label for="location" :value="__('Location')" />
+                <x-text-input id="location" name="location" type="text" class="block w-full" :value="old('location', $job->location)" maxlength="255" />
+                <x-input-error class="mt-2" :messages="$errors->get('location')" />
+            </div>
+
+            <div>
+                <x-input-label for="employment_type" :value="__('Employment type')" />
+                <select id="employment_type" name="employment_type">
+                    <option value="">{{ __('Select type') }}</option>
+                    @foreach (\App\Enums\EmploymentType::cases() as $type)
+                        <option value="{{ $type->value }}" @selected(old('employment_type', $job->employment_type?->value) === $type->value)>
+                            {{ $type->label() }}
+                        </option>
+                    @endforeach
+                </select>
+                <x-input-error class="mt-2" :messages="$errors->get('employment_type')" />
+            </div>
+
+            <div>
                 <x-input-label for="status" :value="__('Status')" />
                 <select id="status" name="status" required>
                     @foreach ($statuses as $status)
