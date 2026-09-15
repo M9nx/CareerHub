@@ -30,8 +30,7 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
 
         return match ($request->user()->role) {
-            UserRole::Employer => to_route('employer.dashboard'),
-            UserRole::Employee => to_route('employee.dashboard'),
+            UserRole::Employer, UserRole::Employee => to_route('feed.index'),
             default => $this->logoutAndRedirectToFilamentLogin($request),
         };
     }

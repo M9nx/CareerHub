@@ -44,8 +44,7 @@ class RegisteredUserController extends Controller
     private function redirectPathFor(UserRole $role): string
     {
         return match ($role) {
-            UserRole::Employer => route('employer.dashboard', absolute: false),
-            UserRole::Employee => route('employee.dashboard', absolute: false),
+            UserRole::Employer, UserRole::Employee => route('feed.index', absolute: false),
             default => route('dashboard', absolute: false),
         };
     }

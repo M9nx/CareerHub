@@ -10,8 +10,7 @@ Route::get('/', function () {
         $user = auth()->user();
 
         return match ($user->role) {
-            UserRole::Employer => redirect()->route('employer.dashboard'),
-            UserRole::Employee => redirect()->route('employee.dashboard'),
+            UserRole::Employer, UserRole::Employee => redirect()->route('feed.index'),
             UserRole::SuperAdmin => redirect('/super-admin'),
             default => redirect()->route('dashboard'),
         };
