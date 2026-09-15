@@ -2,6 +2,7 @@
 
 use App\Enums\UserRole;
 use App\Http\Controllers\FeedController;
+use App\Http\Controllers\PeopleController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -45,8 +46,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/feed/posts/{post}/comments', [FeedController::class, 'storeComment'])->name('feed.posts.comments.store');
     Route::delete('/feed/posts/{post}/comments/{comment}', [FeedController::class, 'destroyComment'])->name('feed.posts.comments.destroy');
 
+    Route::get('/people/{user}', [PeopleController::class, 'show'])->name('people.show');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::patch('/profile/professional', [ProfileController::class, 'updateProfessional'])->name('profile.professional.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
