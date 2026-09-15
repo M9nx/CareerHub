@@ -11,6 +11,11 @@
             'href' => route('feed.index'),
             'active' => request()->routeIs('feed.*'),
         ],
+        [
+            'label' => __('Network'),
+            'href' => route('network.index'),
+            'active' => request()->routeIs('network.*'),
+        ],
         $user->role === UserRole::Employer && Route::has('employer.jobs.index')
             ? [
                 'label' => __('Jobs'),

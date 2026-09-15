@@ -10,6 +10,7 @@ test('feed shows three column network shell landmarks', function () {
     $this->get(route('feed.index'))
         ->assertOk()
         ->assertSee(__('Home'))
+        ->assertSee(__('Network'))
         ->assertSee('Shell Employee')
         ->assertSee(__('Profile settings'))
         ->assertSee(__('Profile strength'))
