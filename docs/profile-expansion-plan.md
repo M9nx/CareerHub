@@ -1,7 +1,8 @@
 # Profile Expansion Plan
 
-**Status:** Stub — expand before Milestone 3 migrations  
-**Date:** 2026-09-15
+**Status:** Approved for Milestone 3 implementation (CH-DOC-003)  
+**Date:** 2026-09-15  
+**Companion:** [`linkedin-gap-analysis.md`](./linkedin-gap-analysis.md), [`ui-architecture.md`](./ui-architecture.md)
 
 ## Current schema (verified)
 
@@ -11,22 +12,72 @@
 | `employee_profiles` | `user_id`, `cv_path`, `application_image_path` |
 | `employer_profiles` | `user_id`, `company_name` |
 
-**Missing:** headline, location, about, avatar/cover, experience, education, skills, company industry/size/website.
+**Missing before M3:** headline, location, about, avatar/cover, experience, education, skills, company industry/size/website.
 
-## Planned stages (do not implement until this doc is completed)
+## Decisions
 
-1. **Minimum identity** — headline, location, avatar path (users or profiles)  
-2. **Public profile show** — route + policy + Blade  
-3. **Employer company fields** — industry, size, location, website, about, logo  
-4. **Career sections** — experience / education / skills tables  
+| Question | Decision |
+|----------|----------|
+| Avatar / headline ownership | **`users`** — shared professional identity for both roles |
+| Company fields | **`employer_profiles`** — industry, size, location, website, about, logo |
+| Public visibility | Authenticated Employer/Employee may view other **active** Employer/Employee profiles |
+| Email on public profile | **Hidden** |
+| CV / application image on public profile | **Hidden** (private career documents) |
+| Fake metrics | **Never** (no profile views / impressions) |
+| Experience / education / skills | **Deferred** to CH-PROF-004 (Milestone 3b+) |
+
+## Stage migrations
+
+### Stage 1 — CH-PROF-001 Minimum identity (`users`)
+
+```php
+$table->string('headline')->nullable();
+$table->string('location')->nullable();
+$table->text('about')->nullable();
+$table->string('avatar_path')->nullable();
+```
+
+Rollback: drop the four columns.
+
+### Stage 2 — CH-PROF-003 Employer company (`employer_profiles`)
+
+```php
+$table->string('industry')->nullable();
+$table->string('company_size')->nullable();
+$table->string('location')->nullable();
+$table->string('website')->nullable();
+$table->text('about')->nullable();
+$table->string('logo_path')->nullable();
+```
+
+Rollback: drop the six columns. `company_name` remains required for posting context.
+
+### Stage 3 — CH-PROF-002 Public profile
+
+- Route: `GET /people/{user}` → `people.show`
+- Policy: `UserPolicy::view` allows active peer Employer/Employee
+- Blade: Swiss `x-app.page` show surface (avatar, headline, location, about, company block, recent posts)
+
+### Stage 4 — CH-PROF-004 Career sections (deferred)
+
+Tables (not in this milestone):
+
+- `profile_experiences` (`user_id`, title, company, location, start/end, description)
+- `profile_educations` (`user_id`, school, degree, field, start/end)
+- `profile_skills` (`user_id`, name, sort)
+
+## Application touch points
+
+| Area | Change |
+|------|--------|
+| `ProfileUpdateRequest` / professional form | Edit headline, location, about, avatar |
+| `UpdateEmployerProfileRequest` | Company enrichment fields + logo |
+| Feed `profile-summary` / completion checks | Show headline/location/avatar; completion includes new fields |
+| Timeline avatars | Prefer `avatar_path` when present |
 
 ## Rules
 
-- No fake profile-view counters.  
-- Propose exact migrations and rollback in this file before coding.  
-- Update [`linkedin-gap-analysis.md`](./linkedin-gap-analysis.md) when decisions land.
-
-## Open questions
-
-- Avatar on `users` vs role profile tables?  
-- Are professional profiles public to all authenticated users or connection-gated?  
+- Nullable columns only (safe for existing rows).  
+- Store avatars/logos on the `public` disk via `LocalDocumentStorage`.  
+- No cover image in Milestone 3 (defer with experience tables).  
+- Update gap analysis when Stage 4 ships.
