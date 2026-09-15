@@ -1,7 +1,7 @@
 # CareerHub UI Architecture & Implementation Plan
 
 **Date:** 2026-09-15  
-**Status:** Milestone 3b (CH-PROF-004) complete — messaging MVP deferred pending architecture approval  
+**Status:** Milestone 7 polish complete — messaging MVP deferred pending architecture approval  
 **Companion:** [`linkedin-gap-analysis.md`](./linkedin-gap-analysis.md), [`CODEBASE_AUDIT.md`](./CODEBASE_AUDIT.md)
 
 ---
@@ -454,7 +454,20 @@ Aligned with product brief:
 
 ---
 
-**Next:** Approve `docs/messaging-architecture.md` before CH-MSG-001, or polish remaining feed/UI items.
+**Next:** Approve `docs/messaging-architecture.md` before CH-MSG-001.
+
+---
+
+## 20. Milestone 7 status (2026-09-15)
+
+**Completed:** CH-UI-004 remainder, profile cover photo.
+
+Shipped:
+- Cover image (`users.cover_path`) on professional profile edit + public `/people/{user}` banner
+- Removed leftover orphans (`AppLayout`, unused Breeze `nav-link` components, dead feed composer wrapper)
+- Renamed legacy “breeze profile page” test titles
+
+**Still deferred:** CH-MSG-001 until messaging architecture approval.
 
 ---
 
@@ -468,7 +481,7 @@ Shipped:
 - Public sections on `/people/{user}`
 - Employee profile-completion check includes experience
 
-**Still deferred:** Cover image; CH-MSG-001 until messaging architecture approval.
+**Still deferred:** CH-MSG-001 until messaging architecture approval.
 
 ---
 

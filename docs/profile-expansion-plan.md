@@ -81,5 +81,5 @@ Owner CRUD on `/profile`; public read on `/people/{user}`.
 
 - Nullable columns only (safe for existing rows).  
 - Store avatars/logos on the `public` disk via `LocalDocumentStorage`.  
-- No cover image in Milestone 3 (defer with experience tables).  
+- No cover image in Milestone 3 (shipped later in Milestone 7).  
 - Update gap analysis when Stage 4 ships.

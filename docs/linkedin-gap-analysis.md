@@ -67,16 +67,16 @@ Related docs:
 
 | | |
 |--|--|
-| **Current state** | Public `/people/{user}` with identity + company + experience/education/skills. Cover image still missing. |
+| **Current state** | Public `/people/{user}` with identity, cover, company, and experience/education/skills. |
 | **Desired state** | Public-ish professional profile: cover, avatar, headline, location, About, Experience, Education, Skills, Activity/Posts. Company profile for employers. |
 | **Affected files** | `ProfileController`(s), `employer/profile/*`, `employee/profile/*`, profile migrations/models, new profile show routes/views |
 | **Backend** | Schema expansion; policies for view/edit; profile show controllers |
 | **Frontend** | Profile header + sections components |
-| **Database** | Identity + career sections shipped (CH-PROF-001–004); cover still deferred |
+| **Database** | Identity, cover, and career sections shipped (CH-PROF-001–004 + M7 cover) |
 | **Risk** | High if big-bang schema; medium if staged |
 | **Priority** | **P0** (minimum identity fields), **P1** (full sections) |
 
-See also: `docs/profile-expansion-plan.md` (Milestone 3 / 3b).
+See also: `docs/profile-expansion-plan.md` (Milestone 3 / 3b / 7).
 
 ---
 
