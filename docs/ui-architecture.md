@@ -1,7 +1,7 @@
 # CareerHub UI Architecture & Implementation Plan
 
 **Date:** 2026-09-15  
-**Status:** Milestone 4 complete — ready for Milestone 5 (discovery)  
+**Status:** Milestone 5 complete — ready for Milestone 6 (engagement)  
 **Companion:** [`linkedin-gap-analysis.md`](./linkedin-gap-analysis.md), [`CODEBASE_AUDIT.md`](./CODEBASE_AUDIT.md)
 
 ---
@@ -454,7 +454,19 @@ Aligned with product brief:
 
 ---
 
-**Next:** Milestone 5 — discovery / search (CH-SEARCH-001+) after Milestone 4 sign-off.
+**Next:** Milestone 6 — notifications / saves / messaging architecture (CH-NOTIF-001+) after Milestone 5 sign-off.
+
+---
+
+## 17. Milestone 5 status (2026-09-15)
+
+**Completed:** CH-SEARCH-001, CH-SEARCH-002, CH-JOB-001, CH-JOB-002.
+
+Shipped:
+- `SearchService` contract + `EloquentSearchService` (people/jobs/companies/posts)
+- `/search` results page + functional header search
+- Employee job discovery split layout (list + detail)
+- Job `location` + `employment_type` enrichment with filters
 
 ---
 
