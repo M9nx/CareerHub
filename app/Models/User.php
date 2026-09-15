@@ -83,4 +83,19 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->hasMany(Post::class, 'author_id');
     }
+
+    public function profileExperiences(): HasMany
+    {
+        return $this->hasMany(ProfileExperience::class)->orderByDesc('started_at');
+    }
+
+    public function profileEducations(): HasMany
+    {
+        return $this->hasMany(ProfileEducation::class)->orderByDesc('started_at');
+    }
+
+    public function profileSkills(): HasMany
+    {
+        return $this->hasMany(ProfileSkill::class)->orderBy('sort');
+    }
 }

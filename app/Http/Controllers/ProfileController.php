@@ -42,6 +42,9 @@ class ProfileController extends Controller
             'user' => $user,
             'employeeProfile' => $employeeProfile,
             'employerProfile' => $employerProfile,
+            'experiences' => $user->profileExperiences()->get(),
+            'educations' => $user->profileEducations()->get(),
+            'skills' => $user->profileSkills()->get(),
         ]);
     }
 

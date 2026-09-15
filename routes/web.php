@@ -7,6 +7,9 @@ use App\Http\Controllers\NetworkController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PeopleController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProfileEducationController;
+use App\Http\Controllers\ProfileExperienceController;
+use App\Http\Controllers\ProfileSkillController;
 use App\Http\Controllers\SavedItemController;
 use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
@@ -77,8 +80,17 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile/professional', [ProfileController::class, 'updateProfessional'])->name('profile.professional.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    Route::post('/profile/experiences', [ProfileExperienceController::class, 'store'])->name('profile.experiences.store');
+    Route::patch('/profile/experiences/{experience}', [ProfileExperienceController::class, 'update'])->name('profile.experiences.update');
+    Route::delete('/profile/experiences/{experience}', [ProfileExperienceController::class, 'destroy'])->name('profile.experiences.destroy');
 
+    Route::post('/profile/educations', [ProfileEducationController::class, 'store'])->name('profile.educations.store');
+    Route::patch('/profile/educations/{education}', [ProfileEducationController::class, 'update'])->name('profile.educations.update');
+    Route::delete('/profile/educations/{education}', [ProfileEducationController::class, 'destroy'])->name('profile.educations.destroy');
 
+    Route::post('/profile/skills', [ProfileSkillController::class, 'store'])->name('profile.skills.store');
+    Route::patch('/profile/skills/{skill}', [ProfileSkillController::class, 'update'])->name('profile.skills.update');
+    Route::delete('/profile/skills/{skill}', [ProfileSkillController::class, 'destroy'])->name('profile.skills.destroy');
 });
 
 require __DIR__.'/auth.php';

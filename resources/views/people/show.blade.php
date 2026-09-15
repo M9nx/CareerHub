@@ -103,6 +103,77 @@
             </section>
         @endif
 
+        @if ($experiences->isNotEmpty())
+            <section class="app-card p-6 sm:p-8">
+                <h3 class="text-sm font-medium uppercase tracking-[0.18em] text-[var(--app-text-muted)]">
+                    {{ __('Experience') }}
+                </h3>
+                <ul class="mt-4 space-y-5">
+                    @foreach ($experiences as $experience)
+                        <li>
+                            <p class="font-medium text-[var(--app-text)]">{{ $experience->title }}</p>
+                            <p class="mt-1 text-sm text-[var(--app-text)] opacity-90">{{ $experience->company }}</p>
+                            <p class="mt-1 text-sm text-[var(--app-text-muted)]">
+                                {{ $experience->started_at?->format('M Y') }}
+                                –
+                                {{ $experience->ended_at?->format('M Y') ?? __('Present') }}
+                                @if (filled($experience->location))
+                                    · {{ $experience->location }}
+                                @endif
+                            </p>
+                            @if (filled($experience->description))
+                                <p class="mt-2 max-w-[65ch] whitespace-pre-line text-sm leading-relaxed opacity-90">
+                                    {{ $experience->description }}
+                                </p>
+                            @endif
+                        </li>
+                    @endforeach
+                </ul>
+            </section>
+        @endif
+
+        @if ($educations->isNotEmpty())
+            <section class="app-card p-6 sm:p-8">
+                <h3 class="text-sm font-medium uppercase tracking-[0.18em] text-[var(--app-text-muted)]">
+                    {{ __('Education') }}
+                </h3>
+                <ul class="mt-4 space-y-5">
+                    @foreach ($educations as $education)
+                        <li>
+                            <p class="font-medium text-[var(--app-text)]">{{ $education->school }}</p>
+                            @if (filled($education->degree) || filled($education->field))
+                                <p class="mt-1 text-sm text-[var(--app-text)] opacity-90">
+                                    {{ collect([$education->degree, $education->field])->filter()->implode(' · ') }}
+                                </p>
+                            @endif
+                            @if ($education->started_at || $education->ended_at)
+                                <p class="mt-1 text-sm text-[var(--app-text-muted)]">
+                                    {{ $education->started_at?->format('M Y') ?? '—' }}
+                                    –
+                                    {{ $education->ended_at?->format('M Y') ?? __('Present') }}
+                                </p>
+                            @endif
+                        </li>
+                    @endforeach
+                </ul>
+            </section>
+        @endif
+
+        @if ($skills->isNotEmpty())
+            <section class="app-card p-6 sm:p-8">
+                <h3 class="text-sm font-medium uppercase tracking-[0.18em] text-[var(--app-text-muted)]">
+                    {{ __('Skills') }}
+                </h3>
+                <ul class="mt-4 flex flex-wrap gap-2">
+                    @foreach ($skills as $skill)
+                        <li class="rounded-md border border-[var(--app-border)] px-3 py-1.5 text-sm text-[var(--app-text)]">
+                            {{ $skill->name }}
+                        </li>
+                    @endforeach
+                </ul>
+            </section>
+        @endif
+
         <section class="space-y-4">
             <h3 class="text-sm font-medium uppercase tracking-[0.18em] text-[var(--app-text-muted)]">
                 {{ __('Recent posts') }}

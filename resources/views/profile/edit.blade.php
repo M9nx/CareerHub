@@ -12,6 +12,18 @@
             </div>
         </div>
 
+        <div class="app-card p-6 sm:p-8">
+            @include('profile.partials.career-experiences', ['experiences' => $experiences])
+        </div>
+
+        <div class="app-card p-6 sm:p-8">
+            @include('profile.partials.career-educations', ['educations' => $educations])
+        </div>
+
+        <div class="app-card p-6 sm:p-8">
+            @include('profile.partials.career-skills', ['skills' => $skills])
+        </div>
+
         @if ($employerProfile)
             <div class="app-card p-6 sm:p-8">
                 <div class="max-w-xl">

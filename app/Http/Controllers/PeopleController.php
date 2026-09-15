@@ -14,7 +14,13 @@ class PeopleController extends Controller
     {
         Gate::authorize('view', $user);
 
-        $user->loadMissing(['employerProfile', 'employeeProfile']);
+        $user->loadMissing([
+            'employerProfile',
+            'employeeProfile',
+            'profileExperiences',
+            'profileEducations',
+            'profileSkills',
+        ]);
 
         $recentPosts = Post::query()
             ->published()
@@ -33,6 +39,9 @@ class PeopleController extends Controller
             'person' => $user,
             'recentPosts' => $recentPosts,
             'connection' => $connection,
+            'experiences' => $user->profileExperiences,
+            'educations' => $user->profileEducations,
+            'skills' => $user->profileSkills,
         ]);
     }
 }
