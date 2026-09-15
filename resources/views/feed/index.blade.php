@@ -28,7 +28,10 @@
         @else
             <div class="space-y-3">
                 @foreach ($items as $item)
-                    @include('feed.partials.timeline-item', ['item' => $item])
+                    @include('feed.partials.timeline-item', [
+                        'item' => $item,
+                        'savedPostIds' => $savedPostIds,
+                    ])
                 @endforeach
             </div>
 

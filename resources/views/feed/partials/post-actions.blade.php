@@ -69,6 +69,20 @@
                 </form>
             </details>
         @endcan
+
+        @php($isSaved = in_array($post->id, $savedPostIds ?? [], true))
+        @if ($isSaved)
+            <form method="POST" action="{{ route('saved.posts.destroy', $post) }}">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="app-action is-active">{{ __('Saved') }}</button>
+            </form>
+        @else
+            <form method="POST" action="{{ route('saved.posts.store', $post) }}">
+                @csrf
+                <button type="submit" class="app-action">{{ __('Save') }}</button>
+            </form>
+        @endif
     </div>
 
     <div class="mt-4 space-y-4" x-show="open" x-cloak>

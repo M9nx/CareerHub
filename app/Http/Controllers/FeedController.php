@@ -13,6 +13,7 @@ use App\Http\Requests\Feed\StoreTimelinePostRequest;
 use App\Models\JobPosting;
 use App\Models\Post;
 use App\Models\PostComment;
+use App\Models\SavedPost;
 use App\Models\User;
 use App\Notifications\PostCommentedNotification;
 use App\Support\Timeline\TimelineQuery;
@@ -67,7 +68,12 @@ class FeedController extends Controller
             ],
         };
 
-        return view('feed.index', compact('items', 'suggestedJobs', 'suggestedPeople', 'profileChecks'));
+        $savedPostIds = SavedPost::query()
+            ->where('user_id', $viewer->id)
+            ->pluck('post_id')
+            ->all();
+
+        return view('feed.index', compact('items', 'suggestedJobs', 'suggestedPeople', 'profileChecks', 'savedPostIds'));
     }
 
     public function store(

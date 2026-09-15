@@ -103,6 +103,19 @@
                         <a href="{{ route('employee.jobs.show', $selected) }}" class="swiss-btn-primary">
                             {{ __('Open & apply') }}
                         </a>
+                        @php($jobSaved = \App\Models\SavedJob::query()->where('user_id', auth()->id())->where('job_posting_id', $selected->id)->exists())
+                        @if ($jobSaved)
+                            <form method="POST" action="{{ route('saved.jobs.destroy', $selected) }}">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="swiss-btn-secondary">{{ __('Unsave') }}</button>
+                            </form>
+                        @else
+                            <form method="POST" action="{{ route('saved.jobs.store', $selected) }}">
+                                @csrf
+                                <button type="submit" class="swiss-btn-secondary">{{ __('Save job') }}</button>
+                            </form>
+                        @endif
                     </div>
                 </article>
             @else

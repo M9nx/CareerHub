@@ -36,6 +36,19 @@
 
             <div class="flex flex-wrap items-center gap-4">
                 <button type="submit" class="swiss-btn-primary">{{ __('Apply') }}</button>
+                @php($jobSaved = \App\Models\SavedJob::query()->where('user_id', auth()->id())->where('job_posting_id', $jobPosting->id)->exists())
+                @if ($jobSaved)
+                    <form method="POST" action="{{ route('saved.jobs.destroy', $jobPosting) }}">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="swiss-btn-secondary">{{ __('Unsave') }}</button>
+                    </form>
+                @else
+                    <form method="POST" action="{{ route('saved.jobs.store', $jobPosting) }}">
+                        @csrf
+                        <button type="submit" class="swiss-btn-secondary">{{ __('Save job') }}</button>
+                    </form>
+                @endif
                 <a href="{{ route('employee.jobs.index', ['selected' => $jobPosting->id]) }}" class="app-link-muted">{{ __('Back to Jobs') }}</a>
             </div>
         </form>

@@ -102,6 +102,7 @@
                     'post' => $post,
                     'liked' => $liked,
                     'likeCount' => $likeCount,
+                    'savedPostIds' => $savedPostIds ?? [],
                 ])
             </div>
         </article>

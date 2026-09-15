@@ -7,6 +7,7 @@ use App\Http\Controllers\NetworkController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PeopleController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SavedItemController;
 use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
 
@@ -65,6 +66,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
     Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
 
+    Route::get('/saved', [SavedItemController::class, 'index'])->name('saved.index');
+    Route::post('/saved/jobs/{job}', [SavedItemController::class, 'storeJob'])->name('saved.jobs.store');
+    Route::delete('/saved/jobs/{job}', [SavedItemController::class, 'destroyJob'])->name('saved.jobs.destroy');
+    Route::post('/saved/posts/{post}', [SavedItemController::class, 'storePost'])->name('saved.posts.store');
+    Route::delete('/saved/posts/{post}', [SavedItemController::class, 'destroyPost'])->name('saved.posts.destroy');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
