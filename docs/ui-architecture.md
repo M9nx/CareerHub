@@ -1,7 +1,7 @@
 # CareerHub UI Architecture & Implementation Plan
 
 **Date:** 2026-09-15  
-**Status:** Milestone 1 (Batch 1) implemented — ready for Milestone 2  
+**Status:** Milestone 2 complete — ready for Milestone 3 (identity)  
 **Companion:** [`linkedin-gap-analysis.md`](./linkedin-gap-analysis.md), [`CODEBASE_AUDIT.md`](./CODEBASE_AUDIT.md)
 
 ---
@@ -454,4 +454,17 @@ Aligned with product brief:
 
 ---
 
-**Next:** Milestone 2 — comments schema + UI (CH-FEED-006+). Ask before migrations.
+**Next:** Milestone 3 — identity / profile expansion (CH-DOC-003+) after Milestone 2 sign-off.
+
+---
+
+## 14. Batch / Milestone 2 status (2026-09-15)
+
+**Completed:** CH-FEED-006, CH-FEED-007, CH-FEED-008, CH-FEED-009, CH-DOC-002.
+
+Shipped:
+- `post_comments` schema (`parent_id` reserved), model, factory, policies
+- Comment store/destroy on feed with Form Request + Pest coverage
+- Reaction bar Liked/Comment/Share polish
+- Attachment lightbox for images
+- Expanded feed scaling notes (rewrite still deferred)
