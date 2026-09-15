@@ -56,7 +56,9 @@
             {{ config('app.name', 'CareerHub') }}
         </a>
 
-        <div
+        <form
+            method="GET"
+            action="{{ route('search.index') }}"
             class="app-header-search"
             role="search"
             aria-label="{{ __('Search') }}"
@@ -64,8 +66,14 @@
             <svg class="h-4 w-4 shrink-0 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m21 21-4.35-4.35M11 18a7 7 0 1 1 0-14 7 7 0 0 1 0 14Z" />
             </svg>
-            <span>{{ __('Search professionals, jobs, companies…') }}</span>
-        </div>
+            <input
+                type="search"
+                name="q"
+                value="{{ request('q') }}"
+                placeholder="{{ __('Search professionals, jobs, companies…') }}"
+                class="min-w-0 flex-1 border-0 bg-transparent p-0 text-sm text-[var(--app-text)] placeholder:text-[var(--app-text-muted)] focus:outline-none focus:ring-0"
+            >
+        </form>
 
         <nav class="ms-auto hidden items-center gap-1 sm:flex" aria-label="{{ __('Main navigation') }}">
             @foreach ($navItems as $item)
