@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\PostStatus;
 use App\Models\Post;
 use App\Models\User;
 
@@ -71,5 +72,12 @@ class PostPolicy
     public function share(User $user, Post $post): bool
     {
         return ! $user->isBlockedFromPosts();
+    }
+
+    public function comment(User $user, Post $post): bool
+    {
+        return ! $user->isBlockedFromPosts()
+            && $post->status === PostStatus::Published
+            && $post->is_active;
     }
 }
