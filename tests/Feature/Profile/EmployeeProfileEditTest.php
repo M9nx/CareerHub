@@ -21,7 +21,7 @@ test('profile lives in the account menu not the primary nav', function () {
     expect(substr_count($response->getContent(), __('Home')))->toBeGreaterThan(0);
 });
 
-test('employee career documents appear on the breeze profile page', function () {
+test('employee career documents appear on the account profile page', function () {
     $user = User::factory()->employee()->create();
 
     EmployeeProfile::factory()->for($user)->create([
@@ -39,7 +39,7 @@ test('employee career documents appear on the breeze profile page', function () 
         ->assertSee(route('employee.profile.update'), false);
 });
 
-test('employee profile route redirects to the breeze profile page', function () {
+test('employee profile route redirects to the account profile page', function () {
     $user = User::factory()->employee()->create();
 
     $this->actingAs($user)
