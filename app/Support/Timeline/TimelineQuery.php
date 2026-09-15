@@ -50,6 +50,8 @@ class TimelineQuery
                 'author',
                 'attachments',
                 'reactions',
+                'comments' => fn ($query) => $query->whereNull('parent_id')->oldest(),
+                'comments.user',
                 'sharedPost.author',
                 'sharedPost.attachments',
             ])

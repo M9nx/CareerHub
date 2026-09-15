@@ -8,9 +8,11 @@ use App\Actions\TogglePostReaction;
 use App\Enums\PostStatus;
 use App\Enums\UserRole;
 use App\Http\Requests\Feed\ShareTimelinePostRequest;
+use App\Http\Requests\Feed\StorePostCommentRequest;
 use App\Http\Requests\Feed\StoreTimelinePostRequest;
 use App\Models\JobPosting;
 use App\Models\Post;
+use App\Models\PostComment;
 use App\Models\User;
 use App\Support\Timeline\TimelineQuery;
 use Illuminate\Http\RedirectResponse;
@@ -103,5 +105,31 @@ class FeedController extends Controller
         );
 
         return redirect()->route('feed.index');
+    }
+
+    public function storeComment(StorePostCommentRequest $request, Post $post): RedirectResponse
+    {
+        PostComment::create([
+            'post_id' => $post->id,
+            'user_id' => $request->user()->id,
+            'body' => $request->validated('body'),
+        ]);
+
+        return redirect()
+            ->route('feed.index')
+            ->withFragment('post-'.$post->id);
+    }
+
+    public function destroyComment(Request $request, Post $post, PostComment $comment): RedirectResponse
+    {
+        abort_unless($comment->post_id === $post->id, 404);
+
+        Gate::authorize('delete', $comment);
+
+        $comment->delete();
+
+        return redirect()
+            ->route('feed.index')
+            ->withFragment('post-'.$post->id);
     }
 }

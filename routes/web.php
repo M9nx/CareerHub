@@ -42,6 +42,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/feed', [FeedController::class, 'store'])->name('feed.store');
     Route::post('/feed/posts/{post}/react', [FeedController::class, 'react'])->name('feed.posts.react');
     Route::post('/feed/posts/{post}/share', [FeedController::class, 'share'])->name('feed.posts.share');
+    Route::post('/feed/posts/{post}/comments', [FeedController::class, 'storeComment'])->name('feed.posts.comments.store');
+    Route::delete('/feed/posts/{post}/comments/{comment}', [FeedController::class, 'destroyComment'])->name('feed.posts.comments.destroy');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
