@@ -10,7 +10,7 @@ test('employer registration persists employer role', function () {
         'password' => 'password',
         'password_confirmation' => 'password',
         'role' => 'Employer',
-    ])->assertRedirect(route('employer.dashboard', absolute: false));
+    ])->assertRedirect(route('feed.index', absolute: false));
 
     $this->assertAuthenticated();
 
@@ -30,7 +30,7 @@ test('employee registration persists employee role', function () {
         'password' => 'password',
         'password_confirmation' => 'password',
         'role' => 'Employee',
-    ])->assertRedirect(route('employee.dashboard', absolute: false));
+    ])->assertRedirect(route('feed.index', absolute: false));
 
     $this->assertAuthenticated();
 

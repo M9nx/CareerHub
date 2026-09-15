@@ -13,7 +13,7 @@ test('employer registers, publishes a job, employee applies, and employer accept
         'password' => 'password',
         'password_confirmation' => 'password',
         'role' => 'Employer',
-    ])->assertRedirect(route('employer.dashboard'));
+    ])->assertRedirect(route('feed.index'));
 
     $employer = User::query()->where('email', 'employer-flow@careerhub.test')->firstOrFail();
 
@@ -45,7 +45,7 @@ test('employer registers, publishes a job, employee applies, and employer accept
         'password' => 'password',
         'password_confirmation' => 'password',
         'role' => 'Employee',
-    ])->assertRedirect(route('employee.dashboard'));
+    ])->assertRedirect(route('feed.index'));
 
     $employee = User::query()->where('email', 'employee-flow@careerhub.test')->firstOrFail();
 
