@@ -1,11 +1,5 @@
-<x-app-layout>
-    <div class="py-12">
-        <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-            <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    Welcome to the Employer Dashboard
-                </div>
-            </div>
-        </div>
+<x-app.page :title="__('Dashboard')" eyebrow="{{ __('Employer') }}">
+    <div class="app-card p-8">
+        <p class="text-base opacity-80">{{ __('Welcome to the Employer Dashboard') }}</p>
     </div>
-</x-app-layout>
+</x-app.page>
