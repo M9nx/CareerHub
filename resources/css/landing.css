@@ -12,6 +12,20 @@
         --landing-radius: 0.75rem;
         --landing-gap: 2rem;
         --landing-rule: rgb(0 0 0 / 0.12);
+
+        /* Semantic app aliases (CH-UI-001) */
+        --app-background: var(--landing-canvas);
+        --app-surface: var(--landing-card);
+        --app-surface-hover: rgb(0 0 0 / 0.03);
+        --app-border: var(--landing-rule);
+        --app-text: var(--landing-ink);
+        --app-text-muted: var(--landing-muted);
+        --app-primary: var(--landing-accent);
+        --app-primary-hover: rgb(37 99 235 / 0.9);
+        --app-danger: #c8102e;
+        --app-success: #2d6a4f;
+        --app-warning: #b45309;
+        --app-radius: var(--landing-radius);
     }
 
     @media (prefers-color-scheme: dark) {
@@ -25,6 +39,9 @@
             --landing-accent-muted: rgb(59 130 246 / 0.14);
             --landing-card: #171717;
             --landing-rule: rgb(245 241 232 / 0.14);
+
+            --app-surface-hover: rgb(255 255 255 / 0.04);
+            --app-primary-hover: rgb(59 130 246 / 0.9);
         }
     }
 
@@ -254,6 +271,74 @@
     /* Authenticated app shell (feed + future P8 UI) */
     .app-feed-column {
         @apply mx-auto w-full max-w-[40rem] px-4 py-10 md:px-0 md:py-14;
+    }
+
+    .app-feed-layout {
+        @apply mx-auto grid w-full max-w-7xl gap-6 px-4 py-6 md:px-6 md:py-8;
+        grid-template-columns: 1fr;
+    }
+
+    @media (min-width: 768px) {
+        .app-feed-layout {
+            grid-template-columns: 16rem minmax(0, 1fr);
+            align-items: start;
+        }
+
+        .app-feed-layout__right {
+            display: none;
+        }
+    }
+
+    @media (min-width: 1280px) {
+        .app-feed-layout {
+            grid-template-columns: 17rem minmax(0, 40rem) 18rem;
+            justify-content: center;
+        }
+
+        .app-feed-layout__right {
+            display: block;
+        }
+    }
+
+    .app-feed-layout__left,
+    .app-feed-layout__right {
+        @apply space-y-4;
+    }
+
+    @media (min-width: 768px) {
+        .app-feed-layout__left,
+        .app-feed-layout__right {
+            @apply sticky top-24;
+        }
+    }
+
+    .app-feed-layout__center {
+        @apply min-w-0 space-y-4;
+    }
+
+    .app-sidebar-card {
+        @apply app-card p-4;
+    }
+
+    .app-sidebar-title {
+        @apply mb-3 text-xs font-medium uppercase tracking-[0.18em] text-[var(--app-text-muted)];
+    }
+
+    .app-btn-primary {
+        @apply swiss-btn-primary;
+    }
+
+    .app-btn-secondary {
+        @apply swiss-btn-secondary;
+    }
+
+    .app-btn-danger {
+        @apply swiss-btn-danger;
+    }
+
+    .app-header-search {
+        @apply hidden w-full max-w-md flex-1 items-center gap-2 border border-[var(--app-border)] bg-[var(--app-background)] px-3 py-2 text-sm text-[var(--app-text-muted)] lg:flex;
+        border-radius: var(--app-radius);
     }
 
     .app-page-column {
