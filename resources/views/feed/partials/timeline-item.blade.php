@@ -16,23 +16,23 @@
         @endphp
 
         <article class="app-card overflow-hidden">
-            <div class="p-6">
-                <div class="flex items-start gap-4">
+            <div class="p-4 sm:p-5">
+                <div class="flex items-start gap-3">
                     <div class="app-avatar">
                         {{ str($author?->name ?? '?')->substr(0, 1)->upper() }}
                     </div>
 
                     <div class="min-w-0 flex-1">
                         <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
-                            <p class="font-medium text-[var(--landing-ink)]">
+                            <p class="font-medium text-[var(--app-text)]">
                                 {{ $author?->name ?? __('Unknown author') }}
                             </p>
                             <span class="opacity-30">·</span>
                             <time
                                 datetime="{{ $item->occurredAt->toIso8601String() }}"
-                                class="text-sm opacity-50"
+                                class="text-sm text-[var(--app-text-muted)]"
                             >
-                                {{ $item->occurredAt->timezone(config('app.timezone'))->format('M j, Y g:i A') }}
+                                {{ $item->occurredAt->timezone(config('app.timezone'))->diffForHumans() }}
                             </time>
                         </div>
 
@@ -45,12 +45,12 @@
                 </div>
 
                 @if ($post->title && ! $post->isShared())
-                    <h2 class="mt-5 text-lg font-normal leading-snug text-[var(--landing-ink)]">
+                    <h2 class="mt-4 text-base font-medium leading-snug text-[var(--app-text)]">
                         {{ $post->title }}
                     </h2>
                 @endif
 
-                <p class="mt-4 max-w-[60ch] whitespace-pre-line text-base leading-relaxed opacity-80">
+                <p class="mt-3 max-w-[60ch] whitespace-pre-line text-sm leading-relaxed text-[var(--app-text)] opacity-90">
                     {{ $post->body }}
                 </p>
 
