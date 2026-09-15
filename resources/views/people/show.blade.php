@@ -1,16 +1,31 @@
 <x-app.page :title="$person->name" :eyebrow="__('Profile')">
     <div class="space-y-6">
         <section class="app-card overflow-hidden">
+            @if ($person->coverUrl())
+                <img
+                    src="{{ $person->coverUrl() }}"
+                    alt=""
+                    class="h-40 w-full object-cover sm:h-52"
+                />
+            @endif
             <div class="p-6 sm:p-8">
                 <div class="flex flex-col gap-6 sm:flex-row sm:items-start">
                     @if ($person->avatarUrl())
                         <img
                             src="{{ $person->avatarUrl() }}"
                             alt=""
-                            class="h-24 w-24 rounded-full object-cover ring-1 ring-[var(--app-border)]"
+                            @class([
+                                'h-24 w-24 rounded-full object-cover ring-1 ring-[var(--app-border)]',
+                                '-mt-16 ring-4 ring-[var(--app-surface)]' => $person->coverUrl(),
+                            ])
                         />
                     @else
-                        <div class="app-avatar h-24 w-24 text-2xl">
+                        <div
+                            @class([
+                                'app-avatar h-24 w-24 text-2xl',
+                                '-mt-16 ring-4 ring-[var(--app-surface)]' => $person->coverUrl(),
+                            ])
+                        >
                             {{ str($person->name)->substr(0, 1)->upper() }}
                         </div>
                     @endif

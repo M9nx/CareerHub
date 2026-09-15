@@ -79,6 +79,14 @@ class ProfileController extends Controller
             $validated['avatar_path'] = $documents->store($request->file('avatar'), 'avatars');
         }
 
+        if ($request->hasFile('cover')) {
+            if (filled($user->cover_path)) {
+                Storage::disk('public')->delete($user->cover_path);
+            }
+
+            $validated['cover_path'] = $documents->store($request->file('cover'), 'covers');
+        }
+
         $user->fill($validated);
         $user->save();
 

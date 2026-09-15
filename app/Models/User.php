@@ -16,7 +16,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
 use Jeffgreco13\FilamentBreezy\Traits\TwoFactorAuthenticatable;
 
-#[Fillable(['name', 'headline', 'location', 'about', 'avatar_path', 'email', 'password', 'role', 'is_active', 'is_blocked_from_posts'])]
+#[Fillable(['name', 'headline', 'location', 'about', 'avatar_path', 'cover_path', 'email', 'password', 'role', 'is_active', 'is_blocked_from_posts'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements FilamentUser
 {
@@ -67,6 +67,15 @@ class User extends Authenticatable implements FilamentUser
         }
 
         return Storage::disk('public')->url($this->avatar_path);
+    }
+
+    public function coverUrl(): ?string
+    {
+        if (! filled($this->cover_path)) {
+            return null;
+        }
+
+        return Storage::disk('public')->url($this->cover_path);
     }
 
     public function employerProfile(): HasOne

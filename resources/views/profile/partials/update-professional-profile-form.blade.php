@@ -24,6 +24,28 @@
         @csrf
         @method('PATCH')
 
+        <div>
+            <x-input-label for="cover" :value="__('Cover photo')" />
+            @if ($user->coverUrl())
+                <img
+                    src="{{ $user->coverUrl() }}"
+                    alt=""
+                    class="mt-2 h-28 w-full max-w-xl rounded-md object-cover ring-1 ring-[var(--app-border)]"
+                />
+            @endif
+            <input
+                id="cover"
+                name="cover"
+                type="file"
+                accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                class="mt-2 block w-full text-sm"
+            />
+            <p class="mt-2 text-xs text-[var(--app-text-muted)]">
+                {{ __('JPG, PNG, or WebP up to 4 MB. Shown as a banner on your public profile.') }}
+            </p>
+            <x-input-error class="mt-2" :messages="$errors->get('cover')" />
+        </div>
+
         <div class="flex items-center gap-4">
             @if ($user->avatarUrl())
                 <img

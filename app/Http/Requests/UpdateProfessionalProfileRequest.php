@@ -25,6 +25,10 @@ class UpdateProfessionalProfileRequest extends FormRequest
                 'nullable',
                 File::types(['jpg', 'jpeg', 'png', 'webp'])->max(2 * 1024),
             ],
+            'cover' => [
+                'nullable',
+                File::types(['jpg', 'jpeg', 'png', 'webp'])->max(4 * 1024),
+            ],
         ];
     }
 }
