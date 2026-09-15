@@ -6,6 +6,15 @@
             </p>
         @endif
 
+        <div class="mt-3 flex flex-wrap gap-2 text-sm text-[var(--app-text-muted)]">
+            @if (filled($jobPosting->location))
+                <span>{{ $jobPosting->location }}</span>
+            @endif
+            @if ($jobPosting->employment_type)
+                <span>{{ $jobPosting->employment_type->label() }}</span>
+            @endif
+        </div>
+
         <div class="app-divider">
             <h2 class="text-lg font-normal">{{ __('Job Description') }}</h2>
             <div class="mt-3 max-w-[60ch] whitespace-pre-line leading-relaxed opacity-80">
@@ -27,7 +36,7 @@
 
             <div class="flex flex-wrap items-center gap-4">
                 <button type="submit" class="swiss-btn-primary">{{ __('Apply') }}</button>
-                <a href="{{ route('employee.jobs.index') }}" class="app-link-muted">{{ __('Back to Jobs') }}</a>
+                <a href="{{ route('employee.jobs.index', ['selected' => $jobPosting->id]) }}" class="app-link-muted">{{ __('Back to Jobs') }}</a>
             </div>
         </form>
     </div>
