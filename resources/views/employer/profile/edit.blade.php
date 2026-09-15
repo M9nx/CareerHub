@@ -15,7 +15,7 @@
         </p>
     @endif
 
-    <form method="POST" action="{{ route('employer.profile.update') }}" class="mt-6 space-y-6">
+    <form method="POST" action="{{ route('employer.profile.update') }}" class="app-form mt-6 space-y-6">
         @csrf
         @method('PATCH')
 

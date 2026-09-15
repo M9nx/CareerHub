@@ -22,7 +22,7 @@
         method="POST"
         action="{{ route('employee.profile.update') }}"
         enctype="multipart/form-data"
-        class="mt-6 space-y-6"
+        class="app-form mt-6 space-y-6"
     >
         @csrf
         @method('PATCH')
