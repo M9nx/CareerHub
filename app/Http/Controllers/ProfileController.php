@@ -4,10 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Enums\UserRole;
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Http\Requests\UpdateProfessionalProfileRequest;
+use App\Services\LocalDocumentStorage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
@@ -56,6 +59,28 @@ class ProfileController extends Controller
         $request->user()->save();
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
+    }
+
+    public function updateProfessional(
+        UpdateProfessionalProfileRequest $request,
+        LocalDocumentStorage $documents,
+    ): RedirectResponse {
+        $user = $request->user();
+        $validated = $request->safe()->only(['headline', 'location', 'about']);
+
+        if ($request->hasFile('avatar')) {
+            if (filled($user->avatar_path)) {
+                Storage::disk('public')->delete($user->avatar_path);
+            }
+
+            $validated['avatar_path'] = $documents->store($request->file('avatar'), 'avatars');
+        }
+
+        $user->fill($validated);
+        $user->save();
+
+        return Redirect::route('profile.edit')
+            ->with('success', __('Professional profile updated successfully.'));
     }
 
     /**

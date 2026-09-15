@@ -6,6 +6,12 @@
             </div>
         </div>
 
+        <div class="app-card p-6 sm:p-8">
+            <div class="max-w-xl">
+                @include('profile.partials.update-professional-profile-form', ['user' => $user])
+            </div>
+        </div>
+
         @if ($employerProfile)
             <div class="app-card p-6 sm:p-8">
                 <div class="max-w-xl">
