@@ -1,7 +1,7 @@
 # CareerHub UI Architecture & Implementation Plan
 
 **Date:** 2026-09-15  
-**Status:** Milestone 5 complete — ready for Milestone 6 (engagement)  
+**Status:** Milestone 3b (CH-PROF-004) complete — messaging MVP deferred pending architecture approval  
 **Companion:** [`linkedin-gap-analysis.md`](./linkedin-gap-analysis.md), [`CODEBASE_AUDIT.md`](./CODEBASE_AUDIT.md)
 
 ---
@@ -295,7 +295,7 @@ Partials under `resources/views/feed/partials/` may remain as thin wrappers that
 | CH-PROF-001 | Minimum identity columns (headline, location, avatar) | P0 | Staged migration |
 | CH-PROF-002 | Public profile show page | P1 | Route + policy |
 | CH-PROF-003 | Employer company fields | P1 | Expand employer_profiles |
-| CH-PROF-004 | Experience/Education/Skills tables | P2 | After plan |
+| CH-PROF-004 | Experience/Education/Skills tables | P2 | Done (Milestone 3b) |
 
 ---
 
@@ -454,7 +454,35 @@ Aligned with product brief:
 
 ---
 
-**Next:** Milestone 6 — notifications / saves / messaging architecture (CH-NOTIF-001+) after Milestone 5 sign-off.
+**Next:** Approve `docs/messaging-architecture.md` before CH-MSG-001, or polish remaining feed/UI items.
+
+---
+
+## 19. Milestone 3b status (2026-09-15)
+
+**Completed:** CH-PROF-004.
+
+Shipped:
+- `profile_experiences`, `profile_educations`, `profile_skills` tables + models
+- Owner CRUD on `/profile` (add/update/remove)
+- Public sections on `/people/{user}`
+- Employee profile-completion check includes experience
+
+**Still deferred:** Cover image; CH-MSG-001 until messaging architecture approval.
+
+---
+
+## 18. Milestone 6 status (2026-09-15)
+
+**Completed:** CH-NOTIF-001, CH-SAVE-001, CH-DOC-004.
+
+Shipped:
+- Laravel `notifications` table + database channel
+- Connection / comment / application in-app notifications + `/notifications` center + header badge
+- Saved jobs/posts (`saved_jobs`, `saved_posts`) + `/saved`
+- Messaging architecture doc (no messaging MVP)
+
+**Deferred:** CH-MSG-001 until messaging architecture is approved.
 
 ---
 
@@ -494,7 +522,7 @@ Shipped:
 - Public profile at `/people/{user}`
 - Feed summary / completion / author links updated
 
-**Deferred:** CH-PROF-004 experience / education / skills tables.
+**Deferred (at time of M3):** CH-PROF-004 — completed in Milestone 3b (see §19).
 
 ---
 

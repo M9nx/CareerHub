@@ -24,7 +24,7 @@
 | Email on public profile | **Hidden** |
 | CV / application image on public profile | **Hidden** (private career documents) |
 | Fake metrics | **Never** (no profile views / impressions) |
-| Experience / education / skills | **Deferred** to CH-PROF-004 (Milestone 3b+) |
+| Experience / education / skills | **Shipped** in CH-PROF-004 (Milestone 3b) |
 
 ## Stage migrations
 
@@ -58,13 +58,15 @@ Rollback: drop the six columns. `company_name` remains required for posting cont
 - Policy: `UserPolicy::view` allows active peer Employer/Employee
 - Blade: Swiss `x-app.page` show surface (avatar, headline, location, about, company block, recent posts)
 
-### Stage 4 — CH-PROF-004 Career sections (deferred)
+### Stage 4 — CH-PROF-004 Career sections (shipped)
 
-Tables (not in this milestone):
+Tables:
 
-- `profile_experiences` (`user_id`, title, company, location, start/end, description)
-- `profile_educations` (`user_id`, school, degree, field, start/end)
+- `profile_experiences` (`user_id`, title, company, location, started_at/ended_at, description)
+- `profile_educations` (`user_id`, school, degree, field, started_at/ended_at)
 - `profile_skills` (`user_id`, name, sort)
+
+Owner CRUD on `/profile`; public read on `/people/{user}`.
 
 ## Application touch points
 

@@ -67,16 +67,16 @@ Related docs:
 
 | | |
 |--|--|
-| **Current state** | Account settings (`/profile`) + thin role profiles. No public professional profile page. No cover, headline, location, about, experience, education, skills. |
+| **Current state** | Public `/people/{user}` with identity + company + experience/education/skills. Cover image still missing. |
 | **Desired state** | Public-ish professional profile: cover, avatar, headline, location, About, Experience, Education, Skills, Activity/Posts. Company profile for employers. |
 | **Affected files** | `ProfileController`(s), `employer/profile/*`, `employee/profile/*`, profile migrations/models, new profile show routes/views |
 | **Backend** | Schema expansion; policies for view/edit; profile show controllers |
 | **Frontend** | Profile header + sections components |
-| **Database** | Staged: headline/location/about/avatar/cover first; then experience/education/skills tables |
+| **Database** | Identity + career sections shipped (CH-PROF-001–004); cover still deferred |
 | **Risk** | High if big-bang schema; medium if staged |
 | **Priority** | **P0** (minimum identity fields), **P1** (full sections) |
 
-See also: planned `docs/profile-expansion-plan.md` (Milestone 3).
+See also: `docs/profile-expansion-plan.md` (Milestone 3 / 3b).
 
 ---
 
