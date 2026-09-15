@@ -4,6 +4,7 @@ use App\Enums\UserRole;
 use App\Http\Controllers\ConnectionController;
 use App\Http\Controllers\FeedController;
 use App\Http\Controllers\NetworkController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PeopleController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
@@ -60,10 +61,18 @@ Route::middleware('auth')->group(function () {
     Route::post('/network/connections/{connection}/withdraw', [ConnectionController::class, 'withdraw'])->name('network.connections.withdraw');
     Route::delete('/network/connections/{connection}', [ConnectionController::class, 'destroy'])->name('network.connections.destroy');
 
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::patch('/profile/professional', [ProfileController::class, 'updateProfessional'])->name('profile.professional.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+
+
 });
 
 require __DIR__.'/auth.php';

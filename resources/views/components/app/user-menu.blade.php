@@ -41,6 +41,22 @@
             {{ __('Profile') }}
         </a>
 
+        <a
+            href="{{ route('saved.index') }}"
+            class="block px-4 py-2 text-sm opacity-70 motion-safe:transition hover:bg-[var(--app-surface-hover)] hover:opacity-100"
+            role="menuitem"
+        >
+            {{ __('Saved') }}
+        </a>
+
+        <a
+            href="{{ route('notifications.index') }}"
+            class="block px-4 py-2 text-sm opacity-70 motion-safe:transition hover:bg-[var(--app-surface-hover)] hover:opacity-100"
+            role="menuitem"
+        >
+            {{ __('Notifications') }}
+        </a>
+
         @if ($user->role === UserRole::Employer)
             @if (Route::has('employer.dashboard'))
                 <a href="{{ route('employer.dashboard') }}" class="block px-4 py-2 text-sm opacity-70 hover:bg-[var(--app-surface-hover)] hover:opacity-100" role="menuitem">

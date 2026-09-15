@@ -14,6 +14,7 @@ use App\Models\JobPosting;
 use App\Models\Post;
 use App\Models\PostComment;
 use App\Models\User;
+use App\Notifications\PostCommentedNotification;
 use App\Support\Timeline\TimelineQuery;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -116,11 +117,21 @@ class FeedController extends Controller
 
     public function storeComment(StorePostCommentRequest $request, Post $post): RedirectResponse
     {
-        PostComment::create([
+        $comment = PostComment::create([
             'post_id' => $post->id,
             'user_id' => $request->user()->id,
             'body' => $request->validated('body'),
         ]);
+
+        $post->loadMissing('author');
+
+        if ($post->author !== null && ! $post->author->is($request->user())) {
+            $post->author->notify(new PostCommentedNotification(
+                $post,
+                $comment,
+                $request->user(),
+            ));
+        }
 
         return redirect()
             ->route('feed.index')

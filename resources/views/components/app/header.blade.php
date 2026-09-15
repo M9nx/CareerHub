@@ -16,6 +16,12 @@
             'href' => route('network.index'),
             'active' => request()->routeIs('network.*'),
         ],
+        [
+            'label' => __('Notifications'),
+            'href' => route('notifications.index'),
+            'active' => request()->routeIs('notifications.*'),
+            'badge' => $user->unreadNotifications()->count(),
+        ],
         $user->role === UserRole::Employer && Route::has('employer.jobs.index')
             ? [
                 'label' => __('Jobs'),
@@ -79,9 +85,14 @@
             @foreach ($navItems as $item)
                 <a
                     href="{{ $item['href'] }}"
-                    @class(['app-nav-link px-3', 'is-active' => $item['active']])
+                    @class(['app-nav-link relative px-3', 'is-active' => $item['active']])
                 >
                     {{ $item['label'] }}
+                    @if (($item['badge'] ?? 0) > 0)
+                        <span class="ms-1 inline-flex min-w-[1.25rem] items-center justify-center rounded-full bg-[var(--app-primary)] px-1.5 text-[10px] font-medium text-white">
+                            {{ $item['badge'] > 99 ? '99+' : $item['badge'] }}
+                        </span>
+                    @endif
                 </a>
             @endforeach
         </nav>
