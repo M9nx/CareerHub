@@ -256,6 +256,70 @@
         @apply mx-auto w-full max-w-[40rem] px-4 py-10 md:px-0 md:py-14;
     }
 
+    .app-page-column {
+        @apply mx-auto w-full max-w-5xl px-4 py-10 md:px-6 md:py-14;
+    }
+
+    .app-page-column--narrow {
+        @apply max-w-2xl;
+    }
+
+    .app-page-column--wide {
+        @apply max-w-6xl;
+    }
+
+    .app-table {
+        @apply min-w-full text-left text-sm;
+    }
+
+    .app-table thead th {
+        @apply px-4 py-3 text-xs font-medium uppercase tracking-[0.18em] opacity-50;
+    }
+
+    .app-table tbody td {
+        @apply border-t border-[var(--landing-rule)] px-4 py-4 align-middle;
+    }
+
+    .app-link {
+        @apply font-medium text-[var(--landing-accent)] underline-offset-4 hover:underline;
+    }
+
+    .app-link-muted {
+        @apply text-sm opacity-70 motion-safe:transition hover:opacity-100;
+    }
+
+    .app-alert-success {
+        @apply mb-4 text-sm font-medium text-[var(--landing-accent)];
+    }
+
+    .app-empty {
+        @apply text-sm opacity-70;
+    }
+
+    .swiss-btn-danger {
+        @apply inline-flex min-h-[44px] items-center justify-center border border-[#C8102E]/40 bg-[#C8102E]/10 px-4 py-2 text-sm font-medium text-[#C8102E] motion-safe:transition hover:bg-[#C8102E]/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8102E];
+        border-radius: var(--landing-radius);
+    }
+
+    .landing-shell .app-form input[type='text'],
+    .landing-shell .app-form input[type='email'],
+    .landing-shell .app-form input[type='password'],
+    .landing-shell .app-form input[type='search'],
+    .landing-shell .app-form input[type='file'],
+    .landing-shell .app-form select,
+    .landing-shell .app-form textarea {
+        @apply mt-1 block w-full border border-[var(--landing-rule)] bg-[var(--landing-canvas)] px-3 py-2 text-[var(--landing-ink)] focus:border-[var(--landing-accent)] focus:outline-none focus:ring-1 focus:ring-[var(--landing-accent)];
+        border-radius: calc(var(--landing-radius) - 0.125rem);
+    }
+
+    .landing-shell .app-form label {
+        @apply block text-sm font-medium opacity-80;
+    }
+
+    .landing-shell .app-divider {
+        @apply my-6 border-t border-[var(--landing-rule)] pt-6;
+    }
+
     .app-page-title {
         @apply text-balance text-3xl font-light tracking-tight text-[var(--landing-ink)] md:text-4xl;
     }
