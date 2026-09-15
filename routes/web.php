@@ -1,7 +1,9 @@
 <?php
 
 use App\Enums\UserRole;
+use App\Http\Controllers\ConnectionController;
 use App\Http\Controllers\FeedController;
+use App\Http\Controllers\NetworkController;
 use App\Http\Controllers\PeopleController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -47,6 +49,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('/feed/posts/{post}/comments/{comment}', [FeedController::class, 'destroyComment'])->name('feed.posts.comments.destroy');
 
     Route::get('/people/{user}', [PeopleController::class, 'show'])->name('people.show');
+
+    Route::get('/network', [NetworkController::class, 'index'])->name('network.index');
+    Route::post('/network/people/{user}/connect', [ConnectionController::class, 'store'])->name('network.connect');
+    Route::post('/network/connections/{connection}/accept', [ConnectionController::class, 'accept'])->name('network.connections.accept');
+    Route::post('/network/connections/{connection}/reject', [ConnectionController::class, 'reject'])->name('network.connections.reject');
+    Route::post('/network/connections/{connection}/withdraw', [ConnectionController::class, 'withdraw'])->name('network.connections.withdraw');
+    Route::delete('/network/connections/{connection}', [ConnectionController::class, 'destroy'])->name('network.connections.destroy');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
