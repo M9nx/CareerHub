@@ -2,14 +2,22 @@
 
 namespace App\Http\Requests;
 
+use App\Http\Requests\Concerns\RemovesEmptyFileUploads;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\File;
 
 class UpdateProfessionalProfileRequest extends FormRequest
 {
+    use RemovesEmptyFileUploads;
+
     public function authorize(): bool
     {
         return $this->user() !== null;
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $this->removeEmptyFileUploads(['avatar', 'cover']);
     }
 
     /**

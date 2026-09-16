@@ -3,14 +3,22 @@
 namespace App\Http\Requests\Employee;
 
 use App\Enums\UserRole;
+use App\Http\Requests\Concerns\RemovesEmptyFileUploads;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rules\File;
 
 class UpdateEmployeeProfileRequest extends FormRequest
 {
+    use RemovesEmptyFileUploads;
+
     public function authorize(): bool
     {
         return $this->user()?->role === UserRole::Employee;
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $this->removeEmptyFileUploads(['cv', 'application_image']);
     }
 
     /**
