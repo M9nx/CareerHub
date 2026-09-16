@@ -48,3 +48,19 @@ test('cover upload rejects unsupported file types', function () {
         ->assertRedirect(route('profile.edit'))
         ->assertSessionHasErrors('cover');
 });
+
+test('navbar me menu shows the uploaded profile photo', function () {
+    Storage::fake('public');
+    $user = actingAsEmployee(['name' => 'Nav Avatar User']);
+
+    $this->patch(route('profile.professional.update'), [
+        'avatar' => UploadedFile::fake()->image('nav-avatar.jpg'),
+    ])->assertRedirect(route('profile.edit'));
+
+    $user->refresh();
+
+    $this->get(route('feed.index'))
+        ->assertOk()
+        ->assertSee($user->avatarUrl(), false)
+        ->assertDontSee('>N</span>', false);
+});

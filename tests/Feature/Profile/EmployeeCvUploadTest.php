@@ -88,6 +88,7 @@ test('cv must be a pdf and application image must be jpg or png', function () {
     $employee = actingAsEmployee();
     EmployeeProfile::factory()->for($employee)->create([
         'cv_path' => '',
+        'application_image_path' => null,
     ]);
 
     $this->from(route('profile.edit'))

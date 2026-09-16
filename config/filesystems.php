@@ -41,7 +41,9 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage',
+            // Host-relative so previews work when `artisan serve` binds a
+            // non-APP_URL port (e.g. :8001 while APP_URL still says :8000).
+            'url' => rtrim(env('FILESYSTEM_PUBLIC_URL', '/storage'), '/'),
             'visibility' => 'public',
             'throw' => false,
             'report' => false,

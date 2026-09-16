@@ -1,5 +1,10 @@
 <x-app.page :title="__('Create Post')" eyebrow="{{ __('Employee') }}" narrow>
     <div class="app-card p-6">
+        <p class="mb-6 text-sm text-[var(--app-text-muted)]">
+            {{ __('To attach photos or PDFs, create the post from Home using Add photo or PDF.') }}
+            <a href="{{ route('feed.index') }}" class="app-link">{{ __('Go to Home') }}</a>
+        </p>
+
         <form method="POST" action="{{ route('employee.posts.store') }}" class="app-form space-y-6">
             @csrf
 

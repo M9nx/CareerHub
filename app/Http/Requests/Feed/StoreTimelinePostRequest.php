@@ -2,14 +2,22 @@
 
 namespace App\Http\Requests\Feed;
 
+use App\Http\Requests\Concerns\RemovesEmptyFileUploads;
 use App\Models\Post;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreTimelinePostRequest extends FormRequest
 {
+    use RemovesEmptyFileUploads;
+
     public function authorize(): bool
     {
         return $this->user()?->can('create', Post::class) ?? false;
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $this->removeEmptyFileUploadArrays(['attachments']);
     }
 
     /**
